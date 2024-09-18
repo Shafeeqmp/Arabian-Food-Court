@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Products</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.css"
+    />
+    <style>
+      /* Form container styling */
+      .form-container {
+        background: #f9f9f9;
+        border-radius: 10px;
+        padding: 2rem;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+      }
+
+      .form-container h2 {
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        color: #333;
+      }
+
+      .form-container label {
+        font-weight: 500;
+        color: #555;
+      }
+
+      .form-container .form-control {
+        border-radius: 5px;
+        border: 1px solid #ddd;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: -0.25rem 1.25rem;
+      }
+
+      .form-container .btn-submit {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        padding: 0.75rem 1.25rem;
+        width: 100%;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .form-container .btn-submit:hover {
+        background-color: #0056b3;
+        color: #fff;
+      }
+
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 767px) {
+        .form-container {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <section>
+      <div class="container mt-4">
+        <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6">
+            <div class="form-container">
+              <h2 class="text-center">Add Products</h2>
+              <form
+                action="/admin/addProuct"
+                method="post"
+                enctype="multipart/form-data"
+                onsubmit="return validateForm()"
+              >
+                <div class="form-group">
+                  <label for="name">Product_Name</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="category">Category</label>
+                  <select
+                    id="category"
+                    name="Category"
+                    class="form-control"
+                    required
+                  >
+                    <% Category.forEach(function(category) { %>
+                    <option value="<%=category._id%>">
+                      <%= category.category_name %>
+                    </option>
+                    <% }); %>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="price">Price</label>
+                  <input
+                    type="Number"
+                    id="price"
+                    name="price"
+                    class="form-control"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="price">Stock</label>
+                  <input
+                    type="Number"
+                    id="price"
+                    name="stock"
+                    class="form-control"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="description">Description</label>
+                  <input type="text" id="description" name="description" class="form-control"required/>
+                </div>
+                <div class="form-group" id="imgView1">
+                  <label for="image">Image1</label>
+                  <input type="file"id="input1"name="images"class="form-control-file"
+                    accept="image/png, image/jpeg, image/jpg"onchange="viewImage1(event), viewImage(event, 1)"required/>
+                </div>
+                <div class="form-group" id="imgView2">
+                  <label for="image">Image2</label>
+                  <input type="file" id="input2" name="image" class="form-control-file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    onchange="viewImage2(event),viewImage(event,2)" required/>
+                </div>
+                <div class="form-group" id="imgView3">
+                  <label for="image">Image3</label>
+                  <input type="file" id="input3" name="Image"class="form-control-file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    onchange="viewImage3 (event),viewImage(event,3)"required/>
+                </div>
+                <div class="form-group" id="imgView4">
+                  <label for="image">Image4</label>
+                  <input type="file"id="input4"name="image"
+                    class="form-control-file"
+                    accept="image/png, image/jpeg, image/jpg"
+                    onchange="viewImage4(event),viewImage(event,4)"required/>
+                </div>
+                <button type="submit" class="btn btn-submit mt-4">Submit</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs/dist/cropper.min.js"></script>
+    <script>
+      function validateAndSubmit() {
+        if (validateForm) {
+          document.forms[0].submit();
+        }
+      }
+
+      function viewImage1(event){
+        document.getElementById("imgView1").src=URL.createObjectURL(event.target.files[0])
+      }
+      function viewImage2(event){
+        document.getElementById("imgView2").src=URL.createObjectURL(event.target.files[0])
+      }
+      function viewImage3(event){
+        document.getElementById("imgView3").src=URL.createObjectURL(event.target.files[0])
+      }
+      function viewImage4(event){
+        document.getElementById("imgView4").src=URL.createObjectURL(event.target.files[0])
+      }
+      function viewImage(event,index){
+          let input =event.target;
+          let reader=new FileReader();
+          reader.onload=function(){
+            let dataURL =reader.result;
+            let image=document.getElementById("imgView"+index)
+            image.src=dataURL;
+            let cropper= new Cropper(image,{
+                apspectRation:1,
+                viewMode:1,
+                guides: true,
+                background:false,
+                autoCropArea:1,
+                zoomable:true
+            });
+            let cropperContainer =document.querySelector('#croppedimg'+index).parentNode;
+            cropperContainer.style.display='block'
+
+            let savedButton=document.querySelector('#savedButton'+index)
+            savedButton.addEventListener('click',async function(){
+                let croppedCanvas=cropped.getCroppedCanvas();
+                let croppedImage=document.getElementById('croppedimg'+index);
+                croppedImage.src=croppedCanvas.toDataURL('image/jpeg',1.0)
+                let timestamp=new Date().getTime();
+                let fileName=`cropped-img-${timestamp}-${index}-png`
+
+                await croppedCanvas.toBlob(blob=>{
+                   let input=document.getElementById('input'+index);
+                   let imgFile=new File([blob],fileName,blob)
+                   const fileList=new DataTransfer();
+                   fileList.item.add(imgFile);
+                    input.files=fileList.files
+                });
+
+                cropperContainer.style.display='none'
+                cropper.destroy();
+            });
+          };
+
+          reader.readAsDataURL(input.flles[0])
+      }
+      function handleFileSelect(event){
+        const addImagesContainer=document.getElementById('addImagesContainer')
+        addImagesContainer.innerHTML="";
+        const files=event.target.files
+        for(let i=0;i<files.length;i++){
+            selectedImages.push(file)
+            const thumbnail=document.createElement('div')
+            thumbnail.classList.add('thumbnail');
+            const img=document.createElement('img')
+            img.src=URL.createObjectURL(file);
+            img.alt='thumbnail';
+            img.style.width='50px';
+            img.style.height='auto';
+            const removeIcone=document.createElement('span')
+            removeIcone.classList.add("remove-icon");
+            removeIcone.innerHTML='&times:';
+            removeIcone.addEventListener('click',function(){
+                   const index=selectedImages.indexOf(file);
+                   if(index!==1){
+                    selectedImages.splice(index,1);
+
+                   }
+                   thumbnail.remove();
+            });
+            thumbnail.appendChild(img);
+            thumbnail.appendChild(removeIcone)
+            addedImagesContainer.appendChild(thumbnail);
+            }
+      }
+
+
+      const selectedImages=[];
+      document.getElementById('input1').addEventListener('change',handleFileSelect);
+
+      function validateForm() {
+        clearErrorMessages();
+        const name = document.getElementsByName("productName")[0].value;
+        const description = document.getElementById("descriptionid").value;
+        const brand = document.getElementsByName("brand")[0].value;
+        const price = document.getElementsByName("regularPrice")[0].value;
+        const saleprice = document.getElementsByName("salePrice")[0].value;
+        const color = document.getElementsByName("color")[0].value;
+        const category = document.getElementsByName("category")[0].value;
+        const images = document.getElementById("input1");
+        const quantity = document.getElementsByName("quantity");
+        let isValid = true;
+        if (name.trim() === "") {
+          displayErrorMessage(
+            "productName-error",
+            "Please enter a product name."
+          );
+          isValid = false;
+        } else if (!/^[a-zA-Z\s]+$/.test(name.trim())) {
+          displayErrorMessage(
+            "productName-error",
+            "Product name should contain only alphabetic characters."
+          );
+          isValid = false;
+        }
+
+        if (description.trim() === "") {
+          displayErrorMessage(
+            "description-error",
+            "Please enter a product description."
+          );
+          isValid = false;
+        } else if (!/^[a-zA-Z\s]+$/.test(description.trim())) {
+          displayErrorMessage(
+            "description-error",
+            "Product description should contain only alphabetic characters."
+          );
+          isValid = false;
+        }
+
+        if (parseInt(quantity) < 0) {
+          displayErrorMessage(
+            "quantity-error",
+            "Please enter a valid non-negative quantity."
+          );
+          isValid = false;
+        }
+
+        if (!/^\d+(\.\d{1,2})?$/.test(price) || parseFloat(price) < 0) {
+          displayErrorMessage(
+            "regularPrice-error",
+            "Please enter a valid non-negative price."
+          );
+          isValid = false;
+        }
+
+        if (!/^\d+(\.\d{1,2})?$/.test(saleprice) || parseFloat(saleprice) < 0) {
+          displayErrorMessage(
+            "salePrice-error",
+            "Please enter a valid non-negative price."
+          );
+          isValid = false;
+        }
+        if (parseFloat(price) <= parseFloat(saleprice)) {
+          displayErrorMessage(
+            "regularPrice-error",
+            "Regular price must be greater than sale price."
+          );
+          isValid = false;
+        }
+
+        if (color.trim() === "") {
+          displayErrorMessage("color-error", "Please enter a color.");
+          isValid = false;
+        }
+
+        if (images.files.length === 0) {
+          displayErrorMessage("images-error", "Please select an image.");
+          isValid = false;
+        }
+        return isValid;
+      }
+
+      function displayErrorMessage(elementId, message) {
+        var errorElement = document.getElementById(elementId);
+        errorElement.innerText = message;
+        errorElement.style.display = "block";
+      }
+
+      function clearErrorMessages() {
+        const errorElements = document.getElementsByClassName("error-message");
+        Array.from(errorElements).forEach((element) => {
+          element.innerText = "";
+        });
+        const errorMessage = document.getElementById("errorMessage");
+      }
+    </script>
+  </body>
+</html>

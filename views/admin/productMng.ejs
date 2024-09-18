@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="shortcut icon" href="/public/images/favicon.png" type="image/png">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .sidebar {
+            height: 100vh;
+            background-color: #ffbe33;
+            color: #fff;
+            padding-top: 1rem;
+        }
+
+        .sidebar a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background-color: #071553;
+        }
+
+        @media (max-width: 767px) {
+            .sidebar {
+                display: none;
+            }
+        }
+
+        .content {
+            padding: 2rem;
+        }
+
+        .navbar {
+            margin-bottom: 0;
+        }
+
+        .navbar-toggler {
+            border: none;
+        }
+
+        @media (min-width: 768px) {
+            .navbar-collapse {
+                display: none;
+            }
+        }
+
+        .table-container {
+            margin-top: 2rem;
+        }
+
+        .table-header {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .table-header th {
+            font-weight: bold;
+        }
+
+        .table img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .table-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .btn-edit {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-edit:hover {
+            background-color: #218838;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .btn-add {
+            background-color: rgb(6, 92, 13);
+            color: #fff;
+            border: none;
+        }
+
+        .btn-add:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar for mobile -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light d-md-none">
+        <a class="navbar-brand" href="#">Admin Dashboard</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mobileNavbar" aria-controls="mobileNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mobileNavbar">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="admin/admin_Dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-box"></i> Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-sliders-h"></i> Category</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-tag"></i> Coupon</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-credit-card"></i> Payment</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <a class="navbar-brand" href="#">Admin Dashboard</a>
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-user"></i> Admin
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                            <a class="dropdown-item" href="/admin/logout" id="logoutBtn">Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div class="row">
+            <nav class="col-md-2 sidebar d-none d-md-block">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/productPage"><i class="fas fa-box"></i> Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-sliders-h"></i> Category</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-tag"></i> Coupon</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-credit-card"></i> Payment</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="col-md-10 content">
+                <div class="d-flex justify-content-between mb-4">
+                    <!-- Optional content here -->
+                </div>
+
+                <div class="container table-container">
+                    <div class="row mb-4">
+                        <form class="form-inline my-2 my-lg-0">
+                            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </form>
+                        <div class="col text-right">
+                            <a href="/admin/addProuctPage" class="btn btn-add">Add Product</a>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-header">
+                            <tr>
+                                <th scope="col">SL</th>
+                                <th scope="col">Product_Name</th>
+                                <th scope="col">Category</th>
+                                <th scope="col">Description</th>
+                                <th scope="col">Stock</th>
+                                <th scope="col">Price</th>
+                                <th scope="col">Image</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% Product.forEach((product, index) => { %>
+                            <tr>
+                                <th scope="row"><%= index + 1 %></th>
+                                <td><%= product.name %></td>
+                                <td><%= product.category %></td>
+                                <td><%= product.description %></td>
+                                <td><%= product.stock %></td>
+                                <td><%= product.price %></td>
+                                <td>
+                                    <img src="/product-images/<%= product._id %>.jpg" alt="<%= product.name %>">
+                                </td>
+                                <td class="table-actions">
+                                    <a href="/admin/edit-product/<%= product._id %>" class="btn btn-edit">Edit</a>
+                                    <a href="/admin/delete-product/<%= product._id %>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete <%= product.name %>?')">Delete</a>
+                                </td>
+                            </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</body>
+
+</html>
