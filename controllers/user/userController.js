@@ -2,6 +2,8 @@ const User = require('../../models/userModel');
 const nodemailer = require('nodemailer'); 
 const env=require('dotenv').config(); 
 const bcrypt = require('bcrypt'); 
+const category=require('../../models/categoryModel')
+const product=require('../../models/productModel')
 
 
 
@@ -37,7 +39,7 @@ const login = async (req, res) => {
             req.session.isAdmin=true;
             return res.render('user/error')
         } else {
-            return res.render('user/menuPage');
+            return res.redirect('/userHomePage');
         }
     } catch (error) {
         console.error('Error during login:', error);
@@ -178,8 +180,13 @@ const resendOtp=async(req,res)=>{
     }
 }
 
-const loadUserHomePage=(req,res)=>{
-    res.render('user/menuPage')
+const loadUserHomePage=async(req,res)=>{
+    console.log("122");
+    
+    const Category = await category.find({isDeleted:false});
+    const Product=await product.find()
+    console.log("Tjhisisis",Product)
+    res.render('user/menuPage',{Category,Product})
 }
 
 const logout = (req, res) => {

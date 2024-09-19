@@ -13,7 +13,7 @@ const productSchema = mongoose.Schema({
   category_id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref:"categoryModel",
+    ref:"category",
     trim: true
   },
   description: {
@@ -31,7 +31,7 @@ const productSchema = mongoose.Schema({
     required: true,
     min: 0
   },
-  image: {
+  images: {
     type: [String],
     required: true
   }

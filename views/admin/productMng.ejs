@@ -222,21 +222,24 @@
                             <% Product.forEach((product, index) => { %>
                             <tr>
                                 <th scope="row"><%= index + 1 %></th>
-                                <td><%= product.name %></td>
-                                <td><%= product.category %></td>
+                                <td><%= product.productname %></td>
+                                <td><%= product.category_id.category_name %></td>
                                 <td><%= product.description %></td>
                                 <td><%= product.stock %></td>
                                 <td><%= product.price %></td>
+                        
                                 <td>
-                                    <img src="/product-images/<%= product._id %>.jpg" alt="<%= product.name %>">
+                                        <img src="/public/<%= product.images[0] %>" alt="" style="width: 100px; height: auto;">
                                 </td>
+                        
                                 <td class="table-actions">
-                                    <a href="/admin/edit-product/<%= product._id %>" class="btn btn-edit">Edit</a>
-                                    <a href="/admin/delete-product/<%= product._id %>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete <%= product.name %>?')">Delete</a>
+                                    <a href="/admin/editProuctPage/<%= product._id %>" class="btn btn-edit">Edit</a>
+                                    
+                                    <a href="/admin/delete-product/<%= product._id %>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete <%= product.productname %>?')">Delete</a>
                                 </td>
                             </tr>
                             <% }); %>
-                        </tbody>
+                        </tbody>                        
                     </table>
                 </div>
             </div>

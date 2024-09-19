@@ -17,8 +17,7 @@ const app=express();
 connectDB();
 
 app.set('view engine','ejs');
-app.use('/public',express.static(path.join(__dirname, 'public')));
-
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use(session({
     secret:process.env.SESSION_SECRET,

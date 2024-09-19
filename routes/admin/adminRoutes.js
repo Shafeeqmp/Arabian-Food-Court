@@ -5,7 +5,7 @@ const adminRouter=express.Router();
 const adminController=require('../../controllers/adimin/adminController')
 const categoryController=require('../../controllers/adimin/categoryController')
 const productController=require('../../controllers/adimin/productController')
-const uploads=require('../../config/multer')
+const upload=require('../../config/multer')
 
 //Admin DashBoard
 adminRouter.get('/',adminController.load_AdminPage);
@@ -26,7 +26,7 @@ adminRouter.put('/restoreCategory/:id',categoryController.restore_Category);
 //Product Management
 adminRouter.get('/loadProuctPage',productController.load_ProuctPage);
 adminRouter.get('/addProuctPage',productController.addProuct_Page);
-adminRouter.post('/addProduct',uploads.array("images",4),productController.add_Product);
+adminRouter.post('/addProduct',upload.any(),productController.add_Product);
 adminRouter.get('/editProuctPage',productController.edit_ProuctPage);
 
 

@@ -2,6 +2,7 @@ const admin =require('../../routes/admin/adminRoutes');
 const product=require('../../models/productModel');
 const category=require('../../models/categoryModel')
 const user=require('../../models/userModel')
+const upload=require('../../config/multer')
 const fs=require('fs')
 const path=require('path')
 const sharp=require('sharp')
@@ -11,6 +12,7 @@ const sharp=require('sharp')
 const load_ProuctPage = async (req, res) => {
     if (req.session.isAdmin) {
       const Product = await product.find().populate('category_id')
+      
       res.render("admin/productMng",{Product});
     } else {
       res.redirect("/admin/loadAdminDash");
@@ -23,59 +25,59 @@ const addProuct_Page=async (req, res) => {
       const Category = await category.find({isDeleted:false});
       res.render("admin/addProduct", { Category});
     } else {
-      res.redirect("/admin/login");
+      res.redirect("/admin/addProuctPage");
     }
   };
 
 //Add Product Section
-const add_Product=async(req,res)=>{
-    try {
-      const Products=req.body;
-      const ProductExist=await product.findOne({
-        productname:Products.productname,
-      })
-      if(!ProductExist){
-        const images=[]
-        if(req.files && req.files.length>0){
-          for(let i=0;i<req.files.length;i++){
-            const originalImagePath=req.files[1].path;
-            const resizedImagePath=path.join('public','uploads','product-images',req.files[1].filename);
-            await sharp (originalImagePath).resize({width:450,height:450}).toFile(resizedImagePath);
-            
-          }
-        }
+const add_Product = async (req, res) => {
+  try {
+    const { productName, Category_id, description, stock, price } = req.body;
+    const images = req.files;
+    const existProduct = await product.findOne({ productname: productName });
+    const Category = await category.find({ isDeleted: false });
 
-        const categoryid =await category.findOne({name:Products.category});
-        if(!categoryid){
-          return res.status(400).json('invalid category name')
-        }
-        const newProduct=new product({
-          productname:Products.productname,
-          description:Products.description,
-          category:categoryid._id,
-          price:Products.price,
-          createdOn:new Date(),
-          stock:Products.stock,
-          image:Products.image
-
-        })
-        await newProduct.save();
-        return res.redirect('/admin/addProduct');
-
-      }else{
-        return res.status(400).json("Product already exist")
-      }
-    } catch (error) {
-      console.error("error saving product",error);
-      return res.redirect('/admin/addProuctPage')
+    if (existProduct) {
+      return res.render('admin/addProduct', { Category, exist: "Product already exists" });
     }
-}
+
+    let Images = [];
+    if (images) {
+      images.forEach(image => {
+        // Extract the relative path for storage in the database
+        const relativePath = image.path.replace(/^.*[\\\/]public[\\\/]uploads[\\\/]/, '/uploads/');
+        Images.push(relativePath);
+      });
+    }
+
+    const newProduct = new product({
+      productname: productName,
+      category_id: Category_id,
+      description,
+      stock,
+      price,
+      images: Images
+    });
+
+    await newProduct.save();
+    res.redirect('/admin/loadProuctPage');
+        console.log("Product added successfully");
+
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(400).send('Error adding product');
+  }
+};
 
 //Edit Product Page Loading Section
 const edit_ProuctPage=async(req,res)=>{
-    res.render('admin/editProuct')
+  if (req.session.isAdmin) {
+    const Category = await category.find({isDeleted:false});
+    res.render("admin/addProduct", { Category});
+  } else {
+    res.redirect("/admin/editProuctPage");
+  }
 }
-
 
 
 
