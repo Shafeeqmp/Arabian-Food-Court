@@ -44,7 +44,6 @@ const add_Product = async (req, res) => {
     let Images = [];
     if (images) {
       images.forEach(image => {
-        // Extract the relative path for storage in the database
         const relativePath = image.path.replace(/^.*[\\\/]public[\\\/]uploads[\\\/]/, '/uploads/');
         Images.push(relativePath);
       });
@@ -69,15 +68,60 @@ const add_Product = async (req, res) => {
   }
 };
 
+
 //Edit Product Page Loading Section
-const edit_ProuctPage=async(req,res)=>{
-  if (req.session.isAdmin) {
-    const Category = await category.find({isDeleted:false});
-    res.render("admin/addProduct", { Category});
-  } else {
-    res.redirect("/admin/editProuctPage");
+const loadEditProductPage = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    console.log(productId);
+    
+    const Product = await product.findById(productId);
+    const Category = await category.find({ isDeleted: false });
+    if (!Product) {
+      return res.status(404).send('Product not found');
+    }
+    res.render('admin/editProduct', { Product, Category });
+  } catch (error) {
+    console.error('Error loading edit page:', error);
+    res.status(500).send('Error loading product edit page');
   }
-}
+};
+
+
+
+const editProduct = async (req, res) => {
+  try {
+    const productId = req.params.id;
+    const { productName, Category_id, description, stock, price } = req.body;
+    const images = req.files;
+    const existingProduct = await product.findById(productId);
+    if (!existingProduct) {
+      return res.status(404).send('Product not found');
+    }
+    existingProduct.productname = productName;
+    existingProduct.category_id = Category_id;
+    existingProduct.description = description;
+    existingProduct.stock = stock;
+    existingProduct.price = price;
+    if (images && images.length > 0) {
+      let updatedImages = [];
+      images.forEach(image => {
+        const relativePath = image.path.replace(/^.*[\\\/]public[\\\/]uploads[\\\/]/, '/uploads/');
+        updatedImages.push(relativePath);
+      });
+      existingProduct.images = updatedImages;
+    }
+    await existingProduct.save();
+    res.redirect('/admin/loadProuctPage');
+    console.log("Product updated successfully");
+
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(400).send('Error updating product');
+  }
+};
+
+
 
 
 
@@ -92,5 +136,6 @@ module.exports={
     load_ProuctPage,
     addProuct_Page,
     add_Product,
-    edit_ProuctPage
+    loadEditProductPage,
+    editProduct
 }

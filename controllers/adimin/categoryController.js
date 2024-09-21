@@ -10,7 +10,7 @@ const load_CategoryPage=async(req,res)=>{
         const catData = await category.find();
            res.render('admin/categoryPage',{catData})
        } else{
-        res.redirect('/admin/categoryPage')
+        res.redirect('/admin')
        }
     } catch (error) {
         console.error(error);
@@ -47,7 +47,8 @@ const edit_Category=async (req, res) =>{
     const { id } = req.params;
     const { name } = req.body;
     const cateData = await category.findById(id);
-    if (!cateData) {
+    const existCat=await category.findOne({category_name:name})
+    if (!cateData&&existCat) {
         return res.status(404).json({ success: false, message: 'Category not found' });
     }
     cateData.category_name = name;

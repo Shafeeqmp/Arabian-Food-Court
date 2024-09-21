@@ -27,8 +27,8 @@ adminRouter.put('/restoreCategory/:id',categoryController.restore_Category);
 adminRouter.get('/loadProuctPage',productController.load_ProuctPage);
 adminRouter.get('/addProuctPage',productController.addProuct_Page);
 adminRouter.post('/addProduct',upload.any(),productController.add_Product);
-adminRouter.get('/editProuctPage',productController.edit_ProuctPage);
-
+adminRouter.get('/editProductPage/:id',productController.loadEditProductPage);
+adminRouter.put('/editPrdouct/:id',productController.editProduct);
 
 
 

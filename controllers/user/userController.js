@@ -11,7 +11,7 @@ const loadIndexPage = (req, res) => {
     if(req.session.email){
         res.redirect("/menuPage")
     }else if(req.session.isAdmin){
-        res.redirect('/admin/admin_dashboard')
+        res.redirect('/')
     }
     res.render('user/index');
 };
@@ -26,6 +26,10 @@ const login = async (req, res) => {
         const findUser = await User.findOne({ email:email });
         if (!findUser) {
             return res.render('user/loginPage', { pmessage: 'Incorrect User_name' });
+        }
+        const blockUser=await User.findOne({isBlocked:true})
+        if(blockUser){
+            return res.render('user/loginPage', { pmessage: 'User is Blocked' });
         }
         const isPasswordValid = await bcrypt.compare(password, findUser.password);
         if (!isPasswordValid) {
@@ -99,11 +103,11 @@ const signup = async (req, res) => {
     try {
         const { name,email, password, cPassword } = req.body;
         if (password !== cPassword) {
-            return res.render("user/signupPage", { message: 'Passwords do not match' });
+            return res.redirect("/signup", { message: 'Passwords do not match' });
         }
         const findUser = await User.findOne({ email:email });
         if (findUser) {
-           return res.render("user/signupPage", { message: "Email already exists" });
+           return res.redirect("/signup", { message: "Email already exists" });
         }
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
@@ -157,35 +161,41 @@ const verifyOTP=async(req,res)=>{
     }
 }
 
-const resendOtp=async(req,res)=>{
+const resendOtp = async (req, res) => {
+    console.log("Resend OTP route hit");  // Debugging log
+
     try {
-        const {email}=req.session.userData;
-        if(!email){
-            return res.status(400).json({success:false,message:"email not found in session"})
+        // Ensure session is available
+        if (!req.session || !req.session.userData) {
+            return res.status(400).json({ success: false, message: "No user session data" });
         }
-        const otp =generateOtp();
-        req.session.userOtp=otp
-        const emailSent=await sendVerificationEmail(email.otp);
-        if(emailSent){
-            console.log("Resend OTP",otp);
-            res.status(200).json({success:true,message:"OTP Resend Successfuly"})
-            
-        }else{
-            res.status(500).json({success:false,message:"Failed to resend OTP, Please try"})
+
+        const { email } = req.session.userData;
+        if (!email) {
+            return res.status(400).json({ success: false, message: "Email not found in session" });
+        }
+
+        const otp = generateOtp();
+        req.session.userOtp = otp;
+
+        const emailSent = await sendVerificationEmail(email, otp);
+        if (emailSent) {
+            console.log("Resend OTP", otp);
+            return res.status(200).json({ success: true, message: "OTP Resent Successfully" });
+        } else {
+            return res.status(500).json({ success: false, message: "Failed to resend OTP" });
         }
     } catch (error) {
-     console.error("Error responding OTP",error);
-     res.status(500).json({success:false,message:"Internal Server Error.Please try again"})
-        
+        console.error("Error resending OTP", error);
+        return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-}
+};
+
+
 
 const loadUserHomePage=async(req,res)=>{
-    console.log("122");
-    
     const Category = await category.find({isDeleted:false});
     const Product=await product.find()
-    console.log("Tjhisisis",Product)
     res.render('user/menuPage',{Category,Product})
 }
 
@@ -200,6 +210,19 @@ const logout = (req, res) => {
   };
 
 
+  const single_ProductView=async(req,res)=>{
+    try {
+      const { id } = req.params; 
+      const Product = await product.findById(id);
+      res.render('user/single-product', { Product });
+    } catch (err) {
+      console.error(err);
+      res.redirect('/userHomePage');
+    }
+  }
+  
+
+
 
 module.exports = {
     loadIndexPage,
@@ -210,5 +233,6 @@ module.exports = {
     verifyOTP,
     resendOtp,
     loadUserHomePage,
-    logout
+    logout,
+    single_ProductView
 };

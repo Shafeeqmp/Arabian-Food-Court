@@ -116,7 +116,7 @@
                     <div id="otpTimer" class="otp-timer">
                         <span id="timerValue">60</span>
                     </div>
-                    <button type="button" id="resendOTP" class="btn btn-secondary" onclick="resendOTP()">Resend OTP</button>
+                    <a  type="button" id="resendOTP" class="btn btn-secondary" onclick= resendOTP() >Resend OTP</a>
                 </div>
                 <!-- Add a hidden alert for any messages -->
                 <div class="alert alert-danger" id="errorAlert" style="display: none;">OTP is invalid</div>
@@ -132,7 +132,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.getElementById("otp").focus();
-
 let timer = 60;
 let timerInterval;
 
@@ -155,13 +154,6 @@ function startTimer() {
     }, 1000);
 }
 
-document.getElementById("resendOTP").addEventListener("click", function() {
-   
-    Swal.fire('OTP Resent', 'A new OTP has been sent to your email.', 'success');
-
-
-    startTimer();
-});
 
 
 startTimer();
@@ -200,37 +192,49 @@ function validateOTPForm() {
     return false;
 }
 
-function resendOTP(){
-    clearInterval(timerInterval);
-    timer=60
-    document.getElementById("otp").disabled=false;
-    document.getElementById("timervalue").classList.remove("expired");
+function resendOTP() {
+         console.log("Resend OTP button clicked");
+         clearInterval(timerInterval);
+         timer = 60;
+         document.getElementById("otp").disabled = false;
+         document.getElementById("timerValue").classList.remove("expired");
 
-    startTimer();
+         startTimer();
 
-    $.ajax({
-        type:"POST",
-        url:"/resend-OTP",
-        success:function(response){
-            if(response.success){
-                Swal.fire({
-                    icon: "success",
-                    title: "OTP Resent Successfully",
-                    showConfirmButton: false,
-                    timer:1500,
+         fetch("/resend-OTP", {
+             method: "POST",
+             headers: {
+                 "Content-Type": "application/json"
+             }
+         })
+         .then(response => response.json())
+         .then(data => {
+             if (data.success) {
+                 Swal.fire({
+                     icon: "success",
+                     title: "OTP Resent Successfully",
+                     showConfirmButton: false,
+                     timer: 1500
+                 });
+             } else {
+                 Swal.fire({
+                     icon: "error",
+                     title: "Error",
+                     text: "An error occurred while resending OTP. Please try again."
+                 });
+             }
+         })
+         .catch(error => {
+             Swal.fire({
+                 icon: "error",
+                 title: "Error",
+                 text: "Failed to connect to the server. Please try again."
+             });
+         });
 
-                })
-            }else{
-                Swal.fire({
-                    icon:"error",
-                    title:"Error",
-                    text:"An error occured while responding OTP.please try again"
-                })
-            }
-        }
-    })
-    return false;
-}
+         return false;
+     }
+
 </script>
 
 </body>

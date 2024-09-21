@@ -18,7 +18,7 @@ const admin_Dashboard=async(req,res)=>{
         const {email,password}=req.body
         const findAdmin=await user.findOne({email:email});
         if(!findAdmin){
-            res.render('admin/adminLogin')
+            res.redirect('/admin')
         }
         const checkpass=await bcrypt.compare(
             req.body.password,

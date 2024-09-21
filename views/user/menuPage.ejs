@@ -143,13 +143,16 @@
       </ul>
       <div class="filters-content">
         <div class="row grid">
+         
           <% Product.forEach(product => { %>
           <div class="col-sm-6 col-lg-4 all pizza">
             <div class="box">
               <div>
                 <div class="img-box">
-                  <img src="/public/<%= product.images[0] %>" alt="">
-                </div>
+                  <a href="/user/singleProductView/<%= product._id %>"> 
+                    <img src="/public/<%= product.images[0] %>" alt="">
+                  </a>
+                </div>                
                 <div class="detail-box">
                   <h5>
                     Delicious Pizza
