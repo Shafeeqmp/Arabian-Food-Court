@@ -9,12 +9,20 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
+        /* Sidebar Styles */
         .sidebar {
-            height: 100vh;
+            position: fixed;
+            top: 56px; /* Adjust according to your navbar height */
+            bottom: 0;
+            left: 0;
+            width: 250px;
             background-color: #ffbe33;
             color: #fff;
             padding-top: 1rem;
+            overflow-y: auto;
+            z-index: 100; /* Ensure it's above other content */
         }
+
 
         .sidebar a {
             color: #fff;
@@ -25,20 +33,27 @@
             background-color: #071553;
         }
 
+        /* Hide sidebar for small screens */
         @media (max-width: 767px) {
             .sidebar {
                 display: none;
             }
         }
 
+         /* Content Styles */
         .content {
+            margin-left: 250px; /* Adjust to match sidebar width */
             padding: 2rem;
+            transition: margin-left 0.3s;
         }
 
-        .navbar {
-            margin-bottom: 0;
+        /* Adjust content margin for smaller screens */
+        @media (max-width: 767px) {
+            .content {
+                margin-left: 0;
+                padding: 1rem;
+            }
         }
-
         .navbar-toggler {
             border: none;
         }
@@ -161,31 +176,32 @@
             </div>
         </nav>
         <div class="row">
-            <nav class="col-md-2 sidebar d-none d-md-block">
+            <nav class="col-md-2 sidebar">
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a>
+                        <a class="nav-link" href="/admin/loadProuctPage"><i class="fas fa-box"></i> Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin/productPage"><i class="fas fa-box"></i> Products</a>
+                        <a class="nav-link" href="#"> <i class="fas fa-shopping-cart"></i> Orders</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/categoryPage"><i class="fas fa-sliders-h"></i> Category</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                        <a class="nav-link" href="#" id="couponLink">
+                            <i class="fas fa-tag"></i> Coupon
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-sliders-h"></i> Category</a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-credit-card"></i> Payment
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-tag"></i> Coupon</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-credit-card"></i> Payment</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <li class="nav-item"></li>
+                        <a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -225,7 +241,9 @@
                                 <td><%= product.productname %></td>
                                 <td><%= product.category_id.category_name %></td>
                                 <td><%= product.description %></td>
-                                <td><%= product.stock %></td>
+                                <td class="<%= product.stock > 0 ? 'text-success' : 'text-danger' %>">
+                                    <%= product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock' %>
+                                  </td>
                                 <td><%= product.price %></td>
                         
                                 <td>

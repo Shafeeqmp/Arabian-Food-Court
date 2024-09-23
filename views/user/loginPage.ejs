@@ -31,20 +31,20 @@
         }
       }
 
-      .gradient-custom-3 {
+      /* .gradient-custom-3 {
         background: linear-gradient(
           to right,
           rgba(132, 250, 176, 0.5),
           rgba(143, 211, 244, 0.5)
         );
-      }
-      .gradient-custom-4 {
+      } */
+      /* .gradient-custom-4 {
         background: linear-gradient(
           to right,
           rgba(132, 250, 176, 1),
           rgba(143, 211, 244, 1)
         );
-      }
+      } */
       .btn-google {
         background-color: #c7d6d6;
         color: black;
@@ -62,7 +62,7 @@
   <body>
     <section
       class="vh-100 bg-image"
-      style="background-image: url('https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp');">
+      style="background-image: url('/public/images/header_img.png');">
       <div class="mask d-flex align-items-center h-100 gradient-custom-3">
         <div class="container h-100">
           <div class="row d-flex justify-content-center align-items-center h-100">
@@ -70,6 +70,7 @@
               <div class="card" style="border-radius: 15px">
                 <div class="card-body p-4 p-md-5">
                   <h2 class="text-uppercase text-center mb-4">Login Page</h2>
+                  <p class="text-danger"><%= locals.message ? message:null %></p>
                   <p class="text-danger"><%= locals.pmessage ? pmessage : null %></p>
                   <form action="/login" method="post">
                     <!-- Email Input -->

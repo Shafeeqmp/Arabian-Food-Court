@@ -32,7 +32,7 @@
             border-radius: 5px;
             border: 1px solid #ddd;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
-            padding: 0.75rem 1.25rem;
+            padding: -0.25rem 1.25rem;
         }
 
         .form-container .btn-submit {
@@ -70,63 +70,81 @@
             <div class="row justify-content-center">
                 <div class="col-md-8 col-lg-6">
                     <div class="form-container">
-                       
                         <h2 class="text-center">Edit Products</h2>
-                        <form action="/admin/add-product" method="post" enctype="multipart/form-data">
-                            <div class="form-group">
-                                <label for="name">Product_Name</label>
-                                <input type="text" id="name" name="name" class="form-control" required>
+                        <form action="/admin/editProduct"method="post"enctype="multipart/form-data">
+                            <div class="form-group"> 
+                                <label for="name">Product Name</label>
+                                <input type="text" id="name" name="name" class="form-control" value="<%= Product.productname %>" required>
                             </div>
-
+    
                             <div class="form-group">
                                 <label for="category">Category</label>
                                 <select id="category" name="Category" class="form-control" required>
                                     <!-- <option value="" disabled selected>Select a category</option> -->
-                                    <% Category.forEach(function(category) { %>
-                                        <option value="<%= category.name %>"><%= category.category_name %></option>
-                                    <% }); %>
+                                    <option value="<%= Product.category_id.category_name %>"><%= Product.category_id.category_name %></option>
+                                    <% Category.forEach((category)=>{ %>
+                                        <% if(category.category_name != Product.category_id.category_name){ %>
+                                            <option value="<%= category.category_name %>"><%= category.category_name %></option>
+                                        <% } %>
+                                    <% }) %>
                                 </select>
                             </div>
-
+    
                             <div class="form-group">
                                 <label for="price">Price</label>
-                                <input type="Number" id="price" name="price" class="form-control" value="<%= Product._id %>" required>
+                                <input type="number" id="price" name="price" class="form-control" value="<%= Product.price %>" required>
                             </div>
-
+                            <div class="form-group">
+                                <label for="price">Qty</label>
+                                <input type="number" id="price" name="price" class="form-control" value="<%= Product.stock %>" required>
+                            </div>
+    
                             <div class="form-group">
                                 <label for="description">Description</label>
                                 <input type="text" id="description" name="description" class="form-control" value="<%= Product.description %>" required>
                             </div>
-
+    
                             <div class="form-group">
-                                <label for="image">Image1</label>
-                                <input type="file" id="image" name="image" class="form-control-file" required>
+                                <label for="image1">Image1</label>
+                                <img src="/public/<%= Product.images[0] %>" alt="" style="width:100px;height:auto" id="imgview1" class="pt-3">
+                                <input type="file" name="image1" class="form-control" onchange="viewImage(event, 'imgview1')">
                             </div>
+    
                             <div class="form-group">
-                                <label for="image">Image2</label>
-                                <input type="file" id="image" name="image" class="form-control-file" required>
+                                <label for="image2">Image2</label>
+                                <img src="/public/<%= Product.images[1] %>" alt="" style="width:100px;height:auto" id="imgview2" class="pt-3">
+                                <input type="file" name="image2" class="form-control" onchange="viewImage(event, 'imgview2')">
                             </div>
+    
                             <div class="form-group">
-                                <label for="image">Image3</label>
-                                <input type="file" id="image" name="image" class="form-control-file" required>
+                                <label for="image3">Image3</label>
+                                <img src="/public/<%= Product.images[2] %>" alt="" style="width:100px;height:auto" id="imgview3" class="pt-3">
+                                <input type="file" name="image3" class="form-control" onchange="viewImage(event, 'imgview3')">
                             </div>
+    
                             <div class="form-group">
-                                <label for="image">Image4</label>
-                                <input type="file" id="image" name="image" class="form-control-file" required>
+                                <label for="image4">Image4</label>
+                                <img src="/public/<%= Product.images[3] %>" alt="" style="width:100px;height:auto" id="imgview4" class="pt-3">
+                                <input type="file" name="image4" class="form-control" onchange="viewImage(event, 'imgview4')">
                             </div>
-
+    
                             <button type="submit" class="btn btn-submit mt-4">Submit</button>
                         </form>
-                
                     </div>
                 </div>
             </div>
         </div>
     </section>
-
+    
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function viewImage(event, imgId) {
+            document.getElementById(imgId).src = URL.createObjectURL(event.target.files[0]);
+        }
+    </script>
+    
 </body>
 
 </html>

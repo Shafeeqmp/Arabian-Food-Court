@@ -10,13 +10,18 @@ const sharp=require('sharp')
 
 //Load Product Page Section
 const load_ProuctPage = async (req, res) => {
+  try {
     if (req.session.isAdmin) {
       const Product = await product.find().populate('category_id')
-      
       res.render("admin/productMng",{Product});
     } else {
       res.redirect("/admin/loadAdminDash");
     }
+  } catch (error) {
+    console.error(error);
+        res.status(500).json({ err: "something went wrong while adding new category" });
+  }
+   
   };
   
 //Add Product Page Section
@@ -72,15 +77,13 @@ const add_Product = async (req, res) => {
 //Edit Product Page Loading Section
 const loadEditProductPage = async (req, res) => {
   try {
-    const productId = req.params.id;
-    console.log(productId);
-    
-    const Product = await product.findById(productId);
-    const Category = await category.find({ isDeleted: false });
+    const productId = req.params.id; 
+    const Product = await product.findById(productId).populate('category_id')
+    const Category=await category.find({isDeleted:false})
     if (!Product) {
       return res.status(404).send('Product not found');
     }
-    res.render('admin/editProduct', { Product, Category });
+    res.render('admin/editProduct', { Product,Category});
   } catch (error) {
     console.error('Error loading edit page:', error);
     res.status(500).send('Error loading product edit page');
@@ -89,8 +92,12 @@ const loadEditProductPage = async (req, res) => {
 
 
 
+
+// Controller Function
 const editProduct = async (req, res) => {
   try {
+    console.log("halooo");
+    
     const productId = req.params.id;
     const { productName, Category_id, description, stock, price } = req.body;
     const images = req.files;
@@ -112,7 +119,7 @@ const editProduct = async (req, res) => {
       existingProduct.images = updatedImages;
     }
     await existingProduct.save();
-    res.redirect('/admin/loadProuctPage');
+    res.redirect('/admin/loadProductPage'); // Fixed the URL here as well
     console.log("Product updated successfully");
 
   } catch (error) {
@@ -120,6 +127,7 @@ const editProduct = async (req, res) => {
     res.status(400).send('Error updating product');
   }
 };
+
 
 
 

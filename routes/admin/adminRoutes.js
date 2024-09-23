@@ -28,7 +28,7 @@ adminRouter.get('/loadProuctPage',productController.load_ProuctPage);
 adminRouter.get('/addProuctPage',productController.addProuct_Page);
 adminRouter.post('/addProduct',upload.any(),productController.add_Product);
 adminRouter.get('/editProductPage/:id',productController.loadEditProductPage);
-adminRouter.put('/editPrdouct/:id',productController.editProduct);
+adminRouter.put('/editProduct/:id', upload.any(), productController.editProduct);
 
 
 

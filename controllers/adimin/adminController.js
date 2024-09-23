@@ -9,36 +9,43 @@ const load_AdminPage=(req,res)=>{
 
 //Admin Dashboard Page Loading
 const load_AdminDash=(req,res)=>{
-    res.render('admin/admin_Dashboard')
-}
-
-//Admin Dashboard
-const admin_Dashboard=async(req,res)=>{
     try {
-        const {email,password}=req.body
-        const findAdmin=await user.findOne({email:email});
-        if(!findAdmin){
-            res.redirect('/admin')
-        }
-        const checkpass=await bcrypt.compare(
-            req.body.password,
-            findAdmin.password
-        )
-        if(checkpass){
-            req.session.email=findAdmin;
-            if(findAdmin.isAdmin){
-                req.session.email=false;
-                req.session.isAdmin=true;
-                res.render('admin/admin_Dashboard')
-            }else{
-                res.render("adminLogin")
-            }
+        if(req.session.isAdmin){
+            res.render('admin/admin_Dashboard')
+        }else{
+            return res.redirect('/admin')
         }
     } catch (error) {
-        console.log("login error"+error);
         
     }
 }
+
+//Admin Dashboard
+const admin_Dashboard = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const findAdmin = await user.findOne({ email: email });
+      if (!findAdmin) {
+        return res.redirect('/admin');
+      }
+      const checkPass = await bcrypt.compare(password, findAdmin.password);
+      if (!checkPass) {
+        return res.redirect('/admin');
+      }
+      if (findAdmin.isAdmin) {
+        req.session.isAdmin = true;
+        req.session.adminEmail = findAdmin.email;
+        return res.render('admin/admin_Dashboard');
+      } else {
+        return res.redirect('/admin');
+      }
+  
+    } catch (error) {
+      console.log("Login error: " + error);
+      return res.status(500).send('An error occurred during login');
+    }
+  };
+  
 
 //User Manage Page Loading
 const load_userMng=async(req,res)=>{
@@ -90,8 +97,8 @@ const logout = (req, res) => {
 
 module.exports={
     load_AdminPage,
-    load_AdminDash,
     admin_Dashboard,
+    load_AdminDash,
     load_userMng,
     block_user,
     unblock_user,

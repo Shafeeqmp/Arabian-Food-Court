@@ -23,33 +23,40 @@ const loadLogin = (req, res) => {
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
-        const findUser = await User.findOne({ email:email });
+        const findUser = await User.findOne({ email: email });
+        // Check if user exists
         if (!findUser) {
-            return res.render('user/loginPage', { pmessage: 'Incorrect User_name' });
+            return res.render('user/loginPage', { pmessage: 'Incorrect username and password' });
         }
-        const blockUser=await User.findOne({isBlocked:true})
-        if(blockUser){
-            return res.render('user/loginPage', { pmessage: 'User is Blocked' });
+        // Check if user is blocked
+        if (findUser.isBlocked) {
+            return res.render('user/loginPage', { pmessage: 'User is blocked' });
         }
+        // Validate password
         const isPasswordValid = await bcrypt.compare(password, findUser.password);
         if (!isPasswordValid) {
-            req.session.email=findUser.email;
-            
-            return res.render('user/loginPage', { pmessage: 'Incorrect UserName or password' });
+            return res.render('user/loginPage', { pmessage: 'Incorrect username and password' });
         }
+        // Set session values
         req.session.userId = findUser._id;
+        req.session.email = findUser.email;
+        // Admin check and redirection
         if (findUser.isAdmin) {
-            req.session.email=false;
-            req.session.isAdmin=true;
-            return res.render('user/error')
+            req.session.isAdmin = true;
+            return res.render('user/error');
         } else {
-            return res.redirect('/userHomePage');
+            const Category=await category.find({})
+            const Product=await product.find({})
+            req.session.isAdmin = false;
+            return  res.render('user/menuPage',{Category,Product});  // Redirect to the user homepage
         }
     } catch (error) {
         console.error('Error during login:', error);
-        return res.status(500).render('user/login', { message: 'Something went wrong. Please try again.' });
+        return res.status(500).render('user/loginPage', { pmessage: 'Something went wrong. Please try again.' });
     }
 };
+
+
 
 
 const loadSignup = async (req, res) => {

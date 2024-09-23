@@ -113,31 +113,32 @@
         </nav>
         <div class="row">
             <!-- Sidebar for large screens -->
-            <nav class="col-md-2 sidebar d-none d-md-block">
+            <nav class="col-md-2 sidebar">
                 <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                    <li class="nav-item"><a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
                     </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users<span class="sr-only">(current)</span></a>
+                    <li class="nav-item"><a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="/admin/productPage"><i class="fas fa-box"></i> Products</a>
+                        <a class="nav-link" href="/admin/loadProuctPage"><i class="fas fa-box"></i> Products</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-shopping-cart"></i> Orders</a>
+                        <a class="nav-link" href="#"> <i class="fas fa-shopping-cart"></i> Orders</a>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/admin/categoryPage"><i class="fas fa-sliders-h"></i> Category</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/admin/categoryPage"><i class="fas fa-sliders-h"></i> Category</a>
+                        <a class="nav-link" href="#" id="couponLink">
+                            <i class="fas fa-tag"></i> Coupon
+                        </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-tag"></i> Coupon</a>
+                        <a class="nav-link" href="#">
+                            <i class="fas fa-credit-card"></i> Payment
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-credit-card"></i> Payment</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    <li class="nav-item"></li>
+                        <a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </nav>
@@ -189,20 +190,13 @@
                                           <span class="badge bg-success">Active</span>
                                         <% } %>
                                       </td>
-                                    <!-- <td class="text-start">
-                                        <% if (users.isBlocked){%>
-                                        <span class="badge rounded-pill alert-danger"style="width: 60px">Blocked</span>
-                                        <% } else { %>
-                                        <span class="badge rounded-pill alert-success"style="width: 60px">Active</span>
-                                        <% } %>
-                                      </td> -->
                                     <td>
                                         <% if (users.isBlocked){%>
-                                        <a href="/admin/block-user/<%= users._id %>" class="btn btn-danger" type="submit"onclick="return confirm('Do you Want to Block <%= users.name %>?')">Block</a>
+                                        <a href="/admin/block-user/<%= users._id %>" class="btn btn-success" type="submit"onclick="return confirm('Do you Want to Block <%= users.name %>?')">UnBlock</a>
                                       
                                         <% } else { %>
                                      
-                                        <a href="/admin/unblock-user/<%= users._id %>" class="btn btn-success" type="submit"onclick="return confirm('Do you Want to UnBlock <%= users.name %>?')">Unblock</a>
+                                        <a href="/admin/unblock-user/<%= users._id %>" class="btn btn-danger" type="submit"onclick="return confirm('Do you Want to UnBlock <%= users.name %>?')">Block</a>
                 
                                     <% } %>
                                     </td>
