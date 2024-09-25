@@ -23,21 +23,23 @@ const load_AdminDash=(req,res)=>{
 //Admin Dashboard
 const admin_Dashboard = async (req, res) => {
     try {
-      const { email, password } = req.body;
+      const { email, Password } = req.body;
       const findAdmin = await user.findOne({ email: email });
+   
+      
       if (!findAdmin) {
-        return res.redirect('/admin');
+        return res.status(400).json({error:"Email and password is required"})
       }
-      const checkPass = await bcrypt.compare(password, findAdmin.password);
+      const checkPass = await bcrypt.compare(Password, findAdmin.password);
       if (!checkPass) {
-        return res.redirect('/admin');
+        return res.status(400).json({error:"Email and password is required"})
       }
       if (findAdmin.isAdmin) {
         req.session.isAdmin = true;
         req.session.adminEmail = findAdmin.email;
-        return res.render('admin/admin_Dashboard');
+        return res.status(200).json({success:true,successRedirectUrl:"/admin/loadAdminDash"});
       } else {
-        return res.redirect('/admin');
+        return res.status(400).json({error:"Incorrect Email and password"})
       }
   
     } catch (error) {

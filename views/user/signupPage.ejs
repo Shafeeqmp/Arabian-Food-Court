@@ -95,15 +95,11 @@
           <div class="card" style="border-radius: 15px">
             <div class="card-body p-4 p-md-5">
               <h2 class="text-uppercase text-center mb-4">Create an account</h2>
-              <form action="/signup" method="post" >
+              <form onsubmit="" action="#" method="post" >
                 <!-- Name Input -->
                 <div class="form-outline mb-4">
                   <label class="form-label" for="form3Example1cg">Enter Your Name</label>
-                  <input
-                    type="text"
-                    id="form3Example1cg"
-                    class="form-control form-control-lg" placeholder="Enter Name" name="name"
-                    required/>
+                  <input type="text" id="userName" class="form-control form-control-lg" placeholder="Enter Name" name="name"required/>
                   
                  
                 </div>
@@ -111,12 +107,8 @@
                 <div class="form-outline mb-4">
                   <p class="text-danger"><%= locals.message ? message:null %></p>
                   <label class="form-label" for="form3Example3cg">Enter Your Email</label>
-                  <input
-                    type="email"
-                    id="form3Example3cg"
-                    class="form-control form-control-lg" placeholder="Enter a valid email address" name="email"required/>
-                  
-                  
+                  <input type="email"id="email" class="form-control form-control-lg" placeholder="Enter a valid email address" name="email"required/>
+                  <p id="result"></p>
                 </div>
 
                 <!-- Password Input -->
@@ -124,7 +116,7 @@
                   <label class="form-label" for="form3Example4cg">Enter Password</label>
                   <input
                     type="password"
-                    id="form3Example4cg"
+                    id="password"
                     class="form-control form-control-lg" placeholder="Enter Password" name="password"
                     required
                   />
@@ -137,17 +129,14 @@
                   <label class="form-label" for="form3Example4cdg">Re-Enter Password</label>
                   <input
                     type="password"
-                    id="form3Example4cdg"
+                    id="cPassword"
                     class="form-control form-control-lg"placeholder="Re-Enter Password" name="cPassword"
                     required
                   />
                 </div>
                 <!-- Register Button -->
                 <div class="d-flex justify-content-center mb-4">
-                  <button
-                    type="submit"
-                    class="btn btn-success btn-lg gradient-custom-4 text-body">Register
-                  </button>
+                  <button onclick="singupClick(event)" type="submit" class="btn btn-success btn-lg gradient-custom-4 text-body">Register</button>
                 </div>
                 <div class="d-flex justify-content-center mb-4">
                   <a href="/auth/google" class="btn btn-google btn-lg">
@@ -184,8 +173,117 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+<script>
+  function singupClick(event){
+    event.preventDefault();
+
+    const userName = document.getElementById('userName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const cpassword = document.getElementById('cPassword').value.trim();
+
+    if (!userName || !email || !password || !cpassword) {
+      Swal.fire({
+          title:"Error",
+          text:"All fields must be filled",
+          icon:"error"
+      });
+      return;
+    }
+    if (!/^[a-zA-Z\s]+$/.test(userName)) {
+      Swal.fire({
+        title:'Error',
+        text:"Name must contain letters and cannot be empty",
+        icon:"error"
+      });
+      return;
+    }
+    if (password !== cpassword) {
+      Swal.fire({
+        title:'Error',
+        text:"Incorrect confirm password",
+        icon:"error"
+      });
+      return;
+    }
+
+    if (password.length < 6 || /\s/.test(password)) {
+      Swal.fire({
+        title:'Error',
+        text:"Password must be at least 6 characters and contain no spaces",
+        icon:"error"
+      });
+      return;
+    }
+    
+    fetch("/signup", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ name: userName, email, password })
+    })
+    .then((res) => res.json())
+    .then((data) => {
+      if (data.success) {
+        Swal.fire({
+          title: 'Success',
+          text: "Signup successful",
+          icon: "success",
+          timer: 1000
+        }).then(() => {
+          window.location.href = "/otpPage";
+        });
+      } else if (data.error) {
+        Swal.fire({
+          title: "Error",
+          text: data.error,
+          icon: "error"
+        });
+      }
+    })
+    .catch((error) => {
+      Swal.fire({
+        title: "Oops!",
+        text: "Something went wrong! Please try again",
+        icon: "error"
+      });
+    });
+  }
+</script>
+
+
+<script>
+  const validateEmail = (email) => {
+  return email.match(
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  );
+};
+
+const validate = () => {
+  const $result = $('#result');
+  const email = $('#email').val();
+  $result.text('');
+
+  if(validateEmail(email)){
+    $result.text(email + ' is valid.');
+    $result.css('color', 'green');
+  } else{
+    $result.text(email + ' is invalid.');
+    $result.css('color', 'red');
+  }
+  return false;
+}
+
+$('#email').on('input', validate);
+</script>
+
+
 </body>
 </html>
 </html>

@@ -97,7 +97,7 @@
             <h3>Admin Login</h3>
           </div>
           
-          <form action="/admin/adminPage" method="post">
+          <form action="#" method="post">
             <!-- Email Input -->
             <div class="form-group mb-3">
               <label for="adminEmail" class="form-label">Admin Email</label>
@@ -112,7 +112,7 @@
 
             <!-- Login Button -->
             <div class="d-grid">
-              <button type="submit" class="btn btn-custom btn-lg">Login</button>
+              <button onclick="login(event)" type="submit" class="btn btn-custom btn-lg">Login</button>
             </div>
 
             <!-- Forgot Password Link -->
@@ -127,5 +127,55 @@
 
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <script>
+    function login(event){
+      event.preventDefault();
+      const email= document.getElementById('adminEmail').value.trim()
+      const Password= document.getElementById('adminPassword').value.trim()
+      if(!email||!Password){
+        Swal.fire({
+          title:"Error",
+          text:"All fields must be filled",
+          icon:"error"
+        })
+        return
+      }
+      fetch("/admin/adminPage",{
+        method:'POST',
+        headers:{
+          "Content-Type": "application/json"
+        },
+        body:JSON.stringify({email,Password}),
+      })
+      .then((res)=>res.json())
+      .then((data)=>{
+        if(data.success){
+          Swal.fire({
+            title:'success',
+            text:"Login successful",
+            icon:"success",
+            timer: 1000
+          }).then(()=>{
+            window.location.href="/admin/loadAdminDash"
+          });
+        }else if(data.error){
+          Swal.fire({
+            title:"Error",
+            text:data.error,
+            icon:"error"
+          })
+        }
+      })
+      .catch((error)=>{
+        Swal.fire({
+          title:"Oops!",
+          text:"Something weng wrong! Please try again",
+          icon:"error"
+        })
+      })
+    }
+  </script>
 </body>
 </html>

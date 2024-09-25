@@ -45,8 +45,8 @@ const login = async (req, res) => {
             req.session.isAdmin = true;
             return res.render('user/error');
         } else {
-            const Category=await category.find({})
-            const Product=await product.find({})
+            const Category=await category.find({isDeleted:false})
+            const Product=await product.find({isDelete:false})
             req.session.isAdmin = false;
             return  res.render('user/menuPage',{Category,Product});  // Redirect to the user homepage
         }
@@ -97,6 +97,7 @@ async function sendVerificationEmail(email, otp) {
             text: `Your OTP is ${otp}`,
             html: `<b> Your OTP: ${otp} </b>`,
         });
+
         
         console.log('Email info:', info);
         return info.accepted.length > 0;
@@ -108,30 +109,34 @@ async function sendVerificationEmail(email, otp) {
 
 const signup = async (req, res) => {
     try {
-        const { name,email, password, cPassword } = req.body;
-        if (password !== cPassword) {
-            return res.redirect("/signup", { message: 'Passwords do not match' });
-        }
-        const findUser = await User.findOne({ email:email });
+        const { name, email, password } = req.body;
+        const findUser = await User.findOne({ email });
         if (findUser) {
-           return res.redirect("/signup", { message: "Email already exists" });
+            return res.status(400).json({ error: "Email already exists" });
         }
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
         if (!emailSent) {
-            return res.json('email-error');
+            return res.json({ error: 'email-error' });
         }
         req.session.userOtp = otp;
-        req.session.userData = {name, email, password};
-        console.log('Stored OTP in session:', req.session.userOtp)
-        res.render("user/otpForm");
-        console.log("OTP sent:", otp);  
-            
+        req.session.userData = { name, email, password };
+        console.log('Stored OTP in session:', req.session.userOtp);
+        
+        // Consider sending a success message here if OTP form rendering is handled separately
+        res.json({ success: true });
+
+        // If rendering the OTP form directly
+        // res.render("user/otpForm");
+        console.log("OTP sent:", otp);
+
     } catch (error) {
         console.error('Error during signup:', error);
         res.redirect("/error");
     }
 };
+
+
 
 const securePassword=async(password)=>{
     try {
@@ -140,6 +145,11 @@ const securePassword=async(password)=>{
     } catch (error) {
         
     }
+}
+
+
+const otpPage=async(req,res)=>{
+    res.render("user/otpForm")
 }
 
 const verifyOTP=async(req,res)=>{       
@@ -198,24 +208,17 @@ const resendOtp = async (req, res) => {
     }
 };
 
-
-
 const loadUserHomePage=async(req,res)=>{
-    const Category = await category.find({isDeleted:false});
-    const Product=await product.find()
-    res.render('user/menuPage',{Category,Product})
+    try {
+        const Category = await category.find({isDeleted:false});
+        const Product=await product.find()
+        res.render('user/menuPage',{Category,Product})
+    } catch (error) {
+        res.redirect('/')
+        
+    }
+   
 }
-
-const logout = (req, res) => {
-    req.session.destroy((err) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.redirect("/");
-      }
-    });
-  };
-
 
   const single_ProductView=async(req,res)=>{
     try {
@@ -229,6 +232,16 @@ const logout = (req, res) => {
   }
   
 
+  
+  const logout = (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res.redirect("/");
+      }
+    });
+  };
 
 
 module.exports = {
@@ -241,5 +254,6 @@ module.exports = {
     resendOtp,
     loadUserHomePage,
     logout,
-    single_ProductView
+    single_ProductView,
+    otpPage
 };

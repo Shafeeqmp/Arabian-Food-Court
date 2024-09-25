@@ -10,6 +10,7 @@ userRouter.get('/login',userController.loadLogin);
 userRouter.post('/login',userController.login);
 userRouter.get('/signup',userController.loadSignup);
 userRouter.post('/signup',userController.signup);
+userRouter.get('/otpPage',userController.otpPage);
 userRouter.post('/verify-OTP',userController.verifyOTP)
 userRouter.post('/resend-OTP', userController.resendOtp);
 userRouter.get('/userHomePage',userController.loadUserHomePage)

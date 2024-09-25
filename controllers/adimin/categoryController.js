@@ -42,23 +42,32 @@ const add_Category=async(req,res)=>{
 }
 
 //Edit Category Section
-const edit_Category=async (req, res) =>{
-  try {
-    const { id } = req.params;
-    const { name } = req.body;
-    const cateData = await category.findById(id);
-    const existCat=await category.findOne({category_name:name})
-    if (!cateData&&existCat) {
+const edit_Category = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name } = req.body;
+    //   const upperCaseName = name.toUpperCase();
+      const cateData = await category.findById(id);
+      if (!cateData) {
         return res.status(404).json({ success: false, message: 'Category not found' });
+      }
+    //   const existCat = await category.findOne({ 
+    //     category_name: upperCaseName 
+    // });
+      // Check if a category with the new name already exists
+      if (existCat && existCat._id.toString() !== id) {
+        return res.status(400).json({ success: false, message: 'Category name already exists' });
+      }
+      cateData.category_name = name;
+      await cateData.save();
+  
+      res.status(200).json({ success: true, message: 'Category updated successfully' });
+    } catch (error) {
+      console.error('Error updating category:', error);
+      res.status(500).json({ success: false, message: 'Failed to update category' });
     }
-    cateData.category_name = name;
-    await cateData.save();
-    res.status(200).json({ success: true, message: 'Category updated successfully' });
-} catch (error) {
-  console.error('Error updating category:', error);
-    res.status(500).json({ success: false, message: 'Failed to update category' });
-}
-}
+  };
+  
 
 //Delete Category Section
 const delete_Category=async (req, res) => {

@@ -251,9 +251,14 @@
                                 </td>
                                     
                                 <td class="table-actions">
-                                    <a href="/admin/editProductPage/<%= product.id %>" class="btn btn-edit">Edit</a>
-                                    
-                                    <a href="/admin/delete-product/<%= product._id %>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete <%= product.productname %>?')">Delete</a>
+                                    <% if (product.isDelete) { %>
+                                    <button class="btn btn-primary btn-sm" onclick="restoreProduct(event,'<%= product._id %>')"></button>
+                                        <i class="fas fa-recycle"></i> Restore
+                                    </button>
+                                    <% } else { %>                                      
+                                    <a href="#" class="btn btn-edit" onclick="confirmEdit('<%= product.id %>')">Edit</a>
+                                    <a href="#" class="btn btn-delete" onclick="deleteconfirm(event, '<%= product._id %>')">Delete</a>
+                                    <% } %>
                                 </td>
                             </tr>
                             <% }); %>
@@ -269,6 +274,107 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        //Delete Function
+        function deleteconfirm(event, productId) {
+          event.preventDefault();
+          Swal.fire({
+            title: "Do you really want to delete this product?",
+            showDenyButton: true,
+            showCancelButton: true,
+            confirmButtonText: "Delete",
+            denyButtonText: `Don't delete`,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              fetch(`/admin/deleteProduct`, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'X-Requested-With': 'XMLHttpRequest' 
+                },
+                body: JSON.stringify({ proId: productId })
+              })
+              .then(response => response.json())
+              .then(data => {
+                Swal.fire('Product deleted successfully', '', 'success');
+              })
+              .catch(error => {
+                Swal.fire('Something went wrong!', '', 'error');
+                console.error('Error:', error);
+              });
+            } else if (result.isDenied) {
+              Swal.fire('Product was not deleted', '', 'info');
+            }
+          });
+        }
+
+        //Restore Function
+        function restoreProduct(event,productId) {
+        Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to restore this Product?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, restore it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/restoreProduct/${productId}`, {
+                method: 'PUT'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Restored!',
+                        text: 'Product has been restored successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: 'Failed to restore product.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error restoring product:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An unexpected error occurred.',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+
+// Edit Function
+function confirmEdit(productId) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You are about to edit this product.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, edit it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = `/admin/editProductPage/${productId}`;
+      }
+    });
+  }
+
+      </script>
 </body>
 
 </html>

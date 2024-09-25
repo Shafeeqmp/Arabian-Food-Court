@@ -12,7 +12,9 @@ const sharp=require('sharp')
 const load_ProuctPage = async (req, res) => {
   try {
     if (req.session.isAdmin) {
-      const Product = await product.find().populate('category_id')
+      const Product = await product.find({isDelete:false}).populate('category_id')
+      console.log(Product);
+      
       res.render("admin/productMng",{Product});
     } else {
       res.redirect("/admin/loadAdminDash");
@@ -43,6 +45,7 @@ const add_Product = async (req, res) => {
     const Category = await category.find({ isDeleted: false });
 
     if (existProduct) {
+      
       return res.render('admin/addProduct', { Category, exist: "Product already exists" });
     }
 
@@ -93,13 +96,11 @@ const loadEditProductPage = async (req, res) => {
 
 
 
-// Controller Function
+//Edit Product post Section
 const editProduct = async (req, res) => {
-  try {
-    console.log("halooo");
-    
+  try {   
     const productId = req.params.id;
-    const { productName, Category_id, description, stock, price } = req.body;
+    const { productName, Category_id,price,stock,description} = req.body;
     const images = req.files;
     const existingProduct = await product.findById(productId);
     if (!existingProduct) {
@@ -119,7 +120,7 @@ const editProduct = async (req, res) => {
       existingProduct.images = updatedImages;
     }
     await existingProduct.save();
-    res.redirect('/admin/loadProductPage'); // Fixed the URL here as well
+    res.redirect('/admin/loadProuctPage');
     console.log("Product updated successfully");
 
   } catch (error) {
@@ -128,6 +129,47 @@ const editProduct = async (req, res) => {
   }
 };
 
+const delete_Product=async(req,res)=>{
+  if (req.session.isAdmin) {
+    try {
+      const { proId } = req.body;
+      await product.findByIdAndUpdate(proId, { isDelete: true });
+      res.status(200).json({ message: "product deleted successfully" });
+    } catch (err) {
+      console.log("something went wrong while deleting the product");
+      res.status(500).json({ err: "something went wrong while deleting the product" });
+    }
+  } else {
+    res.redirect("/admin/login");
+  }
+}
+
+
+const restore_Product=async(req,res)=>{
+  if (req.session.isAdmin) {
+    try {
+      const { proId } = req.body;
+      const Product = await product.findById(proId).populate('category_id')
+console.log(Product);
+
+      const Category = await category.findById(product.Category_id._id)
+      if(category.isDeleted){
+        return res.status(400).json({ message: 'category of this product is deleted' });
+      }else{
+        await Product.findByIdAndUpdate(proId, { isDelete: false });
+      }
+
+
+      res.status(200).json({ message: "product restored successfully" });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ err: "something went wrong while restoring the product" });
+    }
+  } else {
+    res.redirect("/admin/login");
+  }
+}
 
 
 
@@ -145,5 +187,7 @@ module.exports={
     addProuct_Page,
     add_Product,
     loadEditProductPage,
-    editProduct
+    editProduct,
+    delete_Product,
+    restore_Product
 }

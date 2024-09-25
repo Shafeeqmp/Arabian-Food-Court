@@ -249,7 +249,7 @@
                                                     </button>
                                                     <button class="btn btn-danger btn-sm" onclick="deleteCategory('<%= category._id %>')">
                                                         <i class="fas fa-trash"></i> Delete
-                                                    </button>
+                                                    </button>                                                    
                                                 <% } %>
                                             </td>
                                         </tr>
@@ -294,114 +294,212 @@
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
     
         let currentCategoryId = null;
 
         // Add Category Section
         async function addCategory() {
-            const categoryName = document.getElementById('addCategory').value;
-            try {
-                if (categoryName.trim() === '') {
-                    alert('Please enter a category name.');
-                    return;
-                }
+    const categoryName = document.getElementById('addCategory').value.trim();
+    if (categoryName === '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please enter a category name!',
+        });
+        return;
+    }
+    try {
+        const response = await fetch('/admin/addCategory', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: categoryName })
+        });
 
-                const response = await fetch('/admin/addCategory', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: categoryName })
-                });
-
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    alert('Failed to add category');
-                }
-            } catch (error) {
-                console.error('Error while adding category', error);
-            }
+        if (response.ok) {
+            Swal.fire({
+                title: 'Category Added!',
+                text: 'The new category was added successfully.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed!',
+                text: 'Failed to add the category. Please try again.',
+            });
         }
+    } catch (error) {
+        console.error('Error while adding category', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'An unexpected error occurred while adding the category.',
+        });
+    }
+}
 
-        //Edit Category Section
-        function editCategory(categoryId, categoryName) {
-            currentCategoryId = categoryId;
-            console.log(categoryName);
-            
-            document.getElementById('editCategoryName').value = categoryName;
-            console.log(document.getElementById('editCategoryName').value);
-            
-            $('#editCategoryModal').modal('show');
+
+    //Edit Category Section
+    function editCategory(categoryId, categoryName) {
+    currentCategoryId = categoryId;
+    document.getElementById('editCategoryName').value = categoryName;
+    
+    $('#editCategoryModal').modal('show');
+}
+
+async function saveCategoryChanges() {
+    const updatedCategoryName = document.getElementById('editCategoryName').value.trim();
+
+    if (updatedCategoryName === '') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Please enter a category name!',
+        });
+        return;
+    }
+
+    try {
+        const response = await fetch(`/admin/editCategory/${currentCategoryId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: updatedCategoryName })
+        });
+
+        if (response.ok) {
+            Swal.fire({
+                title: 'Updated!',
+                text: 'Category updated successfully!',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            }).then(() => {
+                $('#editCategoryModal').modal('hide');
+                location.reload();
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'Failed!',
+                text: 'Failed to update category. Please try again.',
+            });
         }
-
-        async function saveCategoryChanges() {
-            const updatedCategoryName = document.getElementById('editCategoryName').value;
-
-            if (updatedCategoryName.trim() === '') {
-                alert('Please enter a category name.');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/admin/editCategory/${currentCategoryId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name: updatedCategoryName })
-                    
-                });
-                if (response.ok) {
-                    alert('Category updated successfully!');
-                    $('#editCategoryModal').modal('hide');
-                    location.reload();
-                } else {
-                    alert('Failed to update category');
-                }
-            } catch (error) {
-                console.error('Error updating category:', error);
-            }
-        }
-
+    } catch (error) {
+        console.error('Error updating category:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'An unexpected error occurred while updating the category.',
+        });
+    }
+}
         //Delete Category Section
-        function deleteCategory(categoryId) {
-            if (confirm('Are you sure you want to delete this category?')) {
-                fetch(`/admin/deleteCategory/${categoryId}`, {
-                    method: 'PUT'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Category deleted successfully!');
+    function deleteCategory(categoryId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/deleteCategory/${categoryId}`, {
+                method: 'PUT'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Category has been deleted successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
                         location.reload();
-                    } else {
-                        alert('Failed to delete category');
-                    }
-                })
-                .catch(error => console.error('Error deleting category:', error));
-            }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: 'Failed to delete category.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting category:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An unexpected error occurred.',
+                    icon: 'error'
+                });
+            });
         }
+    });
+}
+
 
         //Restore Category Setion
         function restoreCategory(categoryId) {
-            if (confirm('Are you sure you want to restore this category?')) {
-                fetch(`/admin/restoreCategory/${categoryId}`, {
-                    method: 'PUT'
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Category restored successfully!');
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to restore this category?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, restore it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/restoreCategory/${categoryId}`, {
+                method: 'PUT'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Restored!',
+                        text: 'Category has been restored successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
                         location.reload();
-                    } else {
-                        alert('Failed to restore category');
-                    }
-                })
-                .catch(error => console.error('Error restoring category:', error));
-            }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: 'Failed to restore category.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error restoring category:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An unexpected error occurred.',
+                    icon: 'error'
+                });
+            });
         }
+    });
+}
 
         
     </script>
