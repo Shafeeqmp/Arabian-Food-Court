@@ -2,12 +2,9 @@
 <html>
 
 <head>
-  <!-- Basic -->
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <!-- Mobile Metas -->
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <!-- Site Metas -->
   <meta name="keywords" content="" />
   <meta name="description" content="" />
   <meta name="author" content="" />
@@ -29,7 +26,38 @@
   <link href="/public/css/style.css" rel="stylesheet" />
   <!-- responsive style -->
   <link href="/public/css/responsive.css" rel="stylesheet" />
+  <style>
+.dropdown-menu {
+  padding: 0;
+  margin: 0;
+}
 
+.profile-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit; /* Adjust this based on your theme */
+  padding: 8px 16px; /* Adjust padding as needed */
+  transition: background-color 0.2s ease; /* Smooth background color transition */
+}
+
+.profile-link:hover {
+  background-color: #f0f0f0; /* Highlight on hover */
+}
+
+.profile-avatar {
+  width: 24px; /* Size of the avatar */
+  height: 24px;
+  border-radius: 50%; /* Circular avatar */
+  margin-right: 8px; /* Space between avatar and text */
+}
+
+.logout-link {
+  margin-bottom: 8px; /* Space between logout and profile link */
+}
+
+  </style>
+ 
 </head>
 
 <body class="sub_page">
@@ -53,42 +81,52 @@
 
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
-              <li class="nav-item">
+              <!-- <li class="nav-item">
                 <a class="nav-link" href="index.html">Home </a>
-              </li>
+              </li> -->
               <li class="nav-item active">
-                <a class="nav-link" href="menu.html">Shop <span class="sr-only">(current)</span> </a>
+                <a class="nav-link" href="#">Home <span class="sr-only">(current)</span> </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="about.html">About</a>
+                <a class="nav-link" href="#">About us</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="book.html">Contacts</a>
+                <a class="nav-link" href="#">Contact us</a>
               </li>
             </ul>
             <div class="user_option">
-              <form class="form-inline">
+              <!-- <form class="form-inline">
                 <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
                   <i class="fa fa-search" aria-hidden="true"></i>
                 </button>
-              </form>
-              <a class="cart_link" href="cart.html">
+              </form> -->
+              <a class="cart_link" href="#">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="50" height="50">
                   <path d="M345.6 338.862c-29.184 0-53.248 23.552-53.248 53.248s23.552 53.248 53.248 53.248 53.248-23.552 53.248-53.248-23.552-53.248-53.248-53.248zM439.296 84.91h-330.56l-5.12-34.304c-2.048-13.824-21.504-30.72-44.544-30.72H20.48C9.216 19.886 0 29.102 0 40.366S9.216 60.846 20.48 60.846h41.472c2.56 0 4.608 2.048 5.12 4.608l31.744 216.064c4.096 27.136 27.648 47.616 55.296 47.616h212.992c26.624 0 49.664-18.944 55.296-45.056l33.28-166.4c4.096-21.504-3.072-32.256-14.336-34.304zM215.04 389.55c-1.024-28.16-24.576-50.688-52.736-50.688-29.696 1.536-52.224 26.112-51.2 55.296 1.024 28.16 24.064 50.688 52.224 50.688 29.184 0 52.224-24.576 51.712-55.296z"/>
                 </svg>
-              </a>              
+              </a> 
+                <a class="bi bi-heart" href="#">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="white" fill="currentColor" class="bi bi-suit-heart" viewBox="0 0 16 16">
+                    <path d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.6 7.6 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z"/>
+                  </svg>
+                </a> 
+                            
               <!-- <p class="user_proname">shafeeq</p> -->
-              <a href="#" class="user_proname">jjjjjj</a>
+              <p href="#" class="user_proname"><%= user.name %></p>
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="loginDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <i class="fa fa-user" aria-hidden="true"></i>
                 </button>
                 
                 <div class="dropdown-menu" aria-labelledby="loginDropdown">
-                  <form action="/logout" method="post">
-                  <button href="/logout" class="user_logoutbtn">Logout</button>
-                </form>
-                </div>
+                  <a href="/logout" class="profile-link logout-link">
+                    Logout
+                  </a>
+                  <a href="#" class="profile-link">
+                    <img src="/public/images/profile.png" alt="Profile Avatar" class="profile-avatar">
+                    profile
+                  </a>
+                </div>                
               </div>
             </div>
           </div>
@@ -99,7 +137,6 @@
   </div>
 
   <!-- food section -->
-
   <section class="food_section layout_padding">
     <div class="container">
       <div class="heading_container heading_center">
@@ -107,14 +144,6 @@
           Chose Category Menu
         </h2>
       </div>
-      
-      <!-- <ul class="filters_menu">
-        <li class="active" data-filter="*">All</li>
-        <li data-filter=".burger">Burger</li>
-        <li data-filter=".pizza">Pizza</li>
-        <li data-filter=".pasta">Pasta</li>
-        <li data-filter=".fries">Fries</li>
-      </ul> -->
       <ul class="filters_menu">
         <li class="active" data-filter="*" onclick="filterSelection('all')">All</li>
         <% Category.forEach(category => { %>
@@ -140,6 +169,7 @@
                   <p>
                   <%= product.description %>
                   </p>
+                  <!-- Cart Icon -->
                   <div class="options">
                     <h6>₹ <%= product.price %></h6>
                     <a href="">
@@ -147,7 +177,16 @@
                         <path d="M345.6 338.862c-29.184 0-53.248 23.552-53.248 53.248s24.064 53.248 53.248 53.248 53.248-23.552 53.248-53.248-24.064-53.248-53.248-53.248zM439.296 84.91h-330.56l-5.12-34.304c-2.048-13.824-21.504-30.72-44.544-30.72H20.48C9.216 19.886 0 29.102 0 40.366S9.216 60.846 20.48 60.846h41.472c2.56 0 4.608 2.048 5.12 4.608l31.744 216.064c4.096 27.136 27.648 47.616 55.296 47.616h212.992c26.624 0 49.664-18.944 55.296-45.056l33.28-166.4c4.096-21.504-3.072-32.256-14.336-34.304zM215.04 389.55c-1.024-28.16-24.576-50.688-52.736-50.688-29.696 1.536-52.224 26.112-51.2 55.296 1.024 28.16 24.064 50.688 52.224 50.688 29.184 0 52.224-24.576 51.712-55.296z" />
                       </svg>
                     </a>
-                    
+                  </div>
+                  <span class="text-warning">★ ★ ★ ★ ☆</span> (4.5)
+
+                  <!-- Whish List -->
+                  <div class="option">
+                    <a class="bi bi-heart" href="">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="white" fill="currentColor" class="bi bi-suit-heart" viewBox="0 0 16 16">
+                        <path d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.6 7.6 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z"/>
+                      </svg>
+                    </a>
                   </div>
                 </div>
               </div>

@@ -72,7 +72,7 @@
                   <h2 class="text-uppercase text-center mb-4">Login Page</h2>
                   <p class="text-danger"><%= locals.message ? message:null %></p>
                   <p class="text-danger"><%= locals.pmessage ? pmessage : null %></p>
-                  <form action="/login" method="post">
+                  <form action="#" method="post">
                     <!-- Email Input -->
                     <div class="form-outline mb-4">
                       <label class="form-label" for="form3Example3cg">Enter Email</label>
@@ -86,10 +86,7 @@
                     </div>
                     <!-- Login Button -->
                     <div class="d-flex justify-content-center mb-4">
-                      <button
-                        type="submit"
-                        class="btn btn-success btn-lg gradient-custom-4 text-body">Login
-                      </button>
+                      <button onclick="userLogin(event)" type="submit" class="btn btn-success btn-lg gradient-custom-4 text-body">Login </button>
                     </div>
 
                     <!-- Google Sign-in Button -->
@@ -115,6 +112,61 @@
     <!-- Bootstrap JS and Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+    <script>
+      function userLogin(event) {
+          event.preventDefault();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value.trim();
+  
+          if (!email || !password) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Please fill in both the email and password',
+                  confirmButtonText: 'Okay'
+              });
+              return;
+          }
+  
+          fetch("/login", {
+              method: 'POST',
+              headers: {
+                  "Content-Type": "application/json"
+              },
+              body: JSON.stringify({ email, password })
+          })
+          .then((res) => res.json())
+          .then((data) => {
+              if (data.success) {
+                  Swal.fire({
+                      icon: 'success',
+                      title: 'Login Successful',
+                      text: 'You will be redirected shortly!',
+                      timer: 1000,
+                      showConfirmButton: false
+                  }).then(() => {
+                      window.location.href = data.redirect; 
+                  });
+              } else if (data.error) {
+                  Swal.fire({
+                      icon: 'error',
+                      title: 'Login Failed',
+                      text: data.error,
+                      confirmButtonText: 'Retry'
+                  });
+              }
+          })
+          .catch((error) => {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Oops!',
+                  text: 'Something went wrong. Please try again!',
+                  confirmButtonText: 'Okay'
+              });
+          });
+      }
+  </script>
+  
+  
   </body>
 </html>

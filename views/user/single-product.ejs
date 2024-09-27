@@ -1,11 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Single Product View with Cursor Zoom</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- bootstrap core css -->
+  <link rel="stylesheet" type="text/css" href="/public/css/bootstrap.css" />
+  
+  <!--owl slider stylesheet -->
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <!-- nice select  -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha512-CruCP+TD3yXzlvvijET8wV5WxxEh5H8P4cmz0RFbKK6FlZ2sYl3AEsKlLPHbniXKSrDdFewhbmBK5skbdsASbQ==" crossorigin="anonymous" />
+  <!-- font awesome style -->
+  <link href="/public/css/font-awesome.min.css" rel="stylesheet" />
+
+  <!-- Custom styles for this template -->
+  <link href="/public/css/style.css" rel="stylesheet" />
+  <!-- responsive style -->
+  <link href="/public/css/responsive.css" rel="stylesheet" />
     <style>
+
         /* Main image container for zoom effect */
         .product-image-container {
             width: 100%;
@@ -50,19 +66,73 @@
             .product-image {
                 transform: none;
             }
+
             .thumbnail-images {
                 flex-direction: row;
                 overflow-x: auto;
             }
+
             .thumbnail-images img {
                 margin-right: 10px;
                 margin-bottom: 0;
                 width: 75px;
             }
         }
+
+        /* Breadcrumb styling */
+        .breadcrumb-item a {
+            text-decoration: none;
+        }
+
+        /* Pagination styling */
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            text-decoration: none;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            border-color: #007bff;
+            color: white;
+        }
+        .breadcrumb {
+            background-color: #f8f9fa; /* Light background for breadcrumb */
+            border-radius: 0.375rem; /* Rounded corners */
+            padding: 0.75rem 1rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: #6c757d; /* Gray color for separator */
+        }
+
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #007bff; /* Bootstrap primary color */
+        }
+
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-item.active {
+            color: #6c757d; /* Gray color for active item */
+        }
     </style>
 </head>
+
 <body>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/login">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Product Page</li>
+        </ol>
+    </nav>
     <div class="container mt-5">
         <div class="row">
             <!-- Thumbnails -->
@@ -80,52 +150,410 @@
                 </div>
             </div>
 
-            <!-- Product Details: Price, Cart, Description, Stock, etc. -->
+            <!-- Product Details: Price, Cart, Description, Stock -->
             <div class="col-md-5">
                 <h2><%=Product.productname %></h2>
                 <h3 class="text-danger">₹ <%= Product.price %></h3>
-                <p class="<%= Product.stock > 0 ? 'text-success' : 'text-danger' %>"><%= Product.stock > 0 ? `${Product.stock} In Stock` : 'Out of Stock' %></p>
+                <p class="<%= Product.stock > 0 ? 'text-success' : 'text-danger' %>">
+                    <%= Product.stock > 0 ? `${Product.stock} In Stock` : 'Out of Stock' %>
+                </p>
                 <p>
-                   <%= Product.description %> 
+                    <%= Product.description %>
                 </p>
                 <div class="mb-3">
                     <span class="text-warning">★ ★ ★ ★ ☆</span> (4.5)
                 </div>
+                <a class="wishlist-link btn btn-outline-dark" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" stroke="red" fill="currentColor" class="bi bi-suit-heart" viewBox="0 0 16 16">
+                        <path d="m8 6.236-.894-1.789c-.222-.443-.607-1.08-1.152-1.595C5.418 2.345 4.776 2 4 2 2.324 2 1 3.326 1 4.92c0 1.211.554 2.066 1.868 3.37.337.334.721.695 1.146 1.093C5.122 10.423 6.5 11.717 8 13.447c1.5-1.73 2.878-3.024 3.986-4.064.425-.398.81-.76 1.146-1.093C14.446 6.986 15 6.131 15 4.92 15 3.326 13.676 2 12 2c-.777 0-1.418.345-1.954.852-.545.515-.93 1.152-1.152 1.595zm.392 8.292a.513.513 0 0 1-.784 0c-1.601-1.902-3.05-3.262-4.243-4.381C1.3 8.208 0 6.989 0 4.92 0 2.755 1.79 1 4 1c1.6 0 2.719 1.05 3.404 2.008.26.365.458.716.596.992a7.6 7.6 0 0 1 .596-.992C9.281 2.049 10.4 1 12 1c2.21 0 4 1.755 4 3.92 0 2.069-1.3 3.288-3.365 5.227-1.193 1.12-2.642 2.48-4.243 4.38z" />
+                    </svg>
+                    Add to Wishlist
+                </a>
                 <div class="d-grid gap-2 mt-4">
-                    <a class="btn btn-primary btn-lg">Add to Cart</a>
+                    <a href="/getAddressPage" class="btn btn-primary btn-lg">Add to Cart</a>
                 </div>
             </div>
         </div>
     </div>
+    <section class="food_section layout_padding">
+        <div class="container">
+          <div class="heading_container heading_center">
+            <h2>Related Products</h2>
+          </div>
+    
+          <!-- <ul class="filters_menu">
+            <li class="active" data-filter="*">All</li>
+            <li data-filter=".burger">Burger</li>
+            <li data-filter=".pizza">Pizza</li>
+            <li data-filter=".pasta">Pasta</li>
+            <li data-filter=".fries">Fries</li>
+          </ul> -->
+    
+          <div class="filters-content">
+            <div class="row grid">
+              <div class="col-sm-6 col-lg-4 all pizza">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f1.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Delicious Pizza
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $20
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all burger">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f2.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Delicious Burger
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $15
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all pizza">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f3.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Delicious Pizza
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $17
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all pasta">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f4.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Delicious Pasta
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $18
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all fries">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f5.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        French Fries
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $10
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all pizza">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f6.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Delicious Pizza
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $15
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all burger">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f7.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Tasty Burger
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $12
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all burger">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f8.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Tasty Burger
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $14
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a> 
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4 all pasta">
+                <div class="box">
+                  <div>
+                    <div class="img-box">
+                      <img src="/public/images/f9.png" alt="">
+                    </div>
+                    <div class="detail-box">
+                      <h5>
+                        Delicious Pasta
+                      </h5>
+                      <p>
+                        Veniam debitis quaerat officiis quasi cupiditate quo, quisquam velit, magnam voluptatem repellendus sed eaque
+                      </p>
+                      <div class="options">
+                        <h6>
+                          $10
+                        </h6>
+                        <a href="#">
+                          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="24" height="24" fill="currentColor">
+                              <!-- Circle for the button -->
+                              <circle cx="345.6" cy="392.11" r="53.248"/>
+                              <!-- Main shape of the button -->
+                              <path d="M439.296,84.91c-1.024,0-2.56-0.512-4.096-0.512H112.64l-5.12-34.304C104.448,27.566,84.992,10.67,61.952,10.67H20.48
+                                  C9.216,10.67,0,19.886,0,31.15c0,11.264,9.216,20.48,20.48,20.48h41.472c2.56,0,4.608,2.048,5.12,4.608l31.744,216.064
+                                  c4.096,27.136,27.648,47.616,55.296,47.616h212.992c26.624,0,49.664-18.944,55.296-45.056l33.28-166.4
+                                  C457.728,97.71,450.56,86.958,439.296,84.91z"/>
+                              <!-- Secondary shape for the button -->
+                              <path d="M215.04,389.55c-1.024-28.16-24.576-50.688-52.736-50.688c-29.696,1.536-52.224,26.112-51.2,55.296
+                                  c1.024,28.16,24.064,50.688,52.224,50.688h1.024C193.536,443.31,216.576,418.734,215.04,389.55z"/>
+                          </svg>
+                      </a>                  
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- <div class="btn-box">
+            <a href="">
+              View More
+            </a>
+          </div> -->
+        </div>
+      </section>
 
+    <!-- Pagination -->
+    <nav aria-label="Page navigation example" class="mt-4">
+        <ul class="pagination">
+            <li class="page-item"><a class="page-link" href="#" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#" aria-label="Next"><span aria-hidden="true">&raquo;</span></a></li>
+        </ul>
+    </nav>
     <script>
-        // JavaScript to change the main image based on the clicked thumbnail
         function changeImage(imageSrc) {
             document.getElementById('mainProductImage').src = imageSrc;
-
-            // Remove active class from all thumbnails
             document.querySelectorAll('.thumb').forEach(function(img) {
                 img.classList.remove('active-thumbnail');
             });
-
-            // Add active class to clicked thumbnail
             event.target.classList.add('active-thumbnail');
         }
 
-        // JavaScript to handle cursor-follow zoom effect
         const productImage = document.getElementById('mainProductImage');
         const imageContainer = document.getElementById('imageContainer');
 
         imageContainer.addEventListener('mousemove', function(e) {
             const rect = imageContainer.getBoundingClientRect();
-            const x = e.clientX - rect.left; // X position within the image container
-            const y = e.clientY - rect.top;  // Y position within the image container
-
-            // Set transform origin to follow the cursor
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
             productImage.style.transformOrigin = `${x}px ${y}px`;
         });
 
-        // Reset transform origin on mouse out
         imageContainer.addEventListener('mouseleave', function() {
             productImage.style.transformOrigin = 'center';
         });
@@ -133,5 +561,26 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQery -->
+  <script src="/public/js/jquery-3.4.1.min.js"></script>
+  <!-- popper js -->
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous">
+  </script>
+  <!-- bootstrap js -->
+  <script src="/public/js/bootstrap.js"></script>
+  <!-- owl slider -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js">
+  </script>
+  <!-- isotope js -->
+  <script src="https://unpkg.com/isotope-layout@3.0.4/dist/isotope.pkgd.min.js"></script>
+  <!-- nice select -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/js/jquery.nice-select.min.js"></script>
+  <!-- custom js -->
+  <script src="/public/js/custom.js"></script>
+  <!-- Google Map -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCh39n5U-4IoWpsVGUHWdqB6puEkhRLdmI&callback=myMap">
+  </script>
+  <!-- End Google Map -->
 </body>
+
 </html>

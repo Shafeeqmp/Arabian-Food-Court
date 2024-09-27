@@ -3,56 +3,65 @@ const nodemailer = require('nodemailer');
 const env=require('dotenv').config(); 
 const bcrypt = require('bcrypt'); 
 const category=require('../../models/categoryModel')
-const product=require('../../models/productModel')
+const product=require('../../models/productModel');
+const { name } = require('ejs');
 
 
 
-const loadIndexPage = (req, res) => {
-    if(req.session.email){
-        res.redirect("/menuPage")
-    }else if(req.session.isAdmin){
-        res.redirect('/')
+
+const loadIndexPage = async(req, res) => {
+    try {
+        if(req.session.email){
+            res.redirect("/userHomePage")
+        }else{
+            const Category = await category.find({ isDeleted: false });
+            const Product = await product.find({ isDelete: false });
+            res.render('user/index',{Category,Product})
+        }
+    } catch (error) {
+        console.error('Error during login:', error);
+        return res.status(500).json({ error: 'Something went wrong. Please try again.' });  
     }
-    res.render('user/index');
+    
 };
 
 const loadLogin = (req, res) => {
-    res.render('user/loginPage');
+    if(req.session.email){
+        res.redirect("/userHomePage")
+    }else {
+        res.render('user/loginPage');
+    }
 };
 
 const login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const findUser = await User.findOne({ email: email });
-        // Check if user exists
+
         if (!findUser) {
-            return res.render('user/loginPage', { pmessage: 'Incorrect username and password' });
+            return res.status(400).json({ error: "Incorrect username and password" });
         }
-        // Check if user is blocked
         if (findUser.isBlocked) {
-            return res.render('user/loginPage', { pmessage: 'User is blocked' });
+            return res.status(400).json({ error: "User is blocked" });
         }
-        // Validate password
         const isPasswordValid = await bcrypt.compare(password, findUser.password);
         if (!isPasswordValid) {
-            return res.render('user/loginPage', { pmessage: 'Incorrect username and password' });
+            return res.status(400).json({ error: "Incorrect username and password" });
         }
-        // Set session values
         req.session.userId = findUser._id;
         req.session.email = findUser.email;
-        // Admin check and redirection
         if (findUser.isAdmin) {
             req.session.isAdmin = true;
-            return res.render('user/error');
+            return res.status(200).json({ success: true, redirect: '/adminDashboard' });
         } else {
-            const Category=await category.find({isDeleted:false})
-            const Product=await product.find({isDelete:false})
             req.session.isAdmin = false;
-            return  res.render('user/menuPage',{Category,Product});  // Redirect to the user homepage
+            const Category = await category.find({ isDeleted: false });
+            const Product = await product.find({ isDelete: false });
+            return res.status(200).json({ success: true, redirect: '/userHomePage' });
         }
     } catch (error) {
         console.error('Error during login:', error);
-        return res.status(500).render('user/loginPage', { pmessage: 'Something went wrong. Please try again.' });
+        return res.status(500).json({ error: 'Something went wrong. Please try again.' });
     }
 };
 
@@ -208,31 +217,38 @@ const resendOtp = async (req, res) => {
     }
 };
 
-const loadUserHomePage=async(req,res)=>{
-    try {
-        const Category = await category.find({isDeleted:false});
-        const Product=await product.find()
-        res.render('user/menuPage',{Category,Product})
-    } catch (error) {
-        res.redirect('/')
-        
+const loadUserHomePage = async (req, res) => {
+    if (req.session.userId) {
+      try {
+        const Category = await category.find({ isDeleted: false });
+        const Product = await product.find({ isDelete: false });
+        const user = await User.findById(req.session.userId);
+        if (user) {
+          res.render('user/menuPage', { Category, Product, user });
+        } else {
+          res.redirect('/');
+        }
+      } catch (error) {
+        console.error(error);
+        res.redirect('/');
+      }
+    } else {
+      res.redirect('/');
     }
-   
-}
+  };
+  
 
   const single_ProductView=async(req,res)=>{
     try {
       const { id } = req.params; 
       const Product = await product.findById(id);
-      res.render('user/single-product', { Product });
+      res.render('user/single-product', { Product});
     } catch (err) {
       console.error(err);
       res.redirect('/userHomePage');
     }
   }
-  
 
-  
   const logout = (req, res) => {
     req.session.destroy((err) => {
       if (err) {
@@ -242,6 +258,7 @@ const loadUserHomePage=async(req,res)=>{
       }
     });
   };
+
 
 
 module.exports = {

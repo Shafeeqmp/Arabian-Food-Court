@@ -12,9 +12,7 @@ const sharp=require('sharp')
 const load_ProuctPage = async (req, res) => {
   try {
     if (req.session.isAdmin) {
-      const Product = await product.find({isDelete:false}).populate('category_id')
-      console.log(Product);
-      
+      const Product = await product.find().populate('category_id')
       res.render("admin/productMng",{Product});
     } else {
       res.redirect("/admin/loadAdminDash");
@@ -40,17 +38,19 @@ const addProuct_Page=async (req, res) => {
 const add_Product = async (req, res) => {
   try {
     const { productName, Category_id, description, stock, price } = req.body;
-    const images = req.files;
+    const images = req.files || []; // Ensure `images` is always an array
+    
+    console.log(images);
+
     const existProduct = await product.findOne({ productname: productName });
     const Category = await category.find({ isDeleted: false });
 
     if (existProduct) {
-      
-      return res.render('admin/addProduct', { Category, exist: "Product already exists" });
+      return res.status(400).json({ error: "Product already exists" });
     }
 
     let Images = [];
-    if (images) {
+    if (images.length > 0) {
       images.forEach(image => {
         const relativePath = image.path.replace(/^.*[\\\/]public[\\\/]uploads[\\\/]/, '/uploads/');
         Images.push(relativePath);
@@ -67,12 +67,12 @@ const add_Product = async (req, res) => {
     });
 
     await newProduct.save();
-    res.redirect('/admin/loadProuctPage');
-        console.log("Product added successfully");
+    res.status(200).json({ success: true });
+    console.log("Product added successfully");
 
   } catch (error) {
     console.error('Error adding product:', error);
-    res.status(400).send('Error adding product');
+    res.status(500).json({ error: 'Error adding product' });
   }
 };
 
@@ -129,47 +129,44 @@ const editProduct = async (req, res) => {
   }
 };
 
-const delete_Product=async(req,res)=>{
+const delete_Product = async (req, res) => {
   if (req.session.isAdmin) {
+
     try {
-      const { proId } = req.body;
-      await product.findByIdAndUpdate(proId, { isDelete: true });
-      res.status(200).json({ message: "product deleted successfully" });
+      const { productId } = req.params;
+      await product.findByIdAndUpdate(productId, { isDelete: true });
+      res.status(200).json({ success: true, message: "Product deleted successfully" });
     } catch (err) {
-      console.log("something went wrong while deleting the product");
-      res.status(500).json({ err: "something went wrong while deleting the product" });
+      console.error("Something went wrong while deleting the product");
+      res.status(500).json({ success: false, err: "Error deleting product" });
     }
   } else {
     res.redirect("/admin/login");
   }
-}
+};
 
 
-const restore_Product=async(req,res)=>{
+
+const restore_Product = async (req, res) => {
   if (req.session.isAdmin) {
     try {
-      const { proId } = req.body;
-      const Product = await product.findById(proId).populate('category_id')
-console.log(Product);
-
-      const Category = await category.findById(product.Category_id._id)
-      if(category.isDeleted){
-        return res.status(400).json({ message: 'category of this product is deleted' });
-      }else{
-        await Product.findByIdAndUpdate(proId, { isDelete: false });
+      const { productId } = req.params;
+      const Product = await product.findById(productId).populate('category_id');
+      
+      if (Product.category_id.isDeleted) {
+        return res.status(400).json({ success: false, message: 'Category of this product is deleted' });
       }
-
-
-      res.status(200).json({ message: "product restored successfully" });
+      
+      await product.findByIdAndUpdate(productId, { isDelete: false });
+      res.status(200).json({ success: true, message: "Product restored successfully" });
     } catch (err) {
-      res
-        .status(500)
-        .json({ err: "something went wrong while restoring the product" });
+      res.status(500).json({ success: false, err: "Error restoring product" });
     }
   } else {
     res.redirect("/admin/login");
   }
-}
+};
+
 
 
 

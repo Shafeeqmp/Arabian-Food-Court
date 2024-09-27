@@ -607,7 +607,21 @@ a:focus {
       -ms-flex-align: center;
           align-items: center;
 }
-
+.food_section .box .option a {
+  width: 40px;
+  height: 40px;
+  border-radius: 100%;
+  background: #f02975;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
 .food_section .box .options a svg {
   width: 18px;
   height: auto;

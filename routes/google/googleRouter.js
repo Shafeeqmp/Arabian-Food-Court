@@ -8,6 +8,8 @@ googleRouter.get("/google",passport.authenticate("google", {scope: ["profile", "
 googleRouter.get("/google/callback",passport.authenticate("google", { failureRedirect: "/signup", failureFlash: true }),
   (req, res) => {
     if (req.isAuthenticated()) {
+      const googleUser=req.user;
+      req.session.userId=googleUser.id || googleUser._id
       res.redirect("/userHomePage"); 
     }else{
       res.redirect('/')
@@ -17,3 +19,6 @@ googleRouter.get("/google/callback",passport.authenticate("google", { failureRed
 
 
 module.exports=googleRouter;
+
+
+
