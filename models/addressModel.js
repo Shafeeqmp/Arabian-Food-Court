@@ -37,5 +37,5 @@ const addressSchema =mongoose.Schema({
     }
 }, { timestamps: true });
 
-const address=mongoose.model("address",userSchema);
+const address=mongoose.model("address",addressSchema);
 module.exports=address

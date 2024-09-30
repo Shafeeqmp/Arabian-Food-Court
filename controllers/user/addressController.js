@@ -4,7 +4,8 @@ const User = require('../../models/userModel');
 
 
 const getAddress_Page=async(req,res)=>{
-    res.render('user/addressPage')
+            res.render('user/addressPage')
+
 }
 
 

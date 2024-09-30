@@ -22,7 +22,8 @@ const load_CategoryPage=async(req,res)=>{
 const add_Category=async(req,res)=>{
     try {
         const categoryName=req.body.name;
-        const existCat=await category.findOne({category_name:categoryName})
+        const upperCaseName = categoryName.toUpperCase();
+        const existCat = await category.findOne({ category_name: upperCaseName });
         const catData=await category.find()
         if(existCat){
             return res.render('admin/categoryPage',{
@@ -31,10 +32,11 @@ const add_Category=async(req,res)=>{
             })
         }
         const newcategory =new category({
-            category_name:categoryName
+            category_name:upperCaseName
         });
-        await newcategory.save()
-        res.redirect('/admin/categoryPage')
+            await newcategory.save()
+            res.redirect('/admin/categoryPage')
+        
     } catch (error) {
         console.log("error");
         res.status(500).json({ err: "something went wrong while adding new category" });
@@ -46,19 +48,19 @@ const edit_Category = async (req, res) => {
     try {
       const { id } = req.params;
       const { name } = req.body;
-    //   const upperCaseName = name.toUpperCase();
+      const upperCaseName = name.toUpperCase();
       const cateData = await category.findById(id);
       if (!cateData) {
         return res.status(404).json({ success: false, message: 'Category not found' });
       }
-    //   const existCat = await category.findOne({ 
-    //     category_name: upperCaseName 
-    // });
+      const existCat = await category.findOne({ category_name: upperCaseName });
       // Check if a category with the new name already exists
       if (existCat && existCat._id.toString() !== id) {
         return res.status(400).json({ success: false, message: 'Category name already exists' });
       }
-      cateData.category_name = name;
+      cateData.category_name = upperCaseName;
+      console.log(cateData);
+      
       await cateData.save();
   
       res.status(200).json({ success: true, message: 'Category updated successfully' });

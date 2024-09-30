@@ -88,7 +88,7 @@
                 </div>
                 <div class="form-group">
                   <label for="name">Description</label>
-                  <input type="text"id="dname" name="description" class="form-control"/>
+                  <input type="text"id="dname"name="description" class="form-control"/>
                 </div>
                 <div class="form-group">
                   <label for="category">Category</label>
@@ -204,6 +204,16 @@
           });
           return;
       }
+      if (description.trim().split(/\s+/).length > 30) {
+    Swal.fire({
+        title: 'Error',
+        text: "Only 30 words allowed",
+        icon: "error",
+        confirmButtonText: "Okay"
+    });
+    return;
+}
+
 
       // if (!/^[a-zA-Z\s]+$/.test(productName)) {
       //     Swal.fire({

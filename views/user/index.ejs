@@ -62,13 +62,13 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
               <li class="nav-item active">
-                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="/login">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/login">Shop</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="user/about">About</a>
+                <a class="nav-link" href="#">About</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">contacts</a>
@@ -272,7 +272,7 @@
             <div class="box">
               <div>
                 <div class="img-box">
-                  <a href="/user/singleProductView/<%= product._id %>"> 
+                  <a href="/login"> 
                     <img src="/public/<%= product.images[0] %>" alt="">
                   </a>
                 </div>                
@@ -280,6 +280,9 @@
                   <h5>
                    <%= product.productname %>
                   </h5>
+                  <p class="<%= Product.stock > 0 ? 'text-success' : 'text-danger' %>"></p>
+                    <%= product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock' %>
+                </p>
                   <p>
                   <%= product.description %>
                   </p>

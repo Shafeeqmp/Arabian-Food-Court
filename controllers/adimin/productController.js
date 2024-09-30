@@ -179,6 +179,9 @@ const restore_Product = async (req, res) => {
 
 
 
+
+
+
 module.exports={
     load_ProuctPage,
     addProuct_Page,

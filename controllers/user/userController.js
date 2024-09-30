@@ -218,7 +218,6 @@ const resendOtp = async (req, res) => {
 };
 
 const loadUserHomePage = async (req, res) => {
-    if (req.session.userId) {
       try {
         const Category = await category.find({ isDeleted: false });
         const Product = await product.find({ isDelete: false });
@@ -231,18 +230,16 @@ const loadUserHomePage = async (req, res) => {
       } catch (error) {
         console.error(error);
         res.redirect('/');
-      }
-    } else {
-      res.redirect('/');
-    }
+      } 
   };
   
 
   const single_ProductView=async(req,res)=>{
     try {
       const { id } = req.params; 
-      const Product = await product.findById(id);
-      res.render('user/single-product', { Product});
+      const Product = await product.findById(id).populate('category_id')
+      const Category=await product.find({category_id:Product.category_id._id}) 
+      res.render('user/single-product', { Product,Category});
     } catch (err) {
       console.error(err);
       res.redirect('/userHomePage');
