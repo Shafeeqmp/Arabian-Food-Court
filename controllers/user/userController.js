@@ -9,7 +9,7 @@ const { name } = require('ejs');
 
 
 
-const loadIndexPage = async(req, res) => {
+exports. loadIndexPage = async(req, res) => {
     try {
         if(req.session.email){
             res.redirect("/userHomePage")
@@ -25,7 +25,7 @@ const loadIndexPage = async(req, res) => {
     
 };
 
-const loadLogin = (req, res) => {
+exports. loadLogin = (req, res) => {
     if(req.session.email){
         res.redirect("/userHomePage")
     }else {
@@ -33,7 +33,7 @@ const loadLogin = (req, res) => {
     }
 };
 
-const login = async (req, res) => {
+exports. login = async (req, res) => {
     try {
         const { email, password } = req.body;
         const findUser = await User.findOne({ email: email });
@@ -68,7 +68,7 @@ const login = async (req, res) => {
 
 
 
-const loadSignup = async (req, res) => {
+exports. loadSignup = async (req, res) => {
     try {
         return res.render('user/signupPage');
     } catch (error) {
@@ -116,7 +116,7 @@ async function sendVerificationEmail(email, otp) {
     }
 }
 
-const signup = async (req, res) => {
+exports. signup = async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const findUser = await User.findOne({ email });
@@ -157,11 +157,11 @@ const securePassword=async(password)=>{
 }
 
 
-const otpPage=async(req,res)=>{
+exports. otpPage=async(req,res)=>{
     res.render("user/otpForm")
 }
 
-const verifyOTP=async(req,res)=>{       
+exports. verifyOTP=async(req,res)=>{       
     try {
        const {otp}=req.body;
        console.log('Received OTP from form:', otp);
@@ -187,7 +187,7 @@ const verifyOTP=async(req,res)=>{
     }
 }
 
-const resendOtp = async (req, res) => {
+exports. resendOtp = async (req, res) => {
     console.log("Resend OTP route hit");  // Debugging log
 
     try {
@@ -217,7 +217,7 @@ const resendOtp = async (req, res) => {
     }
 };
 
-const loadUserHomePage = async (req, res) => {
+exports. loadUserHomePage = async (req, res) => {
       try {
         const Category = await category.find({ isDeleted: false });
         const Product = await product.find({ isDelete: false });
@@ -234,7 +234,7 @@ const loadUserHomePage = async (req, res) => {
   };
   
 
-  const single_ProductView=async(req,res)=>{
+  exports. single_ProductView=async(req,res)=>{
     try {
       const { id } = req.params; 
       const Product = await product.findById(id).populate('category_id')
@@ -246,7 +246,7 @@ const loadUserHomePage = async (req, res) => {
     }
   }
 
-  const logout = (req, res) => {
+  exports. logout = (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.log(err);
@@ -258,16 +258,3 @@ const loadUserHomePage = async (req, res) => {
 
 
 
-module.exports = {
-    loadIndexPage,
-    loadLogin,
-    login,
-    loadSignup,
-    signup,
-    verifyOTP,
-    resendOtp,
-    loadUserHomePage,
-    logout,
-    single_ProductView,
-    otpPage
-};

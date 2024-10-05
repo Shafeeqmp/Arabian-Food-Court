@@ -5,6 +5,8 @@ const adminRouter=express.Router();
 const adminController=require('../../controllers/adimin/adminController')
 const categoryController=require('../../controllers/adimin/categoryController')
 const productController=require('../../controllers/adimin/productController')
+const orderController=require('../../controllers/adimin/orderController')
+const adminAuth=require('../../middlewares/adminAuth')
 const upload=require('../../config/multer')
 
 //Admin DashBoard
@@ -32,6 +34,10 @@ adminRouter.post('/editProduct/:id', upload.any(),productController.editProduct)
 adminRouter.put('/deleteProduct/:productId',productController.delete_Product);
 adminRouter.put('/restoreProduct/:productId',productController.restore_Product)
 
+//Order Management
+adminRouter.get('/loardOrderMng',adminAuth,orderController.loard_OrderMng)
+adminRouter.get('/orders/:id', adminAuth,orderController.getOrderDetails);
+adminRouter.post('/update-status',adminAuth,orderController.updateOrderStatus);
 
 
 

@@ -9,7 +9,7 @@ const sharp=require('sharp')
 
 
 //Load Product Page Section
-const load_ProuctPage = async (req, res) => {
+exports.load_ProuctPage = async (req, res) => {
   try {
     if (req.session.isAdmin) {
       const Product = await product.find().populate('category_id')
@@ -25,7 +25,7 @@ const load_ProuctPage = async (req, res) => {
   };
   
 //Add Product Page Section
-const addProuct_Page=async (req, res) => {
+exports.addProuct_Page=async (req, res) => {
     if (req.session.isAdmin) {
       const Category = await category.find({isDeleted:false});
       res.render("admin/addProduct", { Category});
@@ -35,7 +35,7 @@ const addProuct_Page=async (req, res) => {
   };
 
 //Add Product Section
-const add_Product = async (req, res) => {
+exports. add_Product = async (req, res) => {
   try {
     const { productName, Category_id, description, stock, price } = req.body;
     const images = req.files || []; // Ensure `images` is always an array
@@ -78,7 +78,7 @@ const add_Product = async (req, res) => {
 
 
 //Edit Product Page Loading Section
-const loadEditProductPage = async (req, res) => {
+exports.loadEditProductPage = async (req, res) => {
   try {
     const productId = req.params.id; 
     const Product = await product.findById(productId).populate('category_id')
@@ -97,7 +97,7 @@ const loadEditProductPage = async (req, res) => {
 
 
 //Edit Product post Section
-const editProduct = async (req, res) => {
+exports. editProduct = async (req, res) => {
   try {   
     const productId = req.params.id;
     const { productName, Category_id,price,stock,description} = req.body;
@@ -129,7 +129,7 @@ const editProduct = async (req, res) => {
   }
 };
 
-const delete_Product = async (req, res) => {
+exports. delete_Product = async (req, res) => {
   if (req.session.isAdmin) {
 
     try {
@@ -147,7 +147,7 @@ const delete_Product = async (req, res) => {
 
 
 
-const restore_Product = async (req, res) => {
+exports. restore_Product = async (req, res) => {
   if (req.session.isAdmin) {
     try {
       const { productId } = req.params;
@@ -182,12 +182,3 @@ const restore_Product = async (req, res) => {
 
 
 
-module.exports={
-    load_ProuctPage,
-    addProuct_Page,
-    add_Product,
-    loadEditProductPage,
-    editProduct,
-    delete_Product,
-    restore_Product
-}

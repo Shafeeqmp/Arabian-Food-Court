@@ -3,12 +3,12 @@ const user=require('../../models/userModel')
 const bcrypt=require('bcrypt')
 
 //Admin Login Page Loading
-const load_AdminPage=(req,res)=>{
+exports.load_AdminPage=(req,res)=>{
     res.render("admin/adminLogin")
 }
 
 //Admin Dashboard Page Loading
-const load_AdminDash=(req,res)=>{
+exports.load_AdminDash=(req,res)=>{
     try {
         if(req.session.isAdmin){
             res.render('admin/admin_Dashboard')
@@ -21,7 +21,7 @@ const load_AdminDash=(req,res)=>{
 }
 
 //Admin Dashboard
-const admin_Dashboard = async (req, res) => {
+exports.admin_Dashboard = async (req, res) => {
     try {
       const { email, Password } = req.body;
       const findAdmin = await user.findOne({ email: email });
@@ -50,7 +50,7 @@ const admin_Dashboard = async (req, res) => {
   
 
 //User Manage Page Loading
-const load_userMng=async(req,res)=>{
+exports.load_userMng=async(req,res)=>{
     try {
           const userdata = await user.find({ isAdmin: false });
           res.render("admin/userMng", { userdata, title: "userMng" });
@@ -61,7 +61,7 @@ const load_userMng=async(req,res)=>{
 } 
 
 //User Block Sectioin
-const block_user=async(req,res)=>{
+exports.block_user=async(req,res)=>{
     try {
         await user.findByIdAndUpdate(req.params.id,{isBlocked:false});
          res.redirect("/admin/loaduserMng")
@@ -72,7 +72,7 @@ const block_user=async(req,res)=>{
 }
 
 //User Unblock Section
-const unblock_user=async(req,res)=>{
+exports. unblock_user=async(req,res)=>{
     try {
         await user.findByIdAndUpdate(req.params.id,{isBlocked:true});
          res.redirect("/admin/loaduserMng")
@@ -83,7 +83,7 @@ const unblock_user=async(req,res)=>{
 }
 
 //Admin Logout Section
-const logout = (req, res) => {
+exports. logout = (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.log(err);
@@ -97,12 +97,3 @@ const logout = (req, res) => {
 
 
 
-module.exports={
-    load_AdminPage,
-    admin_Dashboard,
-    load_AdminDash,
-    load_userMng,
-    block_user,
-    unblock_user,
-    logout
-}

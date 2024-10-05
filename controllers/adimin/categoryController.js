@@ -4,7 +4,7 @@ const category=require("../../models/categoryModel")
 
 
 //Load Category Page Section
-const load_CategoryPage=async(req,res)=>{
+exports. load_CategoryPage=async(req,res)=>{
     try {
        if(req.session.isAdmin){
         const catData = await category.find();
@@ -19,7 +19,7 @@ const load_CategoryPage=async(req,res)=>{
 }
 
 // Add Category Section
-const add_Category=async(req,res)=>{
+exports.add_Category=async(req,res)=>{
     try {
         const categoryName=req.body.name;
         const upperCaseName = categoryName.toUpperCase();
@@ -44,7 +44,7 @@ const add_Category=async(req,res)=>{
 }
 
 //Edit Category Section
-const edit_Category = async (req, res) => {
+exports.edit_Category = async (req, res) => {
     try {
       const { id } = req.params;
       const { name } = req.body;
@@ -54,7 +54,6 @@ const edit_Category = async (req, res) => {
         return res.status(404).json({ success: false, message: 'Category not found' });
       }
       const existCat = await category.findOne({ category_name: upperCaseName });
-      // Check if a category with the new name already exists
       if (existCat && existCat._id.toString() !== id) {
         return res.status(400).json({ success: false, message: 'Category name already exists' });
       }
@@ -72,7 +71,7 @@ const edit_Category = async (req, res) => {
   
 
 //Delete Category Section
-const delete_Category=async (req, res) => {
+exports. delete_Category=async (req, res) => {
   try {
       const { id } = req.params;
       const Category = await category.findById(id);
@@ -90,7 +89,7 @@ const delete_Category=async (req, res) => {
 
 
 //Restore Category Setion
-  const restore_Category=async (req, res) => {
+exports. restore_Category=async (req, res) => {
     try {
         const { id } = req.params;
         const Category = await category.findById(id);
@@ -114,10 +113,3 @@ const delete_Category=async (req, res) => {
 
 
 
-module.exports={
-    load_CategoryPage,
-    add_Category,
-    delete_Category,
-    edit_Category,
-    restore_Category
-}

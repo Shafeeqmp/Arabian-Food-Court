@@ -178,26 +178,29 @@
       <div class="col-md-8">
         <div class="profile-header text-center">
           <img src="public/images/profile.png" alt="User Image" class="profile-picture mb-3">
-          <h3 class="mb-0">Shafeeq</h3>
-          <p class="text-muted">shafeeq@gmail.com</p>
+          <% address.forEach(addr => { %>
+          <h3 class="mb-0"><%= addr.fullName %></h3>
+            <p class="text-muted"><%= addr.userId.email %></p>
+        
         </div>
         <div class="card mt-5">
           <h5>Personal Details</h5>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Username:</strong> Shafeeq</li>
-            <li class="list-group-item"><strong>Email:</strong> shafeeq@gmail.com</li>
-            <li class="list-group-item"><strong>Phone Number:</strong> 9895089017</li>
+            <li class="list-group-item"><strong>Username:</strong> <%= addr.userId.name %></li>
+            <li class="list-group-item"><strong>Email:</strong> <%= addr.userId.email %></li>
+            <li class="list-group-item"><strong>Phone Number:</strong> <%= addr.phone %></li>
           </ul>
           <h5>Address Details</h5>
           <ul class="list-group list-group-flush">
-            <li class="list-group-item"><strong>Full Name:</strong> Shafeeq</li>
-            <li class="list-group-item"><strong>Street Address:</strong> shafeeq@gmail.com</li>
+            <li class="list-group-item"><strong>Full Name:</strong> <%= addr.fullName %></li>
+            <li class="list-group-item"><strong>Street Address:</strong> <%= addr.streetAddress %></li>
             <li class="list-group-item"><strong>Phone Number:</strong> 9895089017</li>
-            <li class="list-group-item"><strong>Country:</strong> India</li>
-            <li class="list-group-item"><strong>State:</strong> Keralam</li>
-            <li class="list-group-item"><strong>City:</strong> Manjeri</li>
-            <li class="list-group-item"><strong>Zip Code:</strong> 676121</li>
+            <li class="list-group-item"><strong>Country:</strong> <%= addr.phone %></li>
+            <li class="list-group-item"><strong>State:</strong> <%= addr.state %></li>
+            <li class="list-group-item"><strong>City:</strong> <%= addr.city %></li>
+            <li class="list-group-item"><strong>Zip Code:</strong> <%= addr.zipCode %></li>
           </ul>
+          
           <h5>Edit Options</h5>
           <ul class="list-group list-group-flush">
             <a href="" style="text-decoration: none; font-weight: bold;" data-bs-toggle="modal" data-bs-target="#editProfileModal">Edit Profile</a>
@@ -209,7 +212,8 @@
           <h5>Account Details</h5>
           <ul class="list-group list-group-flush">
             <li class="list-group-item"><strong>Status:</strong> Active</li>
-            <li class="list-group-item"><strong>Member Since:</strong> January 1, 2020</li>
+            <li class="list-group-item"><strong>Member Since:</strong> <%= addr.createdAt %></li>
+            <% }) %>
           </ul>
         </div>
       </div>

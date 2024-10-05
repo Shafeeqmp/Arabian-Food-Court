@@ -2,10 +2,11 @@ const express=require('express');
 const userRouter=express.Router();
 const user= require('../../models/userModel');
 const userController=require('../../controllers/user/userController');
-const addressController=require('../../controllers/user/addressController')
 const profileController=require('../../controllers/user/profileController')
 const cartController=require('../../controllers/user/cartController')
 const userAuth=require('../../middlewares/userAuth')
+const orderController=require('../../controllers/user/orderController')
+
 
 
 //Index Page Loading
@@ -30,17 +31,19 @@ userRouter.get('/logout',userController.logout)
 userRouter.get('/user/singleProductView/:id',userAuth,userController.single_ProductView);
 
 //User Profile Page
-userRouter.get('/profilePage',profileController.profile_Page);
+userRouter.get('/profilePage',userAuth,profileController.profile_Page);
 
-//Add Address Page
-userRouter.get('/getAddressPage',addressController.getAddress_Page);
-
-//Cart Page
+//Cart Controller Section
 userRouter.get('/getCartPage',userAuth,cartController.getCart_Page)
-
 userRouter.post('/postCartPage',cartController.postCart_Page)
-
-
+userRouter.post('/remove-cart-item', cartController.removeCartItem);
+userRouter.post('/update-cart-quantity', cartController.updateCartItemQuantity);
+userRouter.get('/checkOutPage',userAuth,cartController.checkOutPage)
+userRouter.post('/addAddress',userAuth,cartController.add_Address);
+userRouter.post('/placeOrder',orderController.place_Order);
+userRouter.get('/orderHistory',userAuth,orderController.getOrderHistory);
+userRouter.post('/orders/:orderId',userAuth,orderController.cancelOrder);
+userRouter.get('/order-status/:orderId', orderController.getOrderStatus);
 
 
 

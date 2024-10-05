@@ -11,11 +11,11 @@ const addressSchema =mongoose.Schema({
         required: true
     },
     zipCode: {
-        type: String,
+        type: Number,
         required: true
     },
     phone: {
-        type: String,
+        type: Number,
         required: true
     },
     city: {
@@ -33,7 +33,7 @@ const addressSchema =mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'User'
+        ref: 'user'
     }
 }, { timestamps: true });
 
