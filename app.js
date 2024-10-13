@@ -12,6 +12,7 @@ const env=require('dotenv').config();
 const connectDB = require('./config/database');
 const passport=require('./config/passport');
 const googleRouter = require('./routes/google/googleRouter');
+const cookieParser = require('cookie-parser');
 
 const app=express();
 connectDB();
@@ -20,15 +21,15 @@ app.set('view engine','ejs');
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 app.use(session({
-    secret:process.env.SESSION_SECRET,
-    resave:false,
-    saveUninitialized:true,
-    cookie:{
-        secure: false,
-        httpOnly:true,
-        maxAge:72*60*60*1000
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,  
+    cookie: {
+        secure: false,         
+        httpOnly: true,
+        maxAge: 72 * 60 * 60 * 1000  
     }
-  }));
+}));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -38,6 +39,7 @@ app.use(nocache());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(cookieParser());
 
 app.use('/',userRouter);
 app.use('/admin',adminRouter)

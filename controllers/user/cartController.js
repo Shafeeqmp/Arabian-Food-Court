@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Category=require('../../models/categoryModel');
 const Product=require('../../models/productModel');
 const User = require('../../models/userModel'); 
@@ -25,6 +26,9 @@ exports.postCart_Page = async (req, res) => {
       return res.status(404).json({ success: false, message: "User not found" });
     }
     const product = await Product.findById(productId);
+    if(product.stock==0){
+      return res.status(404).json({ success: false, message: "Not enough stock available" });
+    }  
     if (!product) {
       return res.status(404).json({ success: false, message: "Product not found" });
     }
@@ -141,7 +145,7 @@ exports.updateCartItemQuantity = async (req, res) => {
 exports.checkOutPage= async(req,res)=>{
   try {
     if (!req.session.userId) {
-      return res.status(401).send('User not authenticated');
+      return res.status(401).json({ success: false, message: "User not authenticated" })
     }
     const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
     const address = await Address.find({userId:req.session.userId});
@@ -177,6 +181,57 @@ exports.add_Address = async (req, res) => {
       return res.status(500).json({ message: "Server error", error: error.message });
   }
 }
+
+exports.edit_Address = async (req, res) => {
+  try {
+    const { addressId, fullName, streetAddress, phone, city, zipCode, state, country } = req.body;
+    if (!mongoose.Types.ObjectId.isValid(addressId)) {
+      return res.status(400).json({ message: 'Invalid address ID' });
+    }
+
+    const updatedAddress = await Address.findByIdAndUpdate(
+      addressId,
+      { fullName, streetAddress, phone, city, zipCode, state, country },
+      { new: true, runValidators: true }
+    );
+
+    if (updatedAddress) {
+      res.status(200).json({ message: "Address updated successfully" });
+    } else {
+      res.status(404).json({ message: "Address not found" });
+    }
+  } catch (error) {
+    console.error('Error updating address:', error);
+    res.status(500).json({ message: 'Something went wrong while editing the address' });
+  }
+};
+
+exports.delete_Address=async(req,res)=>{
+  try {
+    const {id}=req.params;
+    console.log(id);
+    await Address.findByIdAndDelete(id);
+    res.status(200).json({ success: true, message: 'Address deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: "something went wrong while deleting the address" });
+  }
+}
+
+
+// exports.loadWishlist=async(req,res)=>{
+//   try {
+//     const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
+//     res.render('user/whishlist',{cart})
+// } catch (error) {
+//     console.error('Error fetching cart:', error); 
+//     res.status(500).send('Something went wrong!');
+// }
+// }
+
+
+
+
+
 
 
 

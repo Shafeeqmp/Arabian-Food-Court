@@ -169,7 +169,7 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">SL</th>
                             <th scope="col">Name</th>
                             <th scope="col">Email</th>
                             <th scope="col">Status</th>
@@ -178,9 +178,9 @@
                     </thead>
                     <tbody>
                         <% if (typeof userdata != 'undefined' && userdata.length > 0) { %>
-                            <% userdata.forEach((users) => { %>
+                            <% userdata.forEach((users,index) => { %>
                                 <tr>
-                                    <td><%= users._id %></td>
+                                    <td><%= index+1 %></td>
                                     <td><%= users.name %></td>
                                     <td><%= users.email %></td>
                                     <td>

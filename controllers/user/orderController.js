@@ -11,7 +11,7 @@ const Order = require('../../models/orderModel');
 exports.place_Order = async (req, res) => {
     try {
       if (!req.session.userId) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ success: false, message: "Unauthorized"})
       }
       const { addressId } = req.body;
       let { paymentMethod } = req.body;
@@ -23,7 +23,7 @@ exports.place_Order = async (req, res) => {
       const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
   
       if (!cart || cart.items.length === 0) {
-        return res.status(400).json({ message: "Cart is empty" });
+        return res.status(400).json({ success: false, message: "Cart is empty" })
       }
   
       for (const item of cart.items) {
@@ -83,11 +83,20 @@ exports.getOrderHistory = async (req, res) => {
         if (!userId) {
             return res.status(401).json({ message: "Unauthorized" });
         }
+        const user = await User.findOne({ _id: req.session.userId }); 
+        const cart = await Cart.findOne({ user: user._id }).populate("items.product");
         const orders = await Order.find({ user: userId })
             .populate('items.product')
             .populate('address')
             .sort({ createdAt: -1 });
-        res.render('user/orderHistory', { orders });
+
+            let cartCount = 0;
+        if (cart && cart.items && cart.items.length > 0) {
+           cart.items.forEach(item => {
+           cartCount += item.quantity; 
+        });
+    }   
+        res.render('user/orderHistory', { orders,user, cartCount });
     } catch (error) {
         console.error('Error fetching order history:', error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -118,11 +127,9 @@ exports.cancelOrder = async (req, res) => {
             return res.status(400).json({ message: "Cannot cancel order at this stage" });
         }
 
-        // Update order status
         order.orderStatus = 'Cancelled';
         order.orderStatusTimestamps.cancelled = new Date();
 
-        // Restore product stock
         for (const item of order.items) {
             await Product.findByIdAndUpdate(item.product, {
                 $inc: { stock: item.quantity }

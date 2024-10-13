@@ -140,6 +140,7 @@ a:focus {
 
 .header_section {
   padding: 15px 0;
+ 
 }
 
 .header_section .container-fluid {
@@ -261,6 +262,7 @@ a:focus {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-bottom: 0rem;
 }
 
 .user_option .user_proname:hover {

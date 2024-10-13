@@ -39,9 +39,6 @@ exports. add_Product = async (req, res) => {
   try {
     const { productName, Category_id, description, stock, price } = req.body;
     const images = req.files || []; // Ensure `images` is always an array
-    
-    console.log(images);
-
     const existProduct = await product.findOne({ productname: productName });
     const Category = await category.find({ isDeleted: false });
 

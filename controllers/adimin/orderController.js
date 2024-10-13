@@ -38,15 +38,23 @@ exports.updateOrderStatus = async (req, res) => {
     try {
         const { orderId, status } = req.body;
 
-        const updatedOrder = await Order.findByIdAndUpdate(
-            orderId,
-            { orderStatus: status },
-            { new: true, runValidators: true }
-        );
+        const order = await Order.findById(orderId).populate('items.product');
         
-        if (!updatedOrder) {
+        if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
+        if (status === 'Cancelled' && order.orderStatus !== 'Cancelled') {
+            for (const item of order.items) {
+                await Product.findByIdAndUpdate(
+                    item.product._id,
+                    { $inc: { stock: item.quantity } }
+                );
+            }
+        }
+
+        order.orderStatus = status;
+        const updatedOrder = await order.save();
+        
         res.json({ success: true, message: 'Order status updated successfully', order: updatedOrder });
     } catch (error) {
         console.error('Error updating order status:', error);
