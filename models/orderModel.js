@@ -44,7 +44,13 @@ const orderSchema = new mongoose.Schema({
     orderStatus: {
         type: String,
         required: true,
+        default:'Pending',
         enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled']
+    },
+    paymentStatus:{
+        type:String,
+        default:'Pending',
+        enum:['Pending','Paid','Failed']
     },
     orderStatusTimestamps: {
         pending: { type: Date },
@@ -56,7 +62,16 @@ const orderSchema = new mongoose.Schema({
     placedAt: {
         type: Date,
         default: Date.now
+    },
+    discount_price: {
+        type: Number
+    },
+    offerPercentage: {
+        type: Number,
+        default: 0
     }
+
+    
 }, { timestamps: true });
 
 const Order = mongoose.model('Order', orderSchema);

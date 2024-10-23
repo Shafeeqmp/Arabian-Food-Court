@@ -34,7 +34,11 @@ const productSchema = mongoose.Schema({
   images: {
     type: [String],
     required: true
-  }
+  },
+  offer:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:'Offer'
+},
 }, { timestamps: true });
 const Product = mongoose.model('Product', productSchema);
 

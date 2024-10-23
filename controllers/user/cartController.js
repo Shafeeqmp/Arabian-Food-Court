@@ -5,12 +5,23 @@ const User = require('../../models/userModel');
 const Address=require('../../models/addressModel')
 const Cart=require('../../models/cartModel')
 const Order = require('../../models/orderModel');
+const Wishlist=require('../../models/wishlistModel')
 
 //Get Cart Page
 exports.getCart_Page=async(req,res)=>{
     try {
+       const user = await User.findById(req.session.userId).lean();
         const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
-        res.render('user/cartPage',{cart})
+        let cartCount=0;
+        if(cart){
+           cartCount  = cart.items.length;
+        }
+        const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
+      let wishlistCount=0;
+      if(wishlist){
+        wishlistCount  = wishlist.items.length;
+      }     
+        res.render('user/cartPage',{cart,cartCount,wishlistCount,user})
     } catch (error) {
         console.error('Error fetching cart:', error); 
     res.status(500).send('Something went wrong!');
@@ -149,7 +160,6 @@ exports.checkOutPage= async(req,res)=>{
     }
     const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
     const address = await Address.find({userId:req.session.userId});
-    
     res.render('user/checkOutPage',{cart,address})
 } catch (error) {
     console.error('Error fetching cart:', error); 
@@ -218,15 +228,6 @@ exports.delete_Address=async(req,res)=>{
 }
 
 
-// exports.loadWishlist=async(req,res)=>{
-//   try {
-//     const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
-//     res.render('user/whishlist',{cart})
-// } catch (error) {
-//     console.error('Error fetching cart:', error); 
-//     res.status(500).send('Something went wrong!');
-// }
-// }
 
 
 

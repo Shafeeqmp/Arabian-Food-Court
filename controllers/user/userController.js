@@ -10,6 +10,7 @@ const product=require('../../models/productModel');
 const OTP=require('../../models/otpModel')
 const { name } = require('ejs');
 const Cart=require('../../models/cartModel')
+const Wishlist=require('../../models/wishlistModel')
 
 exports.loadUserHomePage = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -23,6 +24,7 @@ exports.loadUserHomePage = async (req, res) => {
       const user = await User.findById(req.session.userId).lean();
     
       const cart = await Cart.findOne({ user: user._id }).populate("items.product");
+      const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
       
       const products = await product.find({ isDelete: false })
         .skip(skip)
@@ -34,7 +36,12 @@ exports.loadUserHomePage = async (req, res) => {
            cart.items.forEach(item => {
            cartCount += item.quantity; 
         });
-    }   
+    } 
+    
+    let wishlistCount=0;
+      if(wishlist){
+        wishlistCount  = wishlist.items.length;
+      }  
       const Category = await category.find({ isDeleted: false }).lean();
   
       res.render('user/menuPage', {
@@ -43,7 +50,8 @@ exports.loadUserHomePage = async (req, res) => {
         products: products,
         currentPage: page,
         totalPages: totalPages,
-        cartCount
+        cartCount,
+        wishlistCount
       });
     } catch (error) {
       console.error('Error loading user home page:', error);
@@ -425,6 +433,11 @@ exports. resendOtp = async (req, res) => {
         if (cart && cart.items) {
           cartCount = cart.items.length;
         }
+        const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
+        let wishlistCount=0;
+        if(wishlist){
+          wishlistCount  = wishlist.items.length;
+        }  
         res.render('user/menuPage', {
         user:user,
         products:products,
@@ -432,6 +445,7 @@ exports. resendOtp = async (req, res) => {
         totalPages,
         Category: Category,
         cartCount:cartCount,
+        wishlistCount:wishlistCount,
         
         searchParams: {
         search,

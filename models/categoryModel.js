@@ -5,6 +5,10 @@ const categorySchema=mongoose.Schema({
         type:String,
         required:true
     },
+    offer:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Offer'
+    },
     isDeleted:{
         type:Boolean,
         default:false

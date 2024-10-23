@@ -65,8 +65,6 @@ exports. add_Product = async (req, res) => {
 
     await newProduct.save();
     res.status(200).json({ success: true });
-    console.log("Product added successfully");
-
   } catch (error) {
     console.error('Error adding product:', error);
     res.status(500).json({ error: 'Error adding product' });
@@ -118,8 +116,6 @@ exports. editProduct = async (req, res) => {
     }
     await existingProduct.save();
     res.redirect('/admin/loadProuctPage');
-    console.log("Product updated successfully");
-
   } catch (error) {
     console.error('Error updating product:', error);
     res.status(400).send('Error updating product');

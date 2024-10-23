@@ -97,7 +97,17 @@
                   <%= cartCount %>
                 </span>
               </a>
-              <p data-toggle="tooltip" data-placement="bottom" title="<%= user.name %>" class="user_proname"><%= user.name %></p>
+
+              <!-- Wishlist Section -->
+              <a class="cart_link position-relative" href="/wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50" fill="red">
+                  <path d="M462.3 62.7C407 7.4 324.8 23.9 270.1 79.1L256 93.3l-14.1-14.2c-54.8-55.2-136.9-71.7-192.2-16.4S-7.4 199.9 48 255.2L239 445.5c7.4 7.5 19.6 7.5 27 0l205.4-205.4c55.2-54.8 71.7-136.9 16.4-192.2z"/>
+                </svg>
+                <span data-toggle="tooltip" data-placement="bottom" title="<%= wishlistCount %>" id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <%= wishlistCount %>
+                </span>
+              </a>
+            <p data-toggle="tooltip" data-placement="bottom" title="<%= user.name %>" class="user_proname"><%= user.name %></p>
 
               <div class="dropdown">
                 <button class="btn btn-secondary dropdown-toggle" type="button" id="loginDropdown" data-toggle="dropdown">
@@ -232,7 +242,7 @@
                         </div>
                         <!-- Wishlist Button -->
                         <div class="d-flex ml-3">
-                          <a href="#" class="btn btn-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                          <a href="#" onclick="addToWishlist('<%= product._id %>')" class="btn btn-danger btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                             <i data-toggle="tooltip" data-placement="bottom" title="Add To Wishlist" class="bi bi-heart-fill"></i>
                           </a>
                         </div>
@@ -430,6 +440,45 @@
       });
     }
   }
+
+
+
+  async function addToWishlist(productId) {
+      try {
+        const response = await fetch('/addWishlist', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ productId: productId }),
+        });
+        if (response.ok) {
+          const result = await response.json();
+          Swal.fire({
+            title: 'Success!',
+            text: result.message,
+            icon: 'success',
+            timer: 1000,
+            showConfirmButton: false,
+          }).then(() => {
+                      window.location.reload() 
+                  });
+        } else {
+          const result = await response.json();
+          Swal.fire({
+            title: 'Error!',
+            text: result.message,
+            icon: 'error',
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Something went wrong.',
+          icon: 'error',
+        });
+      }
+    }
 </script>
 
 

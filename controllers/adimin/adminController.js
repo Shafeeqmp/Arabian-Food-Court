@@ -1,30 +1,42 @@
 const admin=require('../../routes/admin/adminRoutes')
 const user=require('../../models/userModel')
 const bcrypt=require('bcrypt')
+const Order=require('../../models/orderModel')
 
 //Admin Login Page Loading
-exports.load_AdminPage=(req,res)=>{
-    res.render("admin/adminLogin")
+exports.load_AdminPage=async(req,res)=>{
+try {
+  res.render("admin/adminLogin")
+} catch (error) {
+  console.log("Login error: " + error);
+      return res.status(500).send('An error occurred during login');
+}
+   
 }
 
 //Admin Dashboard Page Loading
-exports.load_AdminDash=(req,res)=>{
+exports.load_AdminDash=async(req,res)=>{
     try {
+      const orders=await Order.find({}).sort({createdAt:-1}).limit(5)
         if(req.session.isAdmin){
-            res.render('admin/admin_Dashboard')
+            res.render('admin/admin_Dashboard',{orders})
         }else{
             return res.redirect('/admin')
         }
     } catch (error) {
-        
+      console.log("Login error: " + error);
+      return res.status(500).send('An error occurred during login');
     }
 }
+
+
 
 //Admin Dashboard
 exports.admin_Dashboard = async (req, res) => {
     try {
       const { email, Password } = req.body;
       const findAdmin = await user.findOne({ email: email });
+      
    
       
       if (!findAdmin) {
@@ -94,6 +106,5 @@ exports. logout = (req, res) => {
   };
 
   
-
 
 

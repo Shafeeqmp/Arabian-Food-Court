@@ -1,113 +1,234 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" type="text/css" href="/public/css/bootstrap.css" />
-
-
-  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery-nice-select/1.1.0/css/nice-select.min.css" integrity="sha512-CruCP+TD3yXzlvvijET8wV5WxxEh5H8P4cmz0RFbKK6FlZ2sYl3AEsKlLPHbniXKSrDdFewhbmBK5skbdsASbQ==" crossorigin="anonymous" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-  <link href="/public/css/font-awesome.min.css" rel="stylesheet" />
-
-
-  <link href="/public/css/style.css" rel="stylesheet" />
-
-  <link href="/public/css/responsive.css" rel="stylesheet" />
-    <title>Cart</title>
-<style>
-    .icon-hover-primary:hover {
-  border-color: #3b71ca !important;
-  background-color: white !important;
-}
-
-.icon-hover-primary:hover i {
-  color: #3b71ca !important;
-}
-.icon-hover-danger:hover {
-  border-color: #dc4c64 !important;
-  background-color: white !important;
-}
-
-.icon-hover-danger:hover i {
-  color: #dc4c64 !important;
-}
-</style>
-
-</head>
-<body>
-    <header>
-        <!-- Jumbotron -->
-        <div class="p-3 text-center bg-white border-bottom">
-          <div class="container">
-            <div class="row gy-3">
-              <!-- Left elements -->
-              <div class="col-lg-2 col-sm-4 col-4">
-                <a class="navbar-brand" href="#">
-                    <span style="color: black">
-                      Arabian Food Court
-                    </span>
+<%- include('../../views/partials/userHeader') %>
+    <style>
+      .icon-hover-primary:hover {
+    border-color: #3b71ca !important;
+    background-color: white !important;
+  }
+  
+  .icon-hover-primary:hover i {
+    color: #3b71ca !important;
+  }
+  .icon-hover-danger:hover {
+    border-color: #dc4c64 !important;
+    background-color: white !important;
+  }
+  
+  .icon-hover-danger:hover i {
+    color: #dc4c64 !important;
+  }
+  </style>
+  
+  </head>
+  <body>
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding-top: 80px;
+       
+      }
+      .sidebar {
+        height: 100vh;
+        background-color: #2c3e50;
+        position: fixed;
+        padding-top: 5rem;
+      }
+      .sidebar a {
+        color: white;
+        transition: background-color 0.3s ease;
+      }
+      .sidebar a:hover {
+        background-color: #34495e;
+      }
+      .profile-header {
+        background-color: #00bcd4; /* Teal 300 */
+        color: white;
+        padding: 20px;
+        text-align: center;
+      }
+      .profile-pic {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 5px solid white;
+        transition: transform 0.3s;
+      }
+      .profile-pic:hover {
+        transform: scale(1.1);
+      }
+      .profile-card {
+        margin-top: 20px;
+        z-index: 1;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      .address-card {
+        background: #f1f1f1;
+        border-radius: 5px;
+        padding: 15px;
+        margin-bottom: 10px;
+        position: relative;
+        transition: background 0.3s;
+      }
+      .address-card:hover {
+        background: #e1e1e1;
+      }
+  
+      .dropdown-menu {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .profile-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    padding: 8px 16px;
+    transition: background-color 0.2s ease; 
+  }
+  
+  .profile-link:hover {
+    background-color: #f0f0f0; 
+  }
+  
+  .profile-avatar {
+    width: 24px; 
+    height: 24px;
+    border-radius: 50%; 
+    margin-right: 8px; 
+  }
+  
+  .logout-link {
+    margin-bottom: 8px; 
+  }
+  .fixed-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; 
+  }
+  
+  .content-section {
+    margin-top: 20px; 
+  }
+  
+  .breadcrumb {
+              background-color: #f8f9fa; 
+              border-radius: 0.375rem;
+              padding: 0.75rem 1rem;
+              box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
+          }
+  
+          .breadcrumb-item + .breadcrumb-item::before {
+              content: ">";
+              color: #6c757d;
+          }
+  
+          .breadcrumb-item a {
+              text-decoration: none;
+              color: #007bff;
+          }
+  
+          .breadcrumb-item a:hover {
+              text-decoration: underline;
+          }
+  
+          .breadcrumb-item.active {
+              color: #6c757d; 
+          }
+    </style>
+    <header class="header_section bg-dark fixed-header">
+      <div class="container">
+        <nav class="navbar navbar-expand-lg custom_nav-container">
+          <a class="navbar-brand" href="/userHomePage">
+            <span>
+              Arabian Food Court
+            </span>
+          </a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+            <span class=""> </span>
+          </button>
+    
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mx-auto">
+              <li class="nav-item active">
+                <a class="nav-link" href="/userHomePage">Home <span class="sr-only">(current)</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">About us</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Contact us</a>
+              </li>
+            </ul>
+    
+            <!-- User Profile and Cart Section -->
+            <div class="user_option">
+              <a class="cart_link position-relative" href="/getCartPage">
+                <!-- Cart Icon SVG -->
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="50" height="50">
+                  <path d="M345.6 338.862c-29.184 0-53.248 23.552-53.248 53.248s23.552 53.248 53.248 53.248 53.248-23.552 53.248-53.248-23.552-53.248-53.248-53.248zM439.296 84.91h-330.56l-5.12-34.304c-2.048-13.824-21.504-30.72-44.544-30.72H20.48C9.216 19.886 0 29.102 0 40.366S9.216 60.846 20.48 60.846h41.472c2.56 0 4.608 2.048 5.12 4.608l31.744 216.064c4.096 27.136 27.648 47.616 55.296 47.616h212.992c26.624 0 49.664-18.944 55.296-45.056l33.28-166.4c4.096-21.504-3.072-32.256-14.336-34.304zM215.04 389.55c-1.024-28.16-24.576-50.688-52.736-50.688-29.696 1.536-52.224 26.112-51.2 55.296 1.024 28.16 24.064 50.688 52.224 50.688 29.184 0 52.224-24.576 51.712-55.296z"/>
+                </svg>
+                <!-- Cart Count Badge -->
+                <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <%= cartCount %>
+                </span>
+              </a>
+              <a class="cart_link position-relative" href="/wishlist">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50" fill="red">
+                  <path d="M462.3 62.7C407 7.4 324.8 23.9 270.1 79.1L256 93.3l-14.1-14.2c-54.8-55.2-136.9-71.7-192.2-16.4S-7.4 199.9 48 255.2L239 445.5c7.4 7.5 19.6 7.5 27 0l205.4-205.4c55.2-54.8 71.7-136.9 16.4-192.2z"/>
+                </svg>
+                <span data-toggle="tooltip" data-placement="bottom" title="<%= wishlistCount %>" id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  <%= wishlistCount %>
+                </span>
+              </a>
+              <p class="user_proname"><%= user.name %></p>
+    
+              <div class="dropdown">
+                <button class="btn btn-secondary dropdown-toggle" type="button" id="loginDropdown" data-toggle="dropdown">
+                  <i class="fa fa-user" aria-hidden="true"></i>
+                </button>
+    
+                <div class="dropdown-menu">
+                  <a href="/profilePage" class="profile-link">
+                    <img src="/public/images/profile.png" class="profile-avatar"> Profile
                   </a>
-              </div>
-              <!-- Left elements -->
-      
-              <!-- Center elements -->
-              <div class="order-lg-last col-lg-5 col-sm-8 col-8">
-                <div class="d-flex float-end">
-                  <!-- <a href="" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank">
-                    <i class="fas fa-user-alt m-1 me-md-2"></i>
-                    <p class="d-none d-md-block mb-0">Sign in</p>
-                  </a> -->
-                  <a href="#" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank">
-                    <i class="fas fa-heart m-1 me-md-2"></i>
-                    <p class="d-none d-md-block mb-0">Wishlist</p>
+                  <a href="/orderHistory" class="profile-link">
+                    <img src="/public/images/purchase-order.png" class="profile-avatar"> Orders
                   </a>
-                  <a href="/getCartPage" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank">
-                    <i class="fas fa-shopping-cart m-1 me-md-2"></i>
-                    <p class="d-none d-md-block mb-0">My cart</p>
+                  <a href="/getCartPage" class="profile-link">
+                    <img src="/public/images/shopping-cart (1).png" class="profile-avatar"> Cart
+                  </a>
+                  <a href="wishlist" class="profile-link">
+                    <img src="/public/images/wishlist.png" class="profile-avatar"> Wishlist
+                  </a>
+                  <a href="/logout" class="profile-link logout-link">
+                    <img src="/public/images/shutdown.png" class="profile-avatar"> Logout
                   </a>
                 </div>
               </div>
-              <!-- Center elements -->
-      
-              <!-- Right elements -->
-              <div class="col-lg-5 col-md-12 col-12">
-                <div class="input-group float-center">
-                  <div class="form-outline">
-                    <!-- <input type="search" id="form1" class="form-control" />
-                    <label class="form-label" for="form1">Search</label> -->
-                  </div>
-                  <!-- <button type="button" class="btn btn-primary shadow-0">
-                    <i class="fas fa-search"></i>
-                  </button> -->
-                </div>
-              </div>
-              <!-- Right elements -->
             </div>
           </div>
-        </div>
-        <!-- Jumbotron -->
-      
-        <!-- Heading -->
-        <div class="bg-light">
-          <div class="container py-4">
-            <!-- Breadcrumb -->
-            <nav class="d-flex">
-              <h6 class="mb-0">
-                <a href="/userHomePage" class="text-blue-50">Home</a>
-                <span class="text-black-50 mx-2"> > </span>
-                <a href="" class="text-black"><u>Shopping cart</u></a>
-              </h6>
-            </nav>
-            <!-- Breadcrumb -->
-          </div>
-        </div>
-        <!-- Heading -->
-      </header>
+        </nav>
+      </div>
+    </header>
+
+    <div class="bg-light">
+      <div class="container py-4">
+        <!-- Breadcrumb -->
+        <nav class="d-flex">
+          <h6 class="mb-0 mt-5">
+            <a href="/userHomePage" class="text-blue-50">Home</a>
+            <span class="text-black-50 mx-2"> > </span>
+            <a href="" class="text-black"><u>Shopping cart</u></a>
+          </h6>
+        </nav>
+        <!-- Breadcrumb -->
+      </div>
+    </div>
       
       <!-- cart + summary -->
       <section class="bg-light my-5">
@@ -156,7 +277,6 @@
                         </div>
                       </div>
                     <% }) %>
-                    <!-- <p class="total-price">Total: ₹<span id="cart-total"><%= cart.total_price.toFixed(2) %></span></p> -->
                   <% } else { %>
                     <p>Your cart is empty.</p>
                   <% } %>
@@ -174,38 +294,19 @@
             <!-- summary -->
             <div class="col-lg-3">
               <div class="card mb-3 border shadow-0">
-                <div class="card-body">
-                  <form>
-                    <div class="form-group">
-                      <label class="form-label">Have coupon?</label>
-                      <div class="input-group">
-                        <input type="text" class="form-control border" name="" placeholder="Coupon code" />
-                        <button class="btn btn-light border">Apply</button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
               </div>
               <div class="card shadow-0 border">
                 <div class="card-body">
                   <div class="d-flex justify-content-between">
-                    <p class="mb-2">Total:</p>
-                    <p id="cart-total" class="mb-2">₹<%= cart ? cart.total_price.toFixed(2) : '0.00' %></p>
+                    <p class="mb-2">Total Item Qty:</p>
+                    <p class="mb-2"><%= cartCount.toFixed(2) %></p>
                   </div>
-                  <div class="d-flex justify-content-between">
-                    <p class="mb-2">Discount:</p>
-                    <p class="mb-2 text-success">00</p>
-                  </div>
-                  <!-- <div class="d-flex justify-content-between">
-                    <p class="mb-2">TAX:</p>
-                    <p class="mb-2">$14.00</p>
-                  </div> -->
                   <hr />
                   <div class="d-flex justify-content-between">
-                    <p class="mb-2">Net Amount:</p>
-                    <p class="mb-2 fw-bold">₹<%= cart ? cart.total_price.toFixed(2) : '0.00' %></p>
+                    <p class="mb-2">Total Amount:</p>
+                    <p id="cart-total" class="mb-2">₹<%= cart ? cart.total_price.toFixed(2) : '0.00' %></p>
                   </div>
-      
+                  <hr />
                   <div class="mt-3">
                     <a href="/checkOutPage" class="btn btn-success w-100 shadow-0 mb-2"> Make Purchase </a>
                     <a href="/userHomePage" class="btn btn-light w-100 border mt-2"> Back to shop </a>
@@ -321,6 +422,23 @@
   </script>
   <!-- End Google Map -->   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- Bootstrap 5 JavaScript and Popper.js (for dropdowns) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<!-- Enable tooltips -->
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+  });
+</script>
+
+
+  
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -453,6 +571,57 @@ document.querySelectorAll('.remove-item-btn').forEach(button => {
 });
 
 
+document.getElementById('applyCouponForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const couponCode = document.getElementById('couponCode').value;
+
+    fetch('/apply-coupon', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ couponCode }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        const resultDiv = document.getElementById('couponResult');
+        if (data.success) {
+            resultDiv.innerHTML = `
+                <p class="text-success">Coupon applied successfully!</p>
+                <p>Your Code: ${data.couponCode}</p>
+                <p>Discount Amount: ${data.discountAmount}</p>
+                <button onclick="removeCoupon()">Remove Coupon</button>
+            `;
+            // Update the cart total or checkout amount here
+        } else {
+            resultDiv.innerHTML = `<p class="text-danger">${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('couponResult').innerHTML = '<p>An error occurred while applying the coupon</p>';
+    });
+});
+
+//Remove Coupon ------ Section
+function removeCoupon() {
+    fetch('/remove-coupon', {
+        method: 'POST',
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('couponResult').innerHTML = '<p>Coupon removed successfully</p>';
+            // Update the cart total or checkout amount here
+        } else {
+            document.getElementById('couponResult').innerHTML = `<p>${data.message}</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('couponResult').innerHTML = '<p>An error occurred while removing the coupon</p>';
+    });
+}
 </script>
 
 </body>

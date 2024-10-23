@@ -58,7 +58,6 @@ exports.edit_Category = async (req, res) => {
         return res.status(400).json({ success: false, message: 'Category name already exists' });
       }
       cateData.category_name = upperCaseName;
-      console.log(cateData);
       
       await cateData.save();
   

@@ -4,6 +4,7 @@ const User = require('../../models/userModel');
 const Address=require('../../models/addressModel')
 const Cart=require('../../models/cartModel')
 const bcrypt = require('bcrypt');
+const Wishlist=require('../../models/wishlistModel')
 
 // Load Profile Page Section
 exports.profile_Page = async (req, res) => {
@@ -11,13 +12,18 @@ exports.profile_Page = async (req, res) => {
       const address = await Address.find({ userId: req.session.userId });
       const user = await User.findOne({ _id: req.session.userId }); 
       const cart = await Cart.findOne({ user: user._id }).populate("items.product"); 
+      const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
+      let wishlistCount=0;
+      if(wishlist){
+        wishlistCount  = wishlist.items.length;
+      }  
       let cartCount = 0;
      if (cart && cart.items && cart.items.length > 0) {
         cart.items.forEach(item => {
         cartCount += item.quantity; 
      });
 }
-      res.render('user/profilePage', { address, user, cartCount });
+      res.render('user/profilePage', { address, user, cartCount,wishlistCount });
     } catch (error) {
       console.error('Error fetching addresses:', error);
       res.status(500).send('Internal Server Error');
