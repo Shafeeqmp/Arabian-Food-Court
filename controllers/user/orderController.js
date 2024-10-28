@@ -18,17 +18,18 @@ exports.place_Order = async (req, res) => {
 
     const { addressId, couponCode } = req.body;
     let { paymentMethod } = req.body;
+    const address = await Address.findById(addressId);
 
-    // Handle payment method
+  
     paymentMethod = paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer';
 
-    // Fetch the user's cart
+   
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: "Cart is empty" });
     }
 
-    // Check stock for each product
+    
     for (const item of cart.items) {
       const product = item.product;
       if (product.stock < item.quantity) {
@@ -38,7 +39,7 @@ exports.place_Order = async (req, res) => {
       }
     }
 
-    // Calculate total price and check for coupon
+  
     let totalAmount = cart.total_price;
     let discountAmount = 0;
 
@@ -50,15 +51,28 @@ exports.place_Order = async (req, res) => {
         totalAmount -= discountAmount;
       }
     }
+    const addressOrder = [
+      {
+        fullName: address.fullName,
+        streetAddress: address.streetAddress,
+        zipCode: address.zipCode,
+        phone: address.phone,
+        city: address.city,
+        state: address.state,
+        country: address.country,
+      },
+    ];
+    
+    
 
-    // Generate a new order ID
+   
     const newOrderId = await generateOrderId();
 
-    // Create the new order
+  
     const newOrder = new Order({
       orderId: newOrderId,
       user: req.session.userId,
-      address: addressId,
+      address: addressOrder,
       items: cart.items.map((item) => ({
         product: item.product._id,
         quantity: item.quantity,
@@ -127,7 +141,6 @@ exports.getOrderHistory = async (req, res) => {
         const cart = await Cart.findOne({ user: user._id }).populate("items.product");
         const orders = await Order.find({ user: userId })
             .populate('items.product')
-            .populate('address')
             .sort({ createdAt: -1 });
 
             let cartCount = 0;

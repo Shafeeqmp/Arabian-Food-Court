@@ -11,6 +11,7 @@ const OTP=require('../../models/otpModel')
 const { name } = require('ejs');
 const Cart=require('../../models/cartModel')
 const Wishlist=require('../../models/wishlistModel')
+const Offer=require('../../models/offerModel')
 
 exports.loadUserHomePage = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -18,6 +19,7 @@ exports.loadUserHomePage = async (req, res) => {
     const skip = (page - 1) * limit;
   
     try {
+        const  offer= await Offer.find({isDelete: false,offerStartDate: { $lte: new Date() }});
       const totalProducts = await product.countDocuments({ isDelete: false });
       const totalPages = Math.ceil(totalProducts / limit);
 
@@ -26,10 +28,12 @@ exports.loadUserHomePage = async (req, res) => {
       const cart = await Cart.findOne({ user: user._id }).populate("items.product");
       const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
       
-      const products = await product.find({ isDelete: false })
+      const products = await product.find({ isDelete: false }).populate('offer')
         .skip(skip)
         .limit(limit)
         .lean();
+       
+        
   
         let cartCount = 0;
         if (cart && cart.items && cart.items.length > 0) {
@@ -51,7 +55,8 @@ exports.loadUserHomePage = async (req, res) => {
         currentPage: page,
         totalPages: totalPages,
         cartCount,
-        wishlistCount
+        wishlistCount,
+        offer
       });
     } catch (error) {
       console.error('Error loading user home page:', error);
@@ -364,8 +369,8 @@ exports. resendOtp = async (req, res) => {
   exports. single_ProductView=async(req,res)=>{
     try {
       const { id } = req.params; 
-      const Product = await product.findById(id).populate('category_id')
-      const Category=await product.find({category_id:Product.category_id._id}) 
+      const Product = await product.findById(id).populate('category_id').populate('offer') 
+      const Category=await product.find({category_id:Product.category_id._id}).populate('offer')
       res.render('user/single-product', { Product,Category});
     } catch (err) {
       console.error(err);

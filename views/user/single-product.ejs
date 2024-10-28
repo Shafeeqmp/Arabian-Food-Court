@@ -147,6 +147,11 @@
 
             <!-- Main Product Image -->
             <div class="col-md-5">
+              <% if(Product.offer) { %>
+                <div class="offer-badge position-absolute" style="top: 10px; right: 10px; background-color: rgba(255, 0, 0, 0.8); color: #fff; padding: 5px 8px; border-radius: 5px; font-size: 0.8em;">
+                  <%= Product.offer.offerPercentage %>% OFF
+                </div>
+              <% } %>
                 <div class="product-image-container" id="imageContainer">
                     <img src="/public/<%= Product.images[0] %>" id="mainProductImage" class="img-fluid product-image" alt="Product Image">
                 </div>
@@ -155,7 +160,14 @@
             <!-- Product Details: Price, Cart, Description, Stock -->
             <div class="col-md-5">
                 <h2><%=Product.productname %></h2>
-                <h3 class="text-danger">₹ <%= Product.price %></h3>
+                <% if(Product.offer) { %>
+                  <h6>
+                    <span style="text-decoration: line-through; color: rgb(255, 0, 0);">₹ <%= Product.price %></span>
+                    <span style="font-size: 1.2em; margin-left: 8px;">₹ <%= Product.discount_price %></span>
+                  </h6>
+                <% } else { %>
+                  <h3 class="text-danger">₹ <%= Product.price %></h3>
+                <% } %>
                 <p class="<%= Product.stock > 0 ? 'text-success' : 'text-danger' %>">
                     <%= Product.stock > 0 ? `${Product.stock} In Stock` : 'Out of Stock' %>
                 </p>
@@ -178,6 +190,7 @@
             </div>
         </div>
     </div>
+    <!-- Related Product -->
     <section class="food_section layout_padding">
         <div class="container">
           <div class="heading_container heading_center">
@@ -190,7 +203,11 @@
               <div class="col-sm-6 col-lg-4 all pizza">
                 <div class="box">
                   <div>
-                    
+                    <% if(category.offer) { %>
+                      <div class="offer-badge position-absolute" style="top: 10px; right: 10px; background-color: rgba(255, 0, 0, 0.8); color: #fff; padding: 5px 8px; border-radius: 5px; font-size: 0.8em;">
+                        <%= category.offer.offerPercentage %>% OFF
+                      </div>
+                    <% } %>
                     <div class="img-box">
                       <a href="/user/singleProductView/<%= category._id %>">
                       <img src="/public/<%= category.images[0] %>" alt="">
@@ -198,11 +215,20 @@
                     </div>
                 
                     <div class="detail-box">
-                      <h5>
-                        <%= category.productname %>
-                      </h5>
+                      <h5><%= category.productname %> </h5>
+                      
+                        <p class="<%= Product.stock > 0 ? 'text-success' : 'text-danger' %>">
+                          <%= Product.stock > 0 ? `${Product.stock} In Stock` : 'Out of Stock' %>
+                      </p>
                       <div class="options">
-                        <h6>₹ <%= category.price %></h6>
+                        <% if(category.offer) { %>
+                          <h6>
+                            <span style="text-decoration: line-through; color: rgb(255, 0, 0);">₹ <%= category.price %></span>
+                            <span style="font-size: 1.2em; margin-left: 8px;">₹ <%= category.discount_price %></span>
+                          </h6>
+                        <% } else { %>
+                          <h6 class="text-left">₹ <%= category.price %></h6>
+                        <% } %>
                       </div>
                       <span class="text-warning">★ ★ ★ ★ ☆</span> (4.5)
                        <div class="d-flex">

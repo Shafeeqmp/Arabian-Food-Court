@@ -364,7 +364,11 @@
                                     <li>Estimate Delivery Time: 
                                         <%= new Date(order.createdAt.getTime() + 30 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
                                     </li>                             
-                                    <li>Shipping Address: <%= order.address.streetAddress %></li>
+                                    <li>Shipping Address: 
+                                    <p><strong><%= order.address[0].fullName %><br></strong>
+                                    <%= order.address[0].streetAddress %>, <%= order.address[0].city %><br>
+                                    Phone number: <%= order.address[0].phone %>
+                                </p></li>
                                 </ul>
                             </div>
                         </td>

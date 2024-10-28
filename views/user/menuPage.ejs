@@ -220,14 +220,30 @@
               <div class="col-sm-6 col-lg-4 all" data-category="<%= product.category_id %>">
                 <div class="box">
                   <div>
-                    <div class="img-box">
+                    <div class="img-box position-relative">
+                      <!-- Offer Percentage Badge -->
+                      <% if(product.offer) { %>
+                        <div class="offer-badge position-absolute" style="top: 10px; right: 10px; background-color: rgba(255, 0, 0, 0.8); color: #fff; padding: 5px 8px; border-radius: 5px; font-size: 0.8em;">
+                          <%= product.offer.offerPercentage %>% OFF
+                        </div>
+                      <% } %>
+                
                       <a href="/user/singleProductView/<%= product._id %>">
-                        <img data-toggle="tooltip" data-placement="bottom" title="<%= product.productname %>" src="/public/<%= product.images[0] %>" alt="Product Image">
+                        <img data-toggle="tooltip" data-placement="bottom" title="<%= product.productname %>" src="/public/<%= product.images[0] %>" alt="Product Image" style="width: 100%; display: block;">
                       </a>
                     </div>
+                    
                     <div class="detail-box">
                       <h5><%= product.productname %></h5>
-                      <h6>₹ <%= product.price %></h6>
+                      <% if(product.offer) { %>
+                        <h6>
+                          <span style="text-decoration: line-through; color: rgb(255, 0, 0);">₹ <%= product.price %></span>
+                          <span style="font-size: 1.2em; margin-left: 8px;">₹ <%= product.discount_price %></span>
+                        </h6>
+                      <% } else { %>
+                        <h6>₹ <%= product.price %></h6>
+                      <% } %>
+                      
                       <p class="<%= product.stock > 0 ? 'text-success' : 'text-danger' %>">
                         <%= product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock' %>
                       </p>
@@ -250,6 +266,7 @@
                     </div>
                   </div>
                 </div>
+                
               </div>
             <% }); %>
           <% } %>

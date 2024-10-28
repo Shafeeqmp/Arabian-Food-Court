@@ -1,362 +1,1048 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include ('../partial/newAdminHeader')-%>
+  <style>
+    .offer-card {
+      border: 1px solid #e2e6ea;
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="shortcut icon" href="/public/images/favicon.png" type="">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        .sidebar {
-            height: 100vh;
-            background-color: #ffbe33;
-            color: #fff;
-            padding-top: 1rem;
-        }
+    .offer-card:hover {
+      transform: scale(1.02);
+    }
 
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-        }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+    }
 
-        .sidebar a:hover {
-            background-color: #071553;
-        }
-
-        .content {
-            padding: 2rem;
-        }
-
-        .navbar {
-            margin-bottom: 0;
-        }
-
-        #couponDetails {
-            display: none;
-        }
-
-        .date-range {
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Admin Dashboard</a>
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user"></i> Admin
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <a class="dropdown-item" href="/admin/logout" id="logoutBtn">Logout</a>
-                    </div>
-                </li>
-            </ul>
+    .card-text {
+      font-size: 14px;
+      color: #6c757d;
+    }
+  </style>
+  <!--  Body Wrapper -->
+  <div class="page-wrapper" id="main-wrapper" data-layout="vertical" data-navbarbg="skin6" data-sidebartype="full"
+    data-sidebar-position="fixed" data-header-position="fixed">
+    <!-- Sidebar Start -->
+    <aside class="left-sidebar">
+      <!-- Sidebar scroll-->
+      <div>
+        <div class="brand-logo d-flex align-items-center justify-content-between">
+          <a href="#" class="text-nowrap logo-img">
+            <img src="/images/SnapCart.png" width="150" style="margin-top: 2vh;" alt="" />
+          </a>
+          <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
+            <i class="ti ti-x fs-8"></i>
+          </div>
         </div>
-    </nav>
+        <!-- Sidebar navigation-->
+        <nav class="sidebar-nav scroll-sidebar">
+          <ul id="sidebarnav">
+            <li class="nav-small-cap">
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-2 sidebar">
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loadProuctPage"><i class="fas fa-box"></i> Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loardOrderMng"> <i class="fas fa-shopping-cart"></i> Orders</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/categoryPage"><i class="fas fa-sliders-h"></i> Category</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loadCouponPage"><i class="fas fa-tag"></i> Coupon</a></li>
-                    <li class="nav-item"><a class="nav-link" href="#"><i class="fas fa-credit-card"></i> Payment</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
-            </nav>
 
-            <!-- Main Content -->
-            <main role="main" class="col-md-10 content">
-                <div class="container">
-                    <h1>Dashboard</h1>
-                    <div class="row">
-                        <!-- Sales Report Section -->
-                        <div class="col-md-12 mb-4">
-                            <div class="card">
-                                <div class="card-header">
-                                    Sales Report
-                                </div>
-                                <div class="card-body">
-                                    <form id="salesReportForm">
-                                        <div class="form-row">
-                                            <div class="form-group col-md-2">
-                                                <label for="startDate">Start Date</label>
-                                                <input type="date" class="form-control" id="startDate" name="startDate" required>
-                                            </div>
-                                            <div class="form-group col-md-2">
-                                                <label for="endDate">End Date</label>
-                                                <input type="date" class="form-control" id="endDate" name="endDate" required>
-                                            </div>
-                                            <div class="form-group col-md-2">
-                                                <label for="reportType">Report Type</label>
-                                                <select class="form-control" id="reportType" name="reportType">
-                                                    <option value="json">View Online</option>
-                                                    <option value="pdf">Download PDF</option>
-                                                    <option value="excel">Download Excel</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group col-md-2">
-                                                <label>&nbsp;</label>
-                                                <button type="submit" class="btn btn-primary btn-block">Generate Report</button>
-                                            </div>
-                                            <div class="form-group col-md-4">
-                                                <label for="dateRangeSelect">Quick Select</label>
-                                                <select id="dateRangeSelect" class="form-control" onchange="setDateRange(this.value)">
-                                                    <option value="">Select Date Range</option>
-                                                    <option value="today">Today</option>
-                                                    <option value="thisWeek">This Week</option>
-                                                    <option value="thisMonth">This Month</option>
-                                                    <option value="thisYear">This Year</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <div id="reportResults" class="mt-4"></div>
-                                </div>
-                            </div>
-                        </div>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/dashboard" aria-expanded="false">
+                <span>
+                  <i class="ti ti-layout-dashboard"></i>
+                </span>
+                <span class="hide-menu">Dashboard</span>
+              </a>
+            </li>
 
-                        <!-- Sales Overview Chart -->
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    Sales Overview
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="salesChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/users" aria-expanded="false">
+                <span>
+                  <i class="ti ti-user"></i>
+                </span>
+                <span class="hide-menu">Users</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/products" aria-expanded="false">
+                <span>
+                  <i class="bi bi-box-seam"></i>
+                </span>
+                <span class="hide-menu">Products</span>
+              </a>
+            </li>
+            <li class="sidebar-item selected">
+              <a class="sidebar-link active" href="/admin/offers" aria-expanded="false">
+                <span>
+                  <i class="bi bi-gift"></i>
+                </span>
+                <span class="hide-menu">Offers</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/orders" aria-expanded="false">
+                <span>
+                  <i class="bi bi-cart2"></i>
+                </span>
+                <span class="hide-menu">Orders</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/category" aria-expanded="false">
+                <span>
+                  <i class="ti ti-list"></i>
 
-                        <!-- Recent Orders -->
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    Recent Orders
-                                </div>
-                                <div class="card-body">
-                                    <table class="table">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Order ID</th>
-                                                <th>Date</th>
-                                                <th>Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <% if(orders.length != 0) { %>
-                                            <% orders.forEach((order, index) => { %>
-                                            <tr>
-                                                <td><%= index + 1 %></td> <!-- To display order index -->
-                                                <td><%= order.orderId %></td>
-                                                <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
-                                                <td><%= order.orderStatus || 'Pending' %></td> <!-- Adjust to your status field -->
-                                            </tr>
-                                            <% }) %>
-                                            <% } else { %>
-                                            <tr>
-                                                <td colspan="4" class="text-center">No recent orders found</td>
-                                            </tr>
-                                            <% } %>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                </span>
+                <span class="hide-menu">Categories</span>
+              </a>
+            </li>
 
-                    <!-- Best Selling Products, Categories, and Brands -->
-                    <div class="row">
-                        <!-- Best Selling Products -->
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Best Selling Products</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Product Name</th>
-                                                    <th>Sale Count</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if(bestSellingProduct.length) { %>
-                                                <% bestSellingProduct.forEach(item => { %>
-                                                <tr>
-                                                    <td><%= item.product_name %></td>
-                                                    <td><%= item.saleCount %></td>
-                                                </tr>
-                                                <% }) %>
-                                                <% } else { %>
-                                                <tr>
-                                                    <td colspan="2" class="text-center">No product found</td>
-                                                </tr>
-                                                <% } %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/brand" aria-expanded="false">
+                <span>
+                  <i class="ti ti-crown"></i>
 
-                        <!-- Best Selling Categories -->
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Best Selling Categories</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Category Name</th>
-                                                    <th>Sale Count</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if(bestSellingCategory.length) { %>
-                                                <% bestSellingCategory.forEach(item => { %>
-                                                <tr>
-                                                    <td><%= item.category_name %></td>
-                                                    <td><%= item.saleCount %></td>
-                                                </tr>
-                                                <% }) %>
-                                                <% } else { %>
-                                                <tr>
-                                                    <td colspan="2" class="text-center">No category found</td>
-                                                </tr>
-                                                <% } %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                </span>
+                <span class="hide-menu">Brands</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/coupon" aria-expanded="false">
+                <span>
+                  <i class="ti ti-ticket"></i>
 
-                        <!-- Best Selling Brands -->
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h5 class="card-title">Best Selling Brands</h5>
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>Brand Name</th>
-                                                    <th>Sale Count</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <% if(bestSellingBrand.length) { %>
-                                                <% bestSellingBrand.forEach(item => { %>
-                                                <tr>
-                                                    <td><%= item.brand_name %></td>
-                                                    <td><%= item.saleCount %></td>
-                                                </tr>
-                                                <% }) %>
-                                                <% } else { %>
-                                                <tr>
-                                                    <td colspan="2" class="text-center">No brand found</td>
-                                                </tr>
-                                                <% } %>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+
+                </span>
+                <span class="hide-menu">Coupon</span>
+              </a>
+            </li>
+
+           
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/admin/logout" aria-expanded="false">
+                <span>
+                  <i class="ti ti-login"></i>
+                </span>
+                <span class="hide-menu">Logout</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </aside>
+
+    <!--  Sidebar End -->
+
+    <div class="body-wrapper">
+
+      <!--  Header Start -->
+      <header class="app-header">
+        <nav class="navbar navbar-expand-lg navbar-light">
+          <ul class="navbar-nav">
+            <li class="nav-item d-block d-xl-none">
+              <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+                <i class="ti ti-menu-2"></i>
+              </a>
+            </li>
+
+          </ul>
+          <div class="navbar-collapse justify-content-end px-0" id="navbarNav">
+           
+            <div class="container-fluid main-area justify-content-end">
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="d-sm-flex align-items-center justify-content-between border-bottom">
+                    <ul class="nav nav-tabs" role="tablist">
+                      <li class="nav-item">
+                        <a class="nav-link active ps-0" id="home-tab" data-bs-toggle="tab" href="#overview" role="tab"
+                          aria-controls="overview" aria-selected="true">Offer Management</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#products" role="tab"
+                          aria-selected="false">Products</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#category" role="tab"
+                          aria-selected="false">Categories</a>
+                      </li>
+                     
+                    </ul>
+                  </div>
                 </div>
-            </main>
+              </div>
+
+            </div>
+
+          </div>
+        </nav>
+      </header>
+      <!--  Header End -->
+      <div class="container-fluid main-area">
+        <div class="tab-content tab-content-basic">
+          <!-- Overview Tab -->
+
+
+          <div class="tab-pane fade show active" id="overview" role="tabpanel" aria-labelledby="overview">
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-lg-9">
+                      <h4 class="card-title">Offer Management</h4>
+                      <p class="card-description">Manage Offer details and customize the discounts.</p>
+                    </div>
+                    <div class="col-lg-3 text-end">
+                      <button type="button" class="btn btn-outline-primary btn-icon-text" data-bs-toggle="modal"
+                        data-bs-target="#addOfferModal">
+                        Add New Offer
+                      </button>
+                    </div>
+                  </div>
+
+
+
+                  <!-- Offers in Card View -->
+                  <div class="row mt-4">
+                    <% if( typeof offer !='undefined' && offer.length>0 ){ %>
+
+                      <% offer.forEach((element)=>{ %>
+
+                        <div class="col-lg-4 mb-4">
+                          <div class="card offer-card shadow-sm">
+                            <div class="card-body">
+                              <h5 class="card-title">
+                                <%= element.offerName %>
+                              </h5>
+                              <p class="card-text">
+                                <strong>Discount:</strong>
+                                <%= element.offerPercentage %>%<br>
+                                  <strong>Start Date:</strong>
+                                  <%= new Date(element.offerStartDate).toLocaleString('en-GB', { day: 'numeric' ,
+                                    month: 'numeric' , year: 'numeric'}) %>
+                                    
+                              </p>
+                              <div class="d-flex justify-content-between">
+
+                                <% if(element.isDelete){ %>
+                                  <button type="button" class="btn btn-secondary btn-sm"
+                                    onclick="restoreOffer('<%=element._id %>')">Restore</button>
+                                  <% }else{ %>
+                                    <button type="button" onclick="deleteOffer('<%= element._id %>')"
+                                      class="btn btn-danger btn-sm">DeditBtnelete</button>
+                                    <button type="button" class="btn btn-outline-info btn-sm "
+                                      data-offer-Id="<%= element._id %>" data-offer-name="<%= element.offerName %>"
+                                      data-offer-percentage="<%= element.offerPercentage %>" data-offer-SDate="<%= new Date(element.offerStartDate).toISOString().slice(0, 10) %>"
+                                      ">
+                                      Edit
+                                    </button>
+                                    <% } %>
+
+
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <% }) %>
+
+
+                          <% }else{ %>
+                            <div class="col-12 text-center mt-4">
+                              <h4 class="card-title">No offer available</h4>
+                            </div>
+                            <% } %>
+
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+        <div class="tab-content tab-content-basic">
+          <!-- Products Tab -->
+          <div class="tab-pane fade" id="products" role="tabpanel" aria-labelledby="products">
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <!-- Title and Description -->
+                  <div class="row align-items-center mb-3">
+                    <div class="col-lg-9">
+                      <h4 class="card-title mb-1">Product Offer Management</h4>
+                      <p class="card-description text-muted">Manage product offer details and discounts</p>
+                    </div>
+
+                  </div>
+
+                  <!-- Offers in Card View -->
+
+                  <div class="row mt-4">
+                    <% if(typeof products !='undefined' && products.length >0){ %>
+                       <% products.forEach((element)=>{ %>
+                        <% element.variants.forEach((variant)=>{ %>
+                          <div class="col-lg-4 mb-4">
+                            <div class="card offer-card shadow-sm">
+                              <div class="card-body">
+                                
+                                <p class="card-text">
+                                  <strong>Product Name:</strong><%= element.product_name %><br>
+                                 
+                                  <strong>Color:</strong><%= variant.color %><br>
+                                    
+                                     
+                                    
+                                <%  if(variant.offer){ %>
+                                    <strong>Discount:</strong><%= variant.offer.offerPercentage %>% <br>
+                                    <strong>Start Date:</strong><%=new Date(variant.offer.offerStartDate).toLocaleString('en-GB', { day: 'numeric' ,
+                                    month: 'numeric' , year: 'numeric' , hour: 'numeric' , minute: 'numeric' , hour12:
+                                    true }) %>
+                                    
+                                  <% }else{ %>
+                                    <strong>Discount:</strong>No discount <br>
+                                    <strong>Start Date:</strong>--/--/---- <br>
+                                    
+                                 <% } %>
+                              
+
+                                </p>
+                                <div class="d-flex justify-content-between">
+      
+                                  <div class="form-group mb-0">
+                                    <select class="form-select form-select-sm" onchange="updateProductOffer('<%= element._id %>', this.value, '<%= variant._id %>')">
+                                      <option>Select Offer</option>
+                                      <% offerSelect.forEach((offer) => { %>
+                                        <option value="<%= offer._id %>" <% if (variant.offer && variant.offer._id.toString() === offer._id.toString()) { %> selected  <% } %> >
+                                         
+                                         <%= offer.offerName %> - <%= offer.offerPercentage %>%</option>
+                                      <% }) %>
+                                    </select>
+                                  </div>
+                                  <%  if(variant.offer){ %>
+                                    <button type="button" class="btn btn-danger btn-sm"
+                                    onclick="removeOffer('<%= element._id %>','<%=variant._id %>')">remove offer</button>
+                                    <% } %>
+                                 
+      
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        <% }) %>
+                        
+                       <% }) %>
+                    
+                     <% }else{ %>
+                      <div class="col-12 text-center mt-4">
+                        <h4 class="card-title">No product available</h4>
+                      </div>
+                 <%   } %>
+                    
+
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+        <div class="tab-content tab-content-basic">
+          <!-- Products Tab -->
+          <div class="tab-pane fade" id="category" role="tabpanel" aria-labelledby="category">
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                  <!-- Title and Description -->
+                  <div class="row align-items-center mb-3">
+                    <div class="col-lg-9">
+                      <h4 class="card-title mb-1">Category Offer Management</h4>
+                      <p class="card-description text-muted">Manage category offer details and discounts</p>
+                    </div>
+
+                  </div>
+
+                  <!-- Offers in Card View -->
+
+                  <div class="row mt-4">
+                   <% if(typeof category !='undefined' && category.length >0){ %>
+                     <% category.forEach((element)=>{ %>
+                        <div class="col-lg-4 mb-4">
+                          <div class="card offer-card shadow-sm">
+                            <div class="card-body">
+                              
+                              <p class="card-text">
+                                <strong>Category Name:</strong><%=element.category_name %><br>
+
+                                <%  if(element.offer){ %>
+                                  <strong>Discount:</strong><%= element.offer.offerPercentage %>% <br>
+                                  <strong>Start Date:</strong><%= new Date(element.offer.offerStartDate).toLocaleString('en-GB', { day: 'numeric' ,
+                                  month: 'numeric' , year: 'numeric' , hour: 'numeric' , minute: 'numeric' , hour12:
+                                  true }) %>
+                                  
+                                <% }else{ %>
+                                  <strong>Discount:</strong>No discount <br>
+                                  <strong>Start Date:</strong>--/--/---- <br>
+                                  
+                               <% } %>
+                               
+                              </p>
+                              <div class="d-flex justify-content-between">
+    
+                                <div class="form-group mb-0">
+                                  <select class="form-select form-select-sm" onchange="updateCategoryOffer('<%=element._id %>',this.value)">
+                                    <option value="">Select Offer</option>
+                                    <% offerSelect.forEach((offer)=>{ %>
+                                      <option value="<%= offer._id %>" <% if (element.offer && element.offer._id.toString() === offer._id.toString()) { %> selected  <% } %>>
+                                        <%= offer.offerName %> - <%=offer.offerPercentage%>%
+                                      </option>
+                                      
+                                    <% }) %>
+                                  </select>
+                                </div>
+                                <%  if(element.offer){ %>
+                                  <button type="button" class="btn btn-danger btn-sm"
+                                  onclick="removeCategoryOffer('<%= element._id %>','<%=element.offer._id%>')">remove offer</button>
+                                  <% } %>
+    
+                              </div>
+                            </div>
+                          </div>
+                          </div>
+                    <%  }) %>
+                 <%   }else{ %>
+                      <div class="col-12 text-center mt-4">
+                        <h4 class="card-title">No product available</h4>
+                      </div>
+                  <%  } %>
+                    
+                    </div>
+
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        
+
+
+
+
+
+
+
+
+
+      </div>
+
+
+
+
+
     </div>
 
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <!-- Add Offer Modal -->
+    <div class="modal fade" id="addOfferModal" tabindex="-1" role="dialog" aria-labelledby="addCouponModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCouponModalLabel">Add New Offer</h5>
+
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="offerName">Offer Name</label>
+                <input type="text" class="form-control" id="offerName" name="offerName" required>
+              </div>
+              <div class="form-group">
+                <label for="offerPercentage">Offer Percentage</label>
+                <input type="number" class="form-control" id="offerPercentage" name="offerPercentage" required>
+              </div>
+              <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" class="form-control" id="offerStartDate" name="offerStartDate" required>
+              </div>
+              
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-primary" onclick="AddOffer()">Add Offer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- edit Offer Modal -->
+    <div class="modal fade" id="editOfferModal" tabindex="-1" role="dialog" aria-labelledby="editOfferModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="addCouponModalLabel">edit Offer</h5>
+
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="form-group">
+                <label for="offerName">Offer Name</label>
+                <input type="text" class="form-control" id="editOfferName" name="editOfferName" required>
+              </div>
+              <div class="form-group">
+                <label for="offerPercentage">Offer Percentage</label>
+                <input type="number" class="form-control" id="editOfferPercentage" name="editOfferPercentage" required>
+              </div>
+              <div class="form-group">
+                <label>Start Date</label>
+                <input type="date" class="form-control" id="editOfferStartDate" name="editOfferStartDate"
+                  required>
+              </div>
+              
+              <input type="hidden" id="editOfferId">
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-outline-primary" onclick="EditOffer()">Add Offer</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        // Date Range Quick Select Handler
-        function setDateRange(range) {
-            const today = new Date();
-            let startDate, endDate;
 
-            switch (range) {
-                case 'today':
-                    startDate = today.toISOString().substr(0, 10);
-                    endDate = startDate;
-                    break;
-                case 'thisWeek':
-                    const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
-                    startDate = new Date(firstDayOfWeek).toISOString().substr(0, 10);
-                    endDate = new Date().toISOString().substr(0, 10);
-                    break;
-                case 'thisMonth':
-                    startDate = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().substr(0, 10);
-                    endDate = new Date().toISOString().substr(0, 10);
-                    break;
-                case 'thisYear':
-                    startDate = new Date(today.getFullYear(), 0, 1).toISOString().substr(0, 10);
-                    endDate = new Date().toISOString().substr(0, 10);
-                    break;
-                default:
-                    startDate = '';
-                    endDate = '';
-            }
-
-            $('#startDate').val(startDate);
-            $('#endDate').val(endDate);
+      async function AddOffer() {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+        const offerName = document.getElementById('offerName').value.trim()
+        const offerPercentage = parseFloat(document.getElementById('offerPercentage').value.trim())
+        const offerStartDate = document.getElementById('offerStartDate').value.trim()
+        
+        const currentDate = new Date();
+        if (!offerName) {
+          Toast.fire({
+            icon: "error",
+            title: "offer name is empty"
+          });
+          return
+        }
+        if (offerName.length < 2) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Name Length",
+            text: 'Name must need minimum 2 characters.',
+          });
+          return
+        }
+        const nameRegex = /^[a-zA-Z\s\-]+$/;
+        if (!nameRegex.test(offerName)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Characters in Name",
+            text: 'Name should not contain numbers or special characters.',
+          });
+          return
         }
 
-        // Sales Chart Initialization
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-                datasets: [{
-                    label: 'Sales',
-                    data: [120, 190, 300, 500, 200, 300],
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
-</body>
 
-</html>
+        if (!offerPercentage) {
+          Toast.fire({
+            icon: "error",
+            title: "percentage is empty"
+          });
+          return
+        }
+
+        if (isNaN(offerPercentage)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Percentage",
+            text: "Percentage must be a number.",
+          });
+          return;
+        }
+
+        if (offerPercentage < 1 || offerPercentage > 100) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid percentage",
+            text: 'Percentage not more than 100 and less than 0'
+          });
+          return
+        }
+        if (offerPercentage !== Math.floor(offerPercentage)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Percentage Format",
+            text: "Percentage must be a whole number.",
+          });
+          return;
+        }
+
+
+        if (!offerStartDate) {
+          Toast.fire({
+            icon: "error",
+            title: "start date is empty"
+          });
+          return
+        }
+        if (offerStartDate < currentDate) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Start Date",
+            text: 'Start date cannot be in the past.',
+          });
+          return;
+        }
+        try {
+          const responce = await fetch('/admin/addOffers', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offerName, offerPercentage, offerStartDate })
+          })
+
+
+          const result = await responce.json()
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Offer added',
+              text: result.message,
+              confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.reload();
+            })
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'error occured',
+              text: result.error,
+              confirmButtonText: 'OK'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: 'An error occurred. Please check your network connection.',
+            confirmButtonText: 'OK'
+          });
+        }
+      }
+
+
+      async function deleteOffer(offerId) {
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to Delete this offer?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, Delete it!',
+          cancelButtonText: 'Close!'
+        });
+        if (result.isConfirmed) {
+          const responce = await fetch('/admin/deleteOffer', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offerId })
+          })
+          if (response.ok) {
+            Swal.fire('deleted!', 'this offer is deleted.', 'success').then(() => {
+              location.reload(); // Reload the page
+            })
+          } else {
+            Swal.fire('Error!', 'Failed to delete offer.', 'error');
+          }
+        }
+
+      }
+      async function deleteOffer(offerId) {
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to Delete this offer?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, Delete it!',
+          cancelButtonText: 'Close!'
+        });
+        if (result.isConfirmed) {
+          const responce = await fetch('/admin/deleteOffer', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offerId })
+          })
+          if (responce.ok) {
+            Swal.fire('deleted!', 'this offer is deleted.', 'success').then(() => {
+              location.reload()
+            })
+
+          } else {
+            Swal.fire('Error!', 'Failed to delete offer.', 'error');
+          }
+        }
+
+      }
+      async function restoreOffer(offerId) {
+        const result = await Swal.fire({
+          title: 'Are you sure?',
+          text: "Do you want to restore this offer?",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, restore it!',
+          cancelButtonText: 'Close!'
+        });
+        if (result.isConfirmed) {
+          const responce = await fetch('/admin/restoreOffer', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ offerId })
+          })
+          if (responce.ok) {
+            Swal.fire('restored!', 'this offer is restored.', 'success').then(() => {
+              location.reload(); // Reload the page
+            })
+          } else {
+            Swal.fire('Error!', 'Failed to restore offer.', 'error');
+          }
+        }
+
+      }
+
+
+
+
+      document.addEventListener("DOMContentLoaded", () => {
+      const editBtn = document.querySelectorAll('.editBtn');
+      editBtn.forEach((button) => {
+      button.addEventListener('click', async () => {
+      const offerName = button.getAttribute('data-offer-name');
+      const offerPercentage = button.getAttribute('data-offer-percentage');
+      const offerStartDate = button.getAttribute('data-offer-SDate');
+      const offerId = button.getAttribute('data-offer-Id'); 
+
+      document.getElementById('editOfferStartDate').value = offerStartDate;
+      document.getElementById('editOfferId').value = offerId;
+      document.getElementById('editOfferName').value = offerName;
+      document.getElementById('editOfferPercentage').value = offerPercentage;
+      $('#editOfferModal').modal('show');
+    });
+  });
+});
+
+
+
+
+
+      async function EditOffer() {
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+
+
+        const editOfferName = document.getElementById('editOfferName').value.trim()
+
+        const editOfferPercentage = parseFloat(document.getElementById('editOfferPercentage').value.trim())
+        const editOfferStartDate = document.getElementById('editOfferStartDate').value.trim()
+     
+        const editOfferId = document.getElementById('editOfferId').value
+        const currentDate = new Date();
+        if (!editOfferName) {
+          Toast.fire({
+            icon: "error",
+            title: "offer name is empty"
+          });
+          return
+        }
+        if (editOfferName.length < 2) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Name Length",
+            text: 'Name must need minimum 2 characters.',
+          });
+          return
+        }
+        const nameRegex = /^[a-zA-Z\s\-]+$/;
+        if (!nameRegex.test(editOfferName)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Characters in Name",
+            text: 'Name should not contain numbers or special characters.',
+          });
+          return
+        }
+
+
+        if (!editOfferPercentage) {
+          Toast.fire({
+            icon: "error",
+            title: "percentage is empty"
+          });
+          return
+        }
+
+        if (isNaN(editOfferPercentage)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Percentage",
+            text: "Percentage must be a number.",
+          });
+          return;
+        }
+
+        if (editOfferPercentage < 1 || editOfferPercentage > 100) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid percentage",
+            text: 'Percentage not more than 100 and less than 0'
+          });
+          return
+        }
+        if (editOfferPercentage !== Math.floor(editOfferPercentage)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Percentage Format",
+            text: "Percentage must be a whole number.",
+          });
+          return;
+        }
+
+
+        if (!editOfferStartDate) {
+          Toast.fire({
+            icon: "error",
+            title: "start date is empty"
+          });
+          return
+        }
+        if (editOfferStartDate < currentDate) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid Start Date",
+            text: 'Start date cannot be in the past.',
+          });
+          return;
+        }
+        try {
+          const responce = await fetch('/admin/editOffers', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ editOfferId, editOfferName, editOfferPercentage, editOfferStartDate })
+          })
+
+
+          const result = await responce.json()
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Offer Edited',
+              text: result.message,
+              confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.reload();
+            })
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'error occured',
+              text: result.error,
+              confirmButtonText: 'OK'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: 'An error occurred. Please check your network connection.',
+            confirmButtonText: 'OK'
+          });
+        }
+
+      }
+
+
+      
+
+
+      async function updateProductOffer(productId,offerId,variantId){
+        try{
+          const responce = await fetch('/admin/updateProductOffer',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body:JSON.stringify({productId,offerId,variantId})
+        })
+        const result = await responce.json()
+        if(result.success){
+          Swal.fire({
+            icon:'success',
+            title:'offer updated',
+            text:result.message,
+            confirmButtonText:'OK'
+          }).then(()=>{
+            window.location.reload()
+          })
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'failed to update',
+            text:result.error,
+            confirmButtonText:'OK'
+          })
+        }
+        }catch(error){
+          Swal.fire('Error!', 'There was a problem processing your request.', 'error');
+        }
+       
+
+
+      } 
+      async function updateCategoryOffer(categoryId,offerId){
+        try{
+          const responce = await fetch('/admin/updateCategoryOffer',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body:JSON.stringify({categoryId,offerId})
+        })
+        const result = await responce.json()
+        if(result.success){
+          Swal.fire({
+            icon:'success',
+            title:'offer updated',
+            text:result.message,
+            confirmButtonText:'OK'
+          }).then(()=>{
+            window.location.reload()
+          })
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'failed to update',
+            text:result.error,
+            confirmButtonText:'OK'
+          })
+        }
+        }catch(error){
+          Swal.fire('Error!', 'There was a problem processing your request.', 'error');
+        }
+       
+
+
+      } 
+
+async function removeOffer(productId,variantId){
+  try{
+          const responce = await fetch('/admin/removeProductOffer',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body:JSON.stringify({productId,variantId})
+        })
+        const result = await responce.json()
+        if(result.success){
+          Swal.fire({
+            icon:'success',
+            title:'offer updated',
+            text:result.message,
+            confirmButtonText:'OK'
+          }).then(()=>{
+            window.location.reload()
+          })
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'failed to update',
+            text:result.error,
+            confirmButtonText:'OK'
+          })
+        }
+        }catch(error){
+          Swal.fire('Error!', 'There was a problem processing your request.', 'error');
+        }
+}
+
+async function removeCategoryOffer(categoryId,offerId){
+  try{
+          const responce = await fetch('/admin/removeCategoryOffer',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body:JSON.stringify({categoryId,offerId})
+        })
+        const result = await responce.json()
+        if(result.success){
+          Swal.fire({
+            icon:'success',
+            title:'offer updated',
+            text:result.message,
+            confirmButtonText:'OK'
+          }).then(()=>{
+            window.location.reload()
+          })
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'failed to update',
+            text:result.error,
+            confirmButtonText:'OK'
+          })
+        }
+        }catch(error){
+          Swal.fire('Error!', 'There was a problem processing your request.', 'error');
+        }
+}
+
+
+    </script>
+
+<%- include ('../partial/newAdminFooter')-%>

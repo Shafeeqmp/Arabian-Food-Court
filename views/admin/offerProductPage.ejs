@@ -205,29 +205,6 @@
 
     <div class="col-md-10">
         <main class="container py-5">
-            <h1 class="h2 mb-4">Offer Product Management</h1>
-            
-            <div class="bg-white rounded shadow-sm p-4 mb-4">
-                <form id="addForm">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="">Offer Name</label>
-                            <input type="text" class="form-control" id="offerName" placeholder="Offer Name" name="offerName" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="">Discount</label>
-                            <input type="number" class="form-control" id="offerPercentage" placeholder="Offer Percentage" name="offerPercentage" required>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="offerStartDate" name="offerStartDate" required>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-primary" onclick="AddOffer()">Add Item</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                   <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Offers</button>
@@ -237,9 +214,31 @@
               </nav>
               <div class="tab-content" id="nav-tabContent">
 
-                <!-- Offer Card Start--1 -->
+                <!-- Add Offer Card Start--1 -->
                 <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                     <div class="bg-white rounded shadow-sm p-4">
+                        <h1 class="h2 mb-4">Offer Product Management</h1>
+                        <div class="bg-white rounded shadow-sm p-4 mb-4">
+                            <form id="addForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="">Offer Name</label>
+                                        <input type="text" class="form-control" id="offerName" placeholder="Offer Name" name="offerName" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="">Discount</label>
+                                        <input type="number" class="form-control" id="offerPercentage" placeholder="Offer Percentage" name="offerPercentage" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="startDate" class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" id="offerStartDate" name="offerStartDate" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="button" class="btn btn-primary" onclick="AddOffer()">Add Item</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <thead>
@@ -250,15 +249,29 @@
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="itemList">
+                                <tbody>
                                     <% offer.forEach(Offer => { %>
                                         <tr>
                                             <td><%= Offer.offerName %></td>
-                                            <td><%= Offer.offerPercentage %></td>
+                                            <td><%= Offer.offerPercentage %>%</td>
                                             <td><%= new Date(Offer.offerStartDate).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary" onclick="editItem('<%= Offer.id %>')">Edit</button>
-                                                <button class="btn btn-sm btn-danger" onclick="deleteItem('<%= Offer.id %>')">Delete</button>
+                                        <td>
+                                            <% if (Offer.isDelete) { %>
+                                                <button class="btn btn-primary btn-sm" onclick="restoreOffer('<%= Offer._id %>')">
+                                                    <i class="fas fa-recycle"></i> Restore
+                                                </button>
+                                                <% } else { %>
+                                                <button type="button" class="btn btn-sm btn-primary editOfferBtn"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#editOfferModal"
+                                                        data-offer-id="<%= Offer._id %>"
+                                                        data-offer-name="<%= Offer.offerName %>"
+                                                        data-offer-percentage="<%= Offer.offerPercentage %>"
+                                                        data-offer-sdate="<%= Offer.offerStartDate.toISOString().split('T')[0] %>">
+                                                    <i class="fas fa-edit"></i> Edit
+                                                </button>
+                                                    <button class="btn btn-sm btn-danger" onclick="deleteItem('<%= Offer.id %>')"><i class="fas fa-trash"></i> Delete</button>
+                                                    <% } %>
                                             </td>
                                         </tr>
         
@@ -268,25 +281,26 @@
                         </div>
                     </div>
                 </div>
-                <!-- Offer Card End--1 -->
+                <!-- Add Offer Card End--1 -->
 
                 <!-- Products Card Start--2 -->
                 <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
                     <div class="row row-cols-1 row-cols-md-3 g-4">
                         <% product.forEach(Product => { %>
                         <div class="col">
-                          <div class="card h-100">
-                            <div class="d-flex justify-content-center">
+                            <div class="card h-100">
+                            <div class="d-flex justify-content-center mt-3">
                                 <img src="/public/<%= Product.images[0] %>" alt="" style="width: 100px; height: auto;">
                             </div>
-                            
                             <div class="card-body">
                               <div class="mb-3">
                                   <p class="card-title text-center"><%= Product.productname %></p>
-                                <select class="form-select" id="editType" required>
+                                <select class="form-select" id="editType" onchange="updateProductOffer('<%= Product._id %>',this.value)" required>
                                     <option value="offer">Select Offers</option>
-                                    <% offer.forEach(Offer => { %>
-                                        <option value="product"><%= Offer.offerName %> - <%= Offer.offerPercentage %>%</option>
+                                    <% selectoffer.forEach(Offer => { %>
+                                        <option value="<%= Offer._id %>" <% if (Product.offer && Product.offer._id.toString() === Offer._id.toString()) { %> selected  <% } %> >
+                                            <%= Offer.offerName %> - <%= Offer.offerPercentage %>%
+                                        </option>
                                     <% }) %>
                                 </select>
                             </div>
@@ -302,90 +316,86 @@
                 <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
                     <div class="row row-cols-1 row-cols-md-3 g-4">
                         <div class="col">
-                          <div class="card h-100">
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="editType" class="form-label">Select Category</label>
-                                    <select class="form-select" id="editType" required>
-                                        <option value="offer">Select Categories</option>
-                                        <% category.forEach(Category => { %>
-                                            <option value="offer"><%= Category.category_name %></option>
-                                        <% }) %>
-                                    </select>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="editType" class="form-label">Select Offer Discount</label>
-                                    <select class="form-select" id="editType" required>
-                                        <option value="offer">Select Offers</option>
-                                        <% offer.forEach(Offer => { %>
-                                            <option value="product"><%= Offer.offerName %> - <%= Offer.offerPercentage %>%</option>
-                                        <% }) %>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                              <small class="text-muted">Last updated 3 mins ago</small>
-                            </div>
-                          </div>
+                            <h5>Category Offer Management</h5>
                         </div>
                       </div>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">SL</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Offer</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                        <% category.forEach((Category,index) => { %>
+                        <tr>
+                            <th scope="row"><%= index+1 %></th>
+                            <td>
+                               <%= Category.category_name%>
+                            </td>      
+                           
+                                <td>
+                                 <select class="form-select" id="editType"required>
+                                 <option value="offer">Select Offers</option>
+                                 <% selectoffer.forEach((Offer) => { %>
+                                 <option value="product"><%= Offer.offerName %> - <%= Offer.offerPercentage %>%</option>
+                                 <% }) %>  
+                                </select>    
+                                </td>
+                                   
+                            <% }) %>
+                           
+                        </tr>
+                        </tbody>
+                      </table>
                 </div>
                 <!-- Categories Card End--3 -->
               </div>
         </main>
     
         <!-- Edit Modal -->
-        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editOfferModal" tabindex="-1" aria-labelledby="editOfferModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit Item</h5>
+                        <h5 class="modal-title" id="editOfferModalLabel">Edit Item</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <form id="editForm">
-                            <input type="hidden" id="editId">
+                            <input type="hidden" id="editId" name="offerId">
                             <div class="mb-3">
-                                <label for="editName" class="form-label">Name</label>
-                                <input type="text" class="form-control" id="editName" required>
+                                <label for="editName" class="form-label">Offer Name</label>
+                                <input type="text" class="form-control" id="editOfferName" required>
                             </div>
                             <div class="mb-3">
-                                <label for="editPrice" class="form-label">Price</label>
-                                <input type="number" class="form-control" id="editPrice" required>
+                                <label for="editPrice" class="form-label">Discount</label>
+                                <input type="number" class="form-control" id="editDiscount" required>
                             </div>
                             <div class="mb-3">
-                                <label for="editType" class="form-label">Type</label>
-                                <select class="form-select" id="editType" required>
-                                    <option value="offer">Offer</option>
-                                    <option value="product">Product</option>
-                                </select>
+                                <label for="Start-Date" class="col-form-label">Start Date:</label>
+                                <input type="date" class="form-control" id="editOffertDate"></input>
+                              </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="editDescription" class="form-label">Description</label>
-                                <input type="text" class="form-control" id="editDescription">
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="EditOffer()" id="saveEdit">Save changes</button>
                             </div>
                         </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" id="saveEdit">Save changes</button>
-                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-
-
-
-
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
  <script>
+    //Add Offer-----------Start
     async function AddOffer() {
         const Toast = Swal.mixin({
           toast: true,
@@ -495,6 +505,7 @@
               icon: 'success',
               title: 'Offer added',
               text: result.message,
+              timer: 1000,
               confirmButtonText: 'OK'
             }).then(() => {
               window.location.reload();
@@ -516,81 +527,274 @@
           });
         }
       }
- </script>
- <script>
-    let items = [];
-    const addForm = document.getElementById('addForm');
-    const itemList = document.getElementById('itemList');
-    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+      //Add Offer-----------End
 
-    addForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const newItem = {
-            id: Date.now(),
-            offerName: document.getElementById('offerName').value,
-            dicount: document.getElementById('offerPercentage').value,
-            date: document.getElementById('offerStartDate').value,
-        };
-        items.push(newItem);
-        updateList(items);
-        addForm.reset();
-    });
+     
 
-    function updateList(items) {
-        itemList.innerHTML = '';
-        items.forEach(item => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${item.offerName}</td>
-                <td>${item.dicount}</td>
-                <td>$${item.date}</td>
-                <td>
-                    <button class="btn btn-sm btn-primary" onclick="editItem(${item.id})">Edit</button>
-                    <button class="btn btn-sm btn-danger" onclick="deleteItem(${item.id})">Delete</button>
-                </td>
-            `;
-            itemList.appendChild(row);
+      //Edit Offer-----------Start
+      document.addEventListener("DOMContentLoaded", () => {
+      const editBtns = document.querySelectorAll('.editOfferBtn'); 
+      editBtns.forEach((button) => {
+      button.addEventListener('click', () => {
+            const offerId = button.getAttribute('data-offer-id');
+            const offerName = button.getAttribute('data-offer-name');
+            const offerPercentage = button.getAttribute('data-offer-percentage');
+            const offerStartDate = button.getAttribute('data-offer-sdate');
+
+        
+            document.getElementById('editId').value = offerId;
+            document.getElementById('editOfferName').value = offerName;
+            document.getElementById('editDiscount').value = offerPercentage;
+            document.getElementById('editOffertDate').value = offerStartDate;
+            $('#editOfferModal').modal('show');
         });
-    }
-
-    function editItem(id) {
-        const item = items.find(i => i.id === id);
-        document.getElementById('editId').value = item.id;
-        document.getElementById('editName').value = item.name;
-        document.getElementById('editPrice').value = item.price;
-        document.getElementById('editType').value = item.type;
-        document.getElementById('editDescription').value = item.description;
-        editModal.show();
-    }
-
-    document.getElementById('saveEdit').addEventListener('click', function() {
-        const id = parseInt(document.getElementById('editId').value);
-        const item = items.find(i => i.id === id);
-        item.name = document.getElementById('editName').value;
-        item.price = document.getElementById('editPrice').value;
-        item.type = document.getElementById('editType').value;
-        item.description = document.getElementById('editDescription').value;
-        updateList();
-        editModal.hide();
     });
+});
 
-    function deleteItem(id) {
-        if (confirm('Are you sure you want to delete this item?')) {
-            items = items.filter(i => i.id !== id);
-            updateList();
+    async function EditOffer() {
+        const Toast = Swal.mixin({
+        toast: true,
+        position: "top-end",
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
         }
-    }
-</script>
+     });
+     const editOfferId = document.getElementById('editId').value
+        const editOfferName = document.getElementById('editOfferName').value.trim()
+        const editOfferPercentage = parseFloat(document.getElementById('editDiscount').value.trim())
+        const editOfferStartDate = document.getElementById('editOffertDate').value.trim()
+        const currentDate = new Date();
+        if (!editOfferName) {
+        Toast.fire({
+            icon: "error",
+            title: "offer name is empty"
+        });
+        return
+        }
+        if (editOfferName.length < 2) {
+        Toast.fire({
+            icon: "error",
+            title: "Invalid Name Length",
+            text: 'Name must need minimum 2 characters.',
+        });
+        return
+        }
+        const nameRegex = /^[a-zA-Z\s\-]+$/;
+        if (!nameRegex.test(editOfferName)) {
+        Toast.fire({
+            icon: "error",
+            title: "Invalid Characters in Name",
+            text: 'Name should not contain numbers or special characters.',
+        });
+        return
+        }
 
-<script>
-     async function updateProductOffer(productId,offerId,variantId){
+
+        if (!editOfferPercentage) {
+        Toast.fire({
+            icon: "error",
+            title: "percentage is empty"
+        });
+        return
+        }
+
+        if (isNaN(editOfferPercentage)) {
+        Toast.fire({
+            icon: "error",
+            title: "Invalid Percentage",
+            text: "Percentage must be a number.",
+        });
+        return;
+        }
+
+        if (editOfferPercentage < 1 || editOfferPercentage > 100) {
+        Toast.fire({
+            icon: "error",
+            title: "Invalid percentage",
+            text: 'Percentage not more than 100 and less than 0'
+        });
+        return
+        }
+        if (editOfferPercentage !== Math.floor(editOfferPercentage)) {
+        Toast.fire({
+            icon: "error",
+            title: "Invalid Percentage Format",
+            text: "Percentage must be a whole number.",
+        });
+        return;
+        }
+
+
+        if (!editOfferStartDate) {
+        Toast.fire({
+            icon: "error",
+            title: "start date is empty"
+        });
+        return
+        }
+        if (editOfferStartDate < currentDate) {
+        Toast.fire({
+            icon: "error",
+            title: "Invalid Start Date",
+            text: 'Start date cannot be in the past.',
+        });
+        return;
+        }
+        try {
+        const responce = await fetch('/admin/editOffer', {
+            method: 'POST',
+            headers: {
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ editOfferId, editOfferName, editOfferPercentage, editOfferStartDate })
+        })
+
+
+        const result = await responce.json()
+        if (result.success) {
+            Swal.fire({
+            icon: 'success',
+            title: 'Offer Edited',
+            text: result.message,
+            timer:1000,
+            confirmButtonText: 'OK'
+            }).then(() => {
+            window.location.reload();
+            })
+        } else {
+            Swal.fire({
+            icon: 'error',
+            title: 'error occured',
+            text: result.error,
+            confirmButtonText: 'OK'
+            });
+        }
+        } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Network Error',
+            text: 'An error occurred. Please check your network connection.',
+            confirmButtonText: 'OK'
+        });
+        }
+
+        }
+
+        //Edit Offer----------End
+
+        //Delete Offer-----------Start
+        function deleteItem(OfferId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "This action cannot be undone!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/deleteOffer/${OfferId}`, {
+                method: 'PUT'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Offer has been deleted successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: 'Failed to delete offer.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting offer:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An unexpected error occurred.',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+ //Delete Offer-----------End
+
+  //Restore Offer-----------Start
+function restoreOffer(offerId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to restore this category?",
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, restore it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            fetch(`/admin/restoreOffer/${offerId}`, {
+                method: 'PUT'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire({
+                        title: 'Restored!',
+                        text: 'Category has been restored successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Failed!',
+                        text: 'Failed to restore category.',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error restoring category:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An unexpected error occurred.',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+//Restore Offer-----------End
+
+
+
+    //Apply Offer-----------Start
+     async function updateProductOffer(productId,offerId){
         try{
           const responce = await fetch('/admin/updateProductOffer',{
             method:'POST',
             headers:{
               'Content-Type':'application/json'
             },
-            body:JSON.stringify({productId,offerId,variantId})
+            body:JSON.stringify({productId,offerId})
         })
         const result = await responce.json()
         if(result.success){
@@ -614,6 +818,7 @@
           Swal.fire('Error!', 'There was a problem processing your request.', 'error');
         }
     }
+    //Apply Offer-----------End
 </script>
 
 <%- include('../../views/partials/adminFooter') %>

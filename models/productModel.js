@@ -39,6 +39,10 @@ const productSchema = mongoose.Schema({
     type:mongoose.Schema.Types.ObjectId,
     ref:'Offer'
 },
+discount_price:{
+  type:Number,
+  default:0
+},
 }, { timestamps: true });
 const Product = mongoose.model('Product', productSchema);
 

@@ -32,7 +32,12 @@
 
                 <h6 class="mt-4">Shipping Address:</h6>
                 <p>
-                    <%= order.address.country %>, <%= order.address.city %>, <%= order.address.state %> <%= order.address.zipCode %>
+                    Name: <%= order.address[0].fullName %><br>
+                    Address: <%= order.address[0].streetAddress %><br>
+                    State: <%= order.address[0].state %> <br>
+                    City: <%= order.address[0].city %> <br>
+                    country: <%= order.address[0].country %><br>
+                    Zipcode: <%= order.address[0].zipCode %>
                 </p>
             </div>
         </div>
