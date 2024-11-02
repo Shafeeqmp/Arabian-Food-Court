@@ -33,10 +33,10 @@ exports.generateSalesReport = async (req, res) => {
                 productName: item.product ? item.product.product_name : 'Unknown Product',
                 quantity: item.quantity,
                 unitPrice: item.price / item.quantity,
-                offerPrice: item.discount_price || item.price,
-                lineTotal: (item.discount_price || item.price)
+                offerPrice: item.discountAmount || item.price,
+                lineTotal: (item.discountAmount || item.price)
             })),
-            subtotal: order.items.reduce((sum, item) => sum + ((item.discount_price || item.price)), 0),
+            subtotal: order.items.reduce((sum, item) => sum + ((item.discountAmount || item.price)), 0),
             couponCode: order.couponCode || null,
             couponDiscount: order.discountAmount || 0,
             totalAmount: order.totalAmount
@@ -220,12 +220,13 @@ function calculateReportData(orders) {
 
     orders.forEach(order => {
         const originalOrderTotal = order.items.reduce((sum, item) => sum + (item.price), 0);
-        const afterOfferOrderTotal = order.items.reduce((sum, item) => sum + (item.discount_price * item.quantity), 0);
-        
+        const afterOfferOrderTotal = order.items.reduce((sum, item) => 
+            sum + ((item.discountAmount || item.price) * item.quantity), 0);
+        const couponDiscount = order.discountAmount || 0;
         
         originalTotal += originalOrderTotal;
         afterOfferTotal += afterOfferOrderTotal;
-        totalCouponDiscount += (afterOfferOrderTotal - order.totalAmount) || 0;
+        totalCouponDiscount += couponDiscount;  
         finalTotal += order.totalAmount;
     });
 
@@ -235,7 +236,7 @@ function calculateReportData(orders) {
         offerDiscount: originalTotal - afterOfferTotal,
         afterOfferTotal,
         totalCouponDiscount,
-        finalTotal
+        finalTotal: afterOfferTotal - totalCouponDiscount 
     };
 }
 

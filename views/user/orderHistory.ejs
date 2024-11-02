@@ -27,7 +27,7 @@
         }
 
         .table thead th {
-            background-color: #007bff;
+            background-color: #000000;
             color: white;
         }
 
@@ -65,15 +65,15 @@
             color: white;
         }
         .breadcrumb {
-            background-color: #f8f9fa; /* Light background for breadcrumb */
-            border-radius: 0.375rem; /* Rounded corners */
+            background-color: #f8f9fa;
+            border-radius: 0.375rem; 
             padding: 0.75rem 1rem;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
         }
 
         .breadcrumb-item + .breadcrumb-item::before {
             content: ">";
-            color: #6c757d; /* Gray color for separator */
+            color: #6c757d;
         }
 
         .breadcrumb-item a {
@@ -190,7 +190,8 @@
     top: 0;
     left: 0;
     width: 100%;
-    z-index: 1000; 
+    z-index: 1000;
+    height: 150px; 
     }
 
     .content-section {
@@ -287,7 +288,10 @@
                 <a href="wishlist" class="profile-link">
                   <img src="/public/images/wishlist.png" class="profile-avatar"> Wishlist
                 </a>
-                <a href="/logout" class="profile-link logout-link">
+                <a href="/loadWalletPage" class="profile-link">
+                  <img src="/public/images/wallet.png" class="profile-avatar"> Wallet
+                </a>
+                <a href="/logout"class="profile-link logout-link">
                   <img src="/public/images/shutdown.png" class="profile-avatar"> Logout
                 </a>
               </div>
@@ -297,98 +301,146 @@
       </nav>
     </div>
   </header>
-    <div class="container">
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
+  <div class="container mt-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-light p-3 shadow-sm rounded">
             <li class="breadcrumb-item"><a href="/userHomePage">Home</a></li>
             <li class="breadcrumb-item"><a href="/checkOutPage">Cart Page</a></li>
             <li class="breadcrumb-item active" aria-current="page">Order History</li>
         </ol>
-    </nav>    
-    <h1 class="text-center">Order History</h1>
-    <div class="table-responsive">
-        <table class="table table-striped table-bordered">
-            <thead>
-                <tr>
-                    <th scope="col">Order Id</th>
-                    <th scope="col">Product Name</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Payment Method</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if (orders.length > 0) { %>
-                    <% orders.forEach((order, index) => { %>
-                    <tr>
-                        <th scope="row"><%= order.orderId %></th>
-                        <td>
-                            <% order.items.forEach((item, itemIndex) => { %>
-                                <%= item.product.productname %><br>
-                            <% }); %>
-                        </td>
-                        <td><%= order.orderStatus %></td>
-                        <td><%= order.paymentMethod %></td>
-                        <td><%= order.totalAmount %></td>
-                        <td>
-                            <% if (['Processing', 'Shipped', 'Delivered', 'Cancelled'].includes(order.orderStatus)) { %>
-                                <button type="button" class="btn btn-secondary ms-4" disabled>
-                                    <%= order.orderStatus === 'Cancelled' ? 'Cancelled' : 'Cancel' %>
-                                </button>
-                            <% } else { %>
-                                <button type="button" class="btn btn-danger ms-4" onclick="cancelOrder('<%= order.orderId %>', this)">Cancel</button>
-                            <% } %>
-                            <button class="btn btn-primary ms-4" data-bs-toggle="collapse" data-bs-target="#details<%= index %>" aria-expanded="false" aria-controls="details<%= index %>">Details</button>
-                        </td>
+    </nav>
+
+    <h1 class="text-center my-4">Order History</h1>
+
+    <div class="card shadow-sm p-4 border-0 rounded">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-dark">
+                    <tr class="text-center">
+                        <th scope="col">Order Id</th>
+                        <th scope="col">Product Name</th>
+                        <th scope="col">Order Status</th>
+                        <th scope="col">Payment Method</th>
+                        <th scope="col">Payment Status</th>
+                        <th scope="col">Discount Amount</th>
+                        <th scope="col">Total</th>
+                        <th scope="col">Actions</th>
                     </tr>
-                    <tr class="collapse" id="details<%= index %>">
-                        <td colspan="6">
-                            <div class="p-3">
-                                <ul>
+                </thead>
+                <tbody>
+                    <% if (orders.length > 0) { %>
+                        <% orders.forEach((order, index) => { %>
+                            <tr class="bg-light">
+                                <th scope="row" class="text-center"><%= order.orderId %></th>
+                                <td class="text-center">
                                     <% order.items.forEach((item) => { %>
-                                        <li>
-                                            <img src="/public/<%= item.product.images[0] %>" alt="" class="order-image">
-                                        </li>
+                                        <span class="d-block"><%= item.product.productname %></span>
                                     <% }); %>
-                                </ul>
-                                
-                                <ul>
-                                    <ul>
-                                        <% order.items.forEach((item) => { %>
-                                            <li>Product: <%= item.product.productname %> - Quantity: <%= item.quantity %></li>
-                                        <% }); %>
-                                    </ul>
-                                    
-                                    <li>Order Date: <%= order.createdAt.toLocaleString() %></li>
-                                    <li>Estimate Delivery Time: 
-                                        <%= new Date(order.createdAt.getTime() + 30 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
-                                    </li>                             
-                                    <li>Shipping Address: 
-                                    <p><strong><%= order.address[0].fullName %><br></strong>
-                                    <%= order.address[0].streetAddress %>, <%= order.address[0].city %><br>
-                                    Phone number: <%= order.address[0].phone %>
-                                </p></li>
-                                </ul>
-                            </div>
-                        </td>
-                    </tr>
-                    <% }); %>
-                <% } else { %>
-                    <tr>
-                        <td colspan="6" class="text-center">No orders found.</td>
-                    </tr>
-                <% } %>
-            </tbody>
-        </table>
-    </div>    
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge 
+                                        <%= order.orderStatus === 'Delivered' ? 'bg-success' : 
+                                        order.orderStatus === 'Cancelled' ? 'bg-danger' : 
+                                        order.orderStatus === 'Shipped' ? 'bg-warning' : 
+                                        'bg-secondary' %>">
+                                        <%= order.orderStatus %>
+                                    </span>
+                                </td>
+                                <td class="text-center"><%= order.paymentMethod %></td>
+                                <td class="text-center"><%= order.paymentStatus %></td>
+                                <td class="text-center"><%= order.discountAmount %></td>
+                                <td class="text-center"><%= order.totalAmount %></td>
+                                <td>
+                                    <% if (['Processing', 'Shipped', 'Delivered', 'Cancelled'].includes(order.orderStatus)) { %>
+                                        <button type="button" class="btn btn-secondary" disabled>
+                                            <%= order.orderStatus === 'Cancelled' ? 'Cancelled' : 'Cancel' %>
+                                        </button>
+                                    <% } else { %>
+                                        <button type="button" class="btn btn-outline-danger" onclick="cancelOrder('<%= order.orderId %>', this)" data-toggle="tooltip" data-placement="bottom" title="You Want to Cancel Order">Cancel</button>
+                                    <% } %>
+                                    <!-- Item details button -->
+                                    <button class="btn btn-outline-info ms-2" onclick="toggleDetails('<%= index %>')" data-toggle="tooltip" data-placement="bottom" title="Click Item Details" >
+                                        <i class="bi bi-info-circle"></i>
+                                    </button>
+                                    <!-- Re-payment button -->
+                                    <% if (order.paymentStatus === 'Failed') { %>
+                                        <button type="button" onclick="Repayment('<%= order._id %>')" class="btn btn-outline-success ms-2" data-toggle="tooltip" data-placement="bottom" title="Again Your Payment">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                        <% } else { %>
+                                            <!-- Download Invoice button -->
+                                        <a href="/invoice/<%= order._id %>" class="btn btn-outline-success ms-2" data-toggle="tooltip" data-placement="bottom" title="Download Invoice"><i class="bi bi-download"></i></a>
+                                        <% } %>
+                                </td>
+                            </tr>
+                            <tr class="details-row" id="details<%= index %>" style="display: none;">
+                                <td colspan="7">
+                                    <div class="p-4 border rounded bg-light shadow-sm">
+                                        <h5 class="text-primary mb-3">Order Details</h5>
+                                        <div class="d-flex flex-wrap align-items-start">
+                                            <div class="me-4 mb-3 d-flex flex-wrap">
+                                                <% order.items.forEach((item) => { %>
+                                                    <div class="me-4 mb-3 text-center border rounded bg-white shadow-sm p-3" style="width: 150px;">
+                                                        <img src="/public/<%= item.product.images[0] %>" alt="<%= item.product.productname %>" class="img-fluid rounded mb-2" style="width: 100%; height: auto;">
+                                                        <p class="m-0"><strong><%= item.product.productname %></strong></p>
+                                                        <p class="text-muted">Qty: <%= item.quantity %></p>
+                                                    </div>
+                                                <% }); %>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <ul class="list-unstyled">
+                                                    <li class="mb-2"><strong>Order Date:</strong> <span class="text-muted"><%= order.createdAt.toLocaleString() %></span></li>
+                                                    <li class="mb-2"><strong>Delivered Time:</strong> 
+                                                        <span class="text-muted">
+                                                            <%= new Date(order.createdAt.getTime() + 30 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                                                        </span>
+                                                    </li>
+                                                    <li>
+                                                        <strong>Shipping Address:</strong>
+                                                        <div class="text-muted">
+                                                            <p class="m-0"><strong><%= order.address[0].fullName %></strong></p>
+                                                            <p class="m-0"><%= order.address[0].streetAddress %>, <%= order.address[0].city %></p>
+                                                            <p class="m-0"><strong>Phone:</strong> <%= order.address[0].phone %></p>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            
+                            
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="7" class="text-center text-muted">No orders found.</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
+
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
+
+
+function toggleDetails(index) {
+        const detailsRow = document.getElementById(`details${index}`);
+        if (detailsRow.style.display === "none") {
+            detailsRow.style.display = "table-row";
+        } else {
+            detailsRow.style.display = "none";
+        }
+    }
+
+
         async function cancelOrder(orderId, button) {
             if (button.disabled) {
                 Swal.fire({
@@ -454,6 +506,104 @@
                     title: 'Error!',
                     text: 'Something went wrong. Please try again.',
                     icon: 'error',
+                });
+            }
+        }
+
+
+        async function Repayment(orderId) {
+            try {
+                const response = await fetch('/repaymentRazorpay', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ orderId })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+
+                    console.log(result);
+                    
+                    if (result.success) {
+                        const options = {
+                            key: result.key,
+                            amount: result.amount,
+                            currency: result.currency,
+                            name: result.name,
+                            description: result.description,
+                            order_id: result.orderId,
+                            handler: async function (response) {
+                                const verifyResponse = await fetch('/verifyRepayment', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        orderId: orderId,
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature
+                                    })
+                                });
+
+                                const verifyResult = await verifyResponse.json();
+
+                                if (verifyResult.success) {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'payment success',
+                                        text: 'Your payment has been  successfully.',
+                                        confirmButtonText: 'OK',
+                                        timer: 2000
+                                    }).then(() => {
+                                        window.location.reload();
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: "Payment Failed",
+                                        text: 'Payment verification failed. Please try again.',
+                                        confirmButtonText: 'OK'
+                                    });
+                                }
+                            },
+                            prefill: {
+                                name: "<%= user.username %>",
+                                email: "<%= user.email %>",
+                            },
+                            theme: {
+                                color: '#000000'
+                            }
+                        };
+                        
+
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: "Payment Failed",
+                            text: 'Payment verification failed. Please try again.',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Failed to pay',
+                        text: 'Error fetching payment details. Please try again later.',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. try agian later..',
+                    confirmButtonText: 'OK'
                 });
             }
         }

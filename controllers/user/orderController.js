@@ -8,6 +8,7 @@ const Coupon=require('../../models/couponModel')
 const Razorpay=require('../../config/razorPay')
 const crypto = require('crypto');
 const Wishlist=require('../../models/wishlistModel')
+const Wallet=require('../../models/walletModel')
 
 
 exports.place_Order = async (req, res) => {
@@ -34,6 +35,7 @@ exports.place_Order = async (req, res) => {
       const product = item.product;
       if (product.stock < item.quantity) {
         return res.status(400).json({
+          success:false,
           message: `Insufficient stock for ${product.product_name}. Only ${product.stock} left in stock.`,
         });
       }
@@ -51,6 +53,12 @@ exports.place_Order = async (req, res) => {
         totalAmount -= discountAmount;
       }
     }
+   
+    if(totalAmount > 1000){
+      return res.json({success:false,message:'above 1000 is not allowed cash of delivery'})
+    }
+    
+
     const addressOrder = [
       {
         fullName: address.fullName,
@@ -65,7 +73,7 @@ exports.place_Order = async (req, res) => {
     
     
 
-   
+    
     const newOrderId = await generateOrderId();
 
   
@@ -101,6 +109,7 @@ exports.place_Order = async (req, res) => {
 
     // Send the response
     res.status(201).json({
+      success:true,
       message: "Order placed successfully",
       order: newOrder,
       discountAmount: discountAmount > 0 ? `Discount Applied: ₹${discountAmount}` : "No Discount",
@@ -184,6 +193,25 @@ exports.cancelOrder = async (req, res) => {
                 $inc: { stock: item.quantity }
             });
         }
+        if (order.paymentStatus === "Paid") {
+          const refund = order.totalAmount;
+          let wallet = await Wallet.findOne({ user: userId });
+          if (!wallet) {
+            wallet = new Wallet({
+              user: order.user,
+              balanceAmount: 0,
+              wallet_history: [],
+            });
+          }
+          wallet.balanceAmount += refund;
+          wallet.wallet_history.push({
+            date: new Date(),
+            amount: refund,
+            description: `Refund for cancelled item (Order ID: ${order.orderId})`,
+            transactionType: "credited",
+          });
+          await wallet.save();
+        }
 
         await order.save();
 
@@ -208,10 +236,6 @@ exports.getOrderStatus = async (req, res) => {
     }
 };
 
-
-
-
-
 // Create Razorpay Order
 exports.razor_PayOrderCreate = async (req, res) => {
   
@@ -219,17 +243,12 @@ exports.razor_PayOrderCreate = async (req, res) => {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
-
     const { addressId, couponCode, paymentMethod } = req.body;
-
-    // Fetch the user's cart
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
       
       return res.status(400).json({ success: false, message: 'Cart is empty' });
     }
-
-    // Check stock for each product
     for (const item of cart.items) {
       const product = item.product;
       if (product.stock < item.quantity) {
@@ -240,8 +259,6 @@ exports.razor_PayOrderCreate = async (req, res) => {
         });
       }
     }
-
-    // Calculate total price and check for coupon
     let totalAmount = cart.total_price;
     let discountAmount = 0;
 
@@ -252,12 +269,8 @@ exports.razor_PayOrderCreate = async (req, res) => {
         totalAmount -= discountAmount;
       }
     }
-
-    
-
-    // Create Razorpay order
     const options = {
-      amount: Math.round(totalAmount * 100), // Razorpay works with paise
+      amount: Math.round(totalAmount * 100),
       currency: 'INR',
       receipt: `receipt#${totalAmount+'shafeeq'}`,
       payment_capture: 1,
@@ -281,19 +294,20 @@ exports.razor_PayOrderCreate = async (req, res) => {
 exports.razorPay_payment = async (req, res) => {
   try {
     const { payment_id, order_id, signature, addressId, couponCode, paymentMethod } = req.body;
-    // Verify user authentication
+    const address = await Address.findById(addressId);
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    // Fetch user's cart
+
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
 
-    
+
     if (!cart || cart.items.length === 0) {
       return res.status(400).json({ success: false, message: 'Cart is empty' });
     }
-    // Calculate total price and apply coupon if available
+
+  
     let totalAmount = cart.total_price;
     let discountAmount = 0;
     if (couponCode) {
@@ -303,12 +317,21 @@ exports.razorPay_payment = async (req, res) => {
         totalAmount -= discountAmount;
       }
     }
-   
-    
-    // Generate order ID
+
+    const addressOrder = [
+      {
+        fullName: address.fullName,
+        streetAddress: address.streetAddress,
+        zipCode: address.zipCode,
+        phone: address.phone,
+        city: address.city,
+        state: address.state,
+        country: address.country,
+      },
+    ];
     const newOrderId = await generateOrderId();
 
-    // Razorpay payment verification
+
     const body = `${order_id}|${payment_id}`;
     const expectedSignature = crypto
       .createHmac('sha256', process.env.RAZOR_PAY_KEY_SECRET)
@@ -316,15 +339,15 @@ exports.razorPay_payment = async (req, res) => {
       .digest('hex');
   
 
+   
     const paymentVerified = expectedSignature === signature;
 
-
-
-    // Create order based on verification
+    
     const newOrder = new Order({
+
       orderId: newOrderId,
       user: req.session.userId,
-      address: addressId,
+      address: addressOrder,
       items: cart.items.map((item) => ({
         product: item.product._id,
         quantity: item.quantity,
@@ -339,15 +362,14 @@ exports.razorPay_payment = async (req, res) => {
       },
     });
     
-    // Update stock for each product in the order
+ 
     for (const item of cart.items) {
       const product = item.product;
       product.stock -= item.quantity;
       await product.save();
     }
-   
-    // Save the order and clear the cart
     await newOrder.save();
+
     await Cart.deleteOne({ user: req.session.userId });
   
     if (paymentVerified) {
@@ -369,3 +391,70 @@ exports.razorPay_payment = async (req, res) => {
   }
 };
 
+
+
+exports.repayment_Razorpay = async (req,res)=>{
+  try {
+    const { orderId } = req.body;
+    const order = await Order.findOne({ _id: orderId });
+
+    if (!order) {
+        return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    const payment_capture = 1; 
+    const amount = order.totalAmount * 100; 
+    const currency = 'INR';
+
+    const options = {
+        amount,
+        currency,
+        receipt: `receipt_${orderId}`,
+        payment_capture
+    };
+
+    const response = await Razorpay.orders.create(options);
+    
+    res.status(200).json({
+        success: true,
+        orderId: response.id,
+        amount: response.amount,
+        currency: response.currency,
+        key: process.env.RAZOR_PAY_KEY_ID,
+        name: 'Arabian foood court', 
+        description: 'Repayment for Order',
+        orderReceipt: orderId 
+    });
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server error occurred' });
+}
+
+}
+
+
+exports.verify_Repayment = async (req,res)=>{
+  try {
+    const { razorpay_payment_id, razorpay_order_id, razorpay_signature, orderId } = req.body;
+    
+    const body = razorpay_order_id + "|" + razorpay_payment_id;
+    const expectedSignature = crypto
+        .createHmac('sha256', process.env.RAZOR_PAY_KEY_SECRET)
+        .update(body.toString())
+        .digest('hex');
+
+    if (expectedSignature === razorpay_signature) {
+        const order = await Order.findById(orderId);
+        order.paymentStatus = 'Paid';
+        order.paymentMethod = 'Bank Transfer';
+        order.razorpayOrderId = razorpay_order_id;
+        await order.save();
+        res.status(200).json({ success: true, message: 'Payment successful' });
+    } else {
+        res.status(400).json({ success: false, message: 'Invalid signature' });
+    }
+} catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: 'Server error' });
+}
+}

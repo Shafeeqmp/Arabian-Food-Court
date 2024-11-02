@@ -19,7 +19,7 @@ exports.load_AdminDash=async(req,res)=>{
     try {
       const orders=await Order.find({}).sort({createdAt:-1}).limit(5)
         if(req.session.isAdmin){
-            res.render('admin/admin_Dashboard',{orders})
+            res.render('admin/admin_Dashboard',{orders,title:'Admin Dashboard'})
         }else{
             return res.redirect('/admin')
         }
@@ -65,7 +65,7 @@ exports.admin_Dashboard = async (req, res) => {
 exports.load_userMng=async(req,res)=>{
     try {
           const userdata = await user.find({ isAdmin: false });
-          res.render("admin/userMng", { userdata, title: "userMng" });
+          res.render("admin/userMng", { userdata, title: "User Management" });
        
       } catch (error) {
         console.log(error);
@@ -99,6 +99,7 @@ exports. logout = (req, res) => {
     req.session.destroy((err) => {
       if (err) {
         console.log(err);
+        res.status(500).send("Error logging out");
       } else {
         res.redirect("/admin");
       }

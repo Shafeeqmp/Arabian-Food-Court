@@ -9,6 +9,7 @@ const isBlockAuth=require('../../middlewares/isBlockAuth')
 const orderController=require('../../controllers/user/orderController')
 const couponController=require('../../controllers/user/couponController')
 const wishlistController=require('../../controllers/user/wishlistController');
+const walletController=require('../../controllers/user/walletController')
 const { whitelist } = require('validator');
 
 
@@ -70,14 +71,22 @@ userRouter.post('/remove-coupon', couponController.removeCoupon);
 //Razor Pay Section
 userRouter.post('/razor-Pay-OrderCreate',userAuth,orderController.razor_PayOrderCreate)
 userRouter.post('/razor-Pay-Payment',userAuth,orderController.razorPay_payment)
+userRouter.post('/repaymentRazorpay',orderController.repayment_Razorpay)
+userRouter.post('/verifyRepayment',orderController.verify_Repayment)
 
 //Wish List Section
 userRouter.get('/wishlist',userAuth,wishlistController.loadWishlist)
 userRouter.post('/addWishlist',userAuth,wishlistController.add_Wishlist)
 userRouter.post('/remove-Wishlist-Item',userAuth,wishlistController.remove_WishlistItem)
 
+//Wallet section
+userRouter.get('/loadWalletPage',userAuth,walletController.load_walletPage)
+userRouter.post('/addFund',userAuth,walletController.addFund)
+userRouter.post('/verifyPayment',userAuth,walletController.verifyPayment)
 
 
+//sales invoice
+userRouter.get('/invoice/:orderId', userAuth, userController.generateInvoice);
 
 
 

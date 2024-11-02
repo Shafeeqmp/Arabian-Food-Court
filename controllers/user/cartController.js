@@ -48,7 +48,7 @@ exports.postCart_Page = async (req, res) => {
       cart = new Cart({ user: user._id, items: [], total_price: 0 });
     }
     const existingItemIndex = cart.items.findIndex((item) => item.product.equals(productId));
-    
+    let actualPrice = product.discount_price ? product.discount_price : product.price
     if (existingItemIndex > -1) {
       const existingItem = cart.items[existingItemIndex];
       const newQuantity = existingItem.quantity + quantity;
@@ -60,13 +60,14 @@ exports.postCart_Page = async (req, res) => {
         return res.status(400).json({ success: false, message: "Maximum quantity reached" });
       }
       
+      
       existingItem.quantity = newQuantity;
-      existingItem.price = product.price * newQuantity;
+      existingItem.price = actualPrice * newQuantity;
     } else {
       cart.items.push({
         product: productId,
         quantity: quantity,
-        price: product.price * quantity,
+        price:  actualPrice * quantity
       });
     }
     cart.total_price = cart.items.reduce((total, item) => total + item.price, 0);
@@ -131,9 +132,12 @@ exports.updateCartItemQuantity = async (req, res) => {
 
     cartItem.quantity = quantity;
 
-    cartItem.price = cartItem.product.price * quantity;
+    cartItem.price = (cartItem.product.price -cartItem.product.discount_price)  * quantity;
 
     cart.total_price = cart.items.reduce((total, item) => total + item.price, 0);
+     
+   
+    
 
     await cart.save();
     
@@ -155,12 +159,22 @@ exports.updateCartItemQuantity = async (req, res) => {
 
 exports.checkOutPage= async(req,res)=>{
   try {
+    const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
+    const user = await User.findById(req.session.userId).lean();
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: "User not authenticated" })
     }
-    const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
+    let cartCount=0;
+    if(cart){
+       cartCount  = cart.items.length;
+    }
+    const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
+  let wishlistCount=0;
+  if(wishlist){
+    wishlistCount  = wishlist.items.length;
+  }     
     const address = await Address.find({userId:req.session.userId});
-    res.render('user/checkOutPage',{cart,address})
+    res.render('user/checkOutPage',{cart,address,wishlistCount,cartCount,user})
 } catch (error) {
     console.error('Error fetching cart:', error); 
 res.status(500).send('Something went wrong!');

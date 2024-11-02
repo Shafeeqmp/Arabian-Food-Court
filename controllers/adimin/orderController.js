@@ -4,11 +4,11 @@ const User = require('../../models/userModel');
 const Address = require('../../models/addressModel');
 const Cart = require('../../models/cartModel');
 const Order = require('../../models/orderModel');
-
+const Wallet=require('../../models/walletModel')
 exports.loard_OrderMng = async (req, res) => {
     try {
         const orders = await Order.find().populate('user', 'name email').populate('items.product').populate('address').sort({ createdAt: -1 });
-        res.render('admin/orderMng', { orders });
+        res.render('admin/orderMng', { orders,title:'Order Management' });
     } catch (error) {
         console.error('Error loading orders:', error);
         res.status(500).render('admin/error', { error: 'Failed to load orders' });
@@ -37,6 +37,7 @@ exports.getOrderDetails = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => { 
     try {
         const { orderId, status } = req.body;
+        
 
         const order = await Order.findById(orderId).populate('items.product');
         
@@ -49,6 +50,32 @@ exports.updateOrderStatus = async (req, res) => {
                     item.product._id,
                     { $inc: { stock: item.quantity } }
                 );
+            }
+        }
+        if(status === 'Delivered'){
+            order.paymentStatus = 'Paid';
+        }
+
+        if(status === 'Cancelled'){
+            
+                if (order.paymentStatus === "Paid") {
+                    const refund = order.totalAmount;
+                    let wallet = await Wallet.findOne({ user: order.user });
+                    if (!wallet) {
+                      wallet = new Wallet({
+                        user: order.user,
+                        balanceAmount: 0,
+                        wallet_history: [],
+                      });
+                    }
+                    wallet.balanceAmount += refund;
+                    wallet.wallet_history.push({
+                      date: new Date(),
+                      amount: refund,
+                      description: `Refund for cancelled item (Order ID: ${order.orderId})`,
+                      transactionType: "credited",
+                    });
+                    await wallet.save();
             }
         }
 

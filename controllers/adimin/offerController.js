@@ -15,7 +15,7 @@ exports.offer=async(req,res)=>{
 
         const category = await Category.find({ isDeleted: false }).populate("offer");
 
-          res.render('admin/offerProductPage',{title:'Offer Product Management',offer,category,product,selectoffer})
+          res.render('admin/offerProductPage',{title:'Offer Management',offer,category,product,selectoffer})
     } catch (error) {
         console.error('Error fetching offer, category, or product data:', error);
         res.status(500).render('errorPage', { message: 'Error retrieving data', error });
@@ -178,7 +178,12 @@ exports. update_ProductOffer = async (req, res) => {
     if (!product) {
       return res.json({ success: false, error: "product not found" });
     }
-    
+    if(productId===offerId){
+      product.offer=null
+      product.discount_price=0
+      await product.save();
+      return res.json({ success: true, message: "product offer successfully removed" });
+    }
     if (!offer) {
       return res.json({ success: false, error: "offer not found" });
     }
@@ -188,7 +193,7 @@ exports. update_ProductOffer = async (req, res) => {
     product.discount_price = discountPrice;
     product.offer = offerId;
     await product.save();
-    res.json({ success: true, messgae: "product offer successfully updated" });
+    res.json({ success: true, message: "product offer successfully updated" });
   } catch (error) {
     console.log("Error occurred while updating offer:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -201,76 +206,88 @@ exports.update_CategoryOffer = async (req, res) => {
   try {
     const { categoryId, offerId } = req.body;
     const category = await Category.findOne({ _id: categoryId });
-    const offer = await Offer.findById(offerId);
+    const offer = await Offer.findById(offerId)
+
     if (!category) {
-      return res.json({ success: false, error: "category not found" });
+      return res.json({ success: false, error: "Category not found" });
+    }
+    if(categoryId===offerId){
+      category.offer=null
+      category.discount_price=0
+      await category.save();
+      const products = await Product.find({ category_id: categoryId });
+      for (let product of products){
+        product.offer = null; 
+        product.discount_price = 0; 
+        await product.save(); 
+      }
+      return res.json({ success: true, message: "product offer successfully removed" });
     }
     if (!offer) {
       return res.json({ success: false, error: "offer not found" });
     }
-    const product = await Product.find({ category_id: categoryId }).populate(
-      "variants.offer"
-    );
-
-    if (product.length === 0) {
-      return res.json({ success: false, error: "product not found" });
+    if (!offer) {
+      return res.json({ success: false, error: "Offer not found" });
     }
-    for (let products of product) {
+
+    const products = await Product.find({ category_id: categoryId }).populate('offer');
+
+    if (products.length === 0) {
+      return res.json({ success: false, error: "No products found for this category" });
+    }
+
+    for (let product of products) {
       let productChanged = false;
-      for (let variant of products.variants) {
-        let bestOffer;
-        if (offer && !offer.isDelete) {
+      let bestOffer = null;
+
+      if (offer && !offer.isDelete) {
+        bestOffer = {
+          percentage: offer.offerPercentage,
+          type: "category",
+        };
+      }
+
+      if (product.offer && product.offer instanceof Object && !product.offer.isDelete) {
+        const productOffer = product.offer;
+        if (
+          productOffer.offerPercentage > (bestOffer ? bestOffer.percentage : 0)
+        ) {
           bestOffer = {
-            percentage: offer.offerPercentage,
-            type: "category",
+            percentage: productOffer.offerPercentage,
+            type: "product",
           };
         }
-
-        //checking product offer which is already applied
-
-        if (variant.offer) {
-          const productOffer = variant.offer;
-          if (
-            !productOffer.isDelete &&
-            productOffer.offerPercentage >
-              (bestOffer ? bestOffer.percentage : 0)
-          ) {
-            bestOffer = {
-              percentage: productOffer.offerPercentage,
-              type: "product",
-            };
-          }
-        }
-
-        if (bestOffer) {
-          const discountPrice = Math.floor(
-            variant.price - (variant.price * bestOffer.percentage) / 100
-          );
-          if (
-            variant.discount_price !== discountPrice ||
-            variant.offer !==
-              (bestOffer.type === "category" ? offer._id : variant.offer)
-          ) {
-            variant.discount_price = discountPrice;
-            variant.offer =
-              bestOffer.type === "category" ? offer._id : variant.offer;
-
-            productChanged = true;
-          }
-        } else {
-          variant.offer = null;
-          variant.discount_price = 0;
-        }
       }
+
+      if (bestOffer) {
+        const discountPrice = Math.floor(
+          product.price - (product.price * bestOffer.percentage) / 100
+        );
+
+        if (
+          product.discount_price !== discountPrice ||
+          String(product.offer) !== (bestOffer.type === "category" ? String(offer._id) : String(product.offer))
+        ) {
+          product.discount_price = discountPrice;
+          product.offer = bestOffer.type === "category" ? offer._id : product.offer;
+          productChanged = true;
+        }
+      } else {
+        product.offer = null;
+        product.discount_price = 0;
+      }
+
       if (productChanged) {
-        await products.save();
+        await product.save();
       }
     }
+
     category.offer = offerId;
     await category.save();
-    res.json({ success: true, messgae: "category offer successfully updated" });
+    res.json({ success: true, message: "Category offer successfully updated" });
   } catch (error) {
-    console.log("Error occurred while updating offer:", error);
+    console.error("Error occurred while updating offer:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+

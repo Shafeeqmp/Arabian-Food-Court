@@ -184,7 +184,10 @@
                 <a href="wishlist" class="profile-link">
                   <img src="/public/images/wishlist.png" class="profile-avatar"> Wishlist
                 </a>
-                <a href="/logout" class="profile-link logout-link">
+                <a href="/loadWalletPage" class="profile-link">
+                  <img src="/public/images/wallet.png" class="profile-avatar"> Wallet
+                </a>
+                <a href="/logout"class="profile-link logout-link">
                   <img src="/public/images/shutdown.png" class="profile-avatar"> Logout
                 </a>
               </div>
@@ -230,6 +233,7 @@
           data-user-email="<%= user.email %>">
           Edit Profile
           </button>
+          <a type="button" href="/loadWalletPage" class="btn btn-primary mb-3">Wallet</a>
 
           <h4 class="text-center">Addresses</h4>
           <!-- Addresses List -->

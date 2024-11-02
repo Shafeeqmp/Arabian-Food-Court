@@ -5,7 +5,8 @@ const user=require('../../models/userModel')
 const upload=require('../../config/multer')
 const fs=require('fs')
 const path=require('path')
-const sharp=require('sharp')
+const sharp=require('sharp');
+const { title } = require('process');
 
 
 //Load Product Page Section
@@ -13,7 +14,7 @@ exports.load_ProuctPage = async (req, res) => {
   try {
     if (req.session.isAdmin) {
       const Product = await product.find().populate('category_id')
-      res.render("admin/productMng",{Product});
+      res.render("admin/productMng",{Product,title:'Product Management' });
     } else {
       res.redirect("/admin/loadAdminDash");
     }
@@ -28,7 +29,7 @@ exports.load_ProuctPage = async (req, res) => {
 exports.addProuct_Page=async (req, res) => {
     if (req.session.isAdmin) {
       const Category = await category.find({isDeleted:false});
-      res.render("admin/addProduct", { Category});
+      res.render("admin/addProduct", { Category,title:'add product'});
     } else {
       res.redirect("/admin/addProuctPage");
     }
@@ -64,7 +65,7 @@ exports. add_Product = async (req, res) => {
     });
 
     await newProduct.save();
-    res.status(200).json({ success: true });
+    res.status(200).json({ success: true});
   } catch (error) {
     console.error('Error adding product:', error);
     res.status(500).json({ error: 'Error adding product' });

@@ -61,7 +61,7 @@ const orderSchema = new mongoose.Schema({
     paymentMethod: {
         type: String,
         required: true,
-        enum: ['Cash on Delivery', 'Bank Transfer']
+        enum: ['Cash on Delivery', 'Bank Transfer','Wallet']
     },
     totalAmount: {
         type: Number,
@@ -89,12 +89,16 @@ const orderSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    discount_price: {
+    discountAmount: {
         type: Number
     },
     offerPercentage: {
         type: Number,
         default: 0
+    },
+    invoiceNumber: {
+        type: String,
+        unique: true
     }
 
     

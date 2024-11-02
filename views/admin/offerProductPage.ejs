@@ -296,9 +296,9 @@
                               <div class="mb-3">
                                   <p class="card-title text-center"><%= Product.productname %></p>
                                 <select class="form-select" id="editType" onchange="updateProductOffer('<%= Product._id %>',this.value)" required>
-                                    <option value="offer">Select Offers</option>
+                                    <option value="<%= Product._id %>">Select Offers</option>
                                     <% selectoffer.forEach(Offer => { %>
-                                        <option value="<%= Offer._id %>" <% if (Product.offer && Product.offer._id.toString() === Offer._id.toString()) { %> selected  <% } %> >
+                                        <option value="<%= Offer._id %>" <% if (Product.offer && Product.offer._id.toString() === Offer._id.toString()) { %> selected  <% } %>>
                                             <%= Offer.offerName %> - <%= Offer.offerPercentage %>%
                                         </option>
                                     <% }) %>
@@ -336,10 +336,12 @@
                             </td>      
                            
                                 <td>
-                                 <select class="form-select" id="editType"required>
-                                 <option value="offer">Select Offers</option>
+                                 <select class="form-select" id="editType" onchange="updateCategoryOffer('<%= Category._id %>',this.value)" required>
+                                 <option value="<%= Category._id %>">Select Offers</option>
                                  <% selectoffer.forEach((Offer) => { %>
-                                 <option value="product"><%= Offer.offerName %> - <%= Offer.offerPercentage %>%</option>
+                                 <option value="<%= Offer._id %>"<% if (Category.offer && Category.offer._id.toString() === Offer._id.toString()) { %> selected  <% } %>>
+                                    <%= Offer.offerName %> - <%= Offer.offerPercentage %>%
+                                </option>
                                  <% }) %>  
                                 </select>    
                                 </td>
@@ -786,17 +788,17 @@ function restoreOffer(offerId) {
 
 
 
-    //Apply Offer-----------Start
+    //Apply Product Offer-----------Start
      async function updateProductOffer(productId,offerId){
         try{
-          const responce = await fetch('/admin/updateProductOffer',{
+          const response = await fetch('/admin/updateProductOffer',{
             method:'POST',
             headers:{
               'Content-Type':'application/json'
             },
             body:JSON.stringify({productId,offerId})
         })
-        const result = await responce.json()
+        const result = await response.json()
         if(result.success){
           Swal.fire({
             icon:'success',
@@ -819,6 +821,40 @@ function restoreOffer(offerId) {
         }
     }
     //Apply Offer-----------End
+
+     //Apply Category Offer-----------Start
+    async function updateCategoryOffer(categoryId,offerId){
+        try{
+          const response = await fetch('/admin/updateCategoryOffer',{
+            method:'POST',
+            headers:{
+              'Content-Type':'application/json'
+            },
+            body:JSON.stringify({categoryId,offerId})
+        })
+        const result = await response.json()
+        if(result.success){
+          Swal.fire({
+            icon:'success',
+            title:'offer updated',
+            text:result.message,
+            confirmButtonText:'OK'
+          }).then(()=>{
+            window.location.reload()
+          })
+        }else{
+          Swal.fire({
+            icon:'error',
+            title:'failed to update',
+            text:result.error,
+            confirmButtonText:'OK'
+          })
+        }
+        }catch(error){
+          Swal.fire('Error!', 'There was a problem processing your request.', 'error');
+        }
+      } 
+
 </script>
 
 <%- include('../../views/partials/adminFooter') %>

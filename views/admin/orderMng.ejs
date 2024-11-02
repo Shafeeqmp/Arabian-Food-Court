@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title><%- title %></title>
     <link rel="shortcut icon" href="/public/images/favicon.png" type="">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
@@ -247,7 +247,8 @@
                 <th>User</th>
                 <th>Total Amount</th>
                 <th>Payment Method</th>
-                <th>Status</th>
+                <th>Payment Status</th>
+                <th>Order Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -259,6 +260,7 @@
                     <td><%= order.user.name %></td>
                     <td>$<%= order.totalAmount.toFixed(2) %></td>
                     <td><%= order.paymentMethod %></td>
+                    <td><%= order.paymentStatus %></td>
                     
                     <td>
                         <select class="form-control status-select" data-order-id="<%= order._id %>" <%= order.orderStatus === 'Cancelled' ? 'disabled' : '' %>>
@@ -295,51 +297,54 @@
 
     <script>
         document.querySelectorAll('.status-select').forEach(select => {
-            select.addEventListener('change', async function() {
-                const orderId = this.dataset.orderId;
-                const status = this.value;
-                
-                try {
-                    const response = await fetch('/admin/update-status', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ orderId, status }),
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (result.success) {
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: 'Order status updated successfully',
-                            timer: 1500,
-                            showConfirmButton: false,
-                        });
+    select.addEventListener('change', async function() {
+        const orderId = this.dataset.orderId;
+        const status = this.value;
 
-                        // Disable the select element if the order is cancelled
-                        if (status === 'Cancelled') {
-                            this.disabled = true;
-                        }
-                    } else {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Failed',
-                            text: 'Failed to update order status',
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error updating order status:', error);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'An error occurred while updating the order status',
-                    });
-                }
+        try {
+            const response = await fetch('/admin/update-status', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ orderId, status }),
             });
-        });
+
+            const result = await response.json();
+
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'Order status updated successfully',
+                    timer: 1500,
+                    showConfirmButton: false,
+                }).then(() => {
+                    location.reload();
+                });
+                
+                // Disable select if status is 'Cancelled'
+                if (status === 'Cancelled') {
+                    this.disabled = true;
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Failed',
+                    text: 'Failed to update order status',
+                });
+            }
+        } catch (error) {
+            console.error('Error updating order status:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'An error occurred while updating the order status',
+            });
+        }
+    });
+});
+
 
         // Function to check and update cancelled orders on page load
         function updateCancelledOrders() {

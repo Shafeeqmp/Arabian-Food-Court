@@ -6,7 +6,7 @@ const Coupon=require('../../models/couponModel')
 exports.load_CouponPage=async(req,res)=>{
     try {
         const coupon=await Coupon.find()
-        res.render('admin/couponMng',{coupon})
+        res.render('admin/couponMng',{coupon,title:'Coupon Management'})
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
@@ -150,7 +150,7 @@ exports.edit_Coupon= async (req,res)=>{
             coupon_code:coupon_code,
             discount:discountValue,
             start_date:new Date(start_date),
-            exipry_date:new Date(expiry_date),
+            expiry_date:new Date(expiry_date),
             min_purchase_amount:min_amount,
             max_coupon_amount:max_amount,
             coupon_description:description

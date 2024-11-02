@@ -8,7 +8,7 @@ exports. load_CategoryPage=async(req,res)=>{
     try {
        if(req.session.isAdmin){
         const catData = await category.find();
-           res.render('admin/categoryPage',{catData})
+           res.render('admin/categoryPage',{catData,title:'Category Management'})
        } else{
         res.redirect('/admin')
        }

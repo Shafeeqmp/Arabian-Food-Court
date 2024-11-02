@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title><%- title %></title>
     <link rel="shortcut icon" href="/public/images/favicon.png" type="image/png">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         /* Sidebar Styles */
+        
         .sidebar {
             position: fixed;
             top: 56px; /* Adjust according to your navbar height */
@@ -235,17 +236,17 @@
                                         <img src="/public/<%= product.images[0] %>" alt="" style="width: 100px; height: auto;">
                                 </td>
                                     
-                                <td>
+                                <td class="d-flex">
                                     <% if (product.isDelete == true) { %>
                                         <button class="btn btn-primary btn-sm" onclick="restoreProduct('<%= product._id %>')">
                                             <i class="fas fa-recycle"></i> Restore
                                         </button>
                                     <% } else { %>
-                                            <button class="btn btn-warning btn-sm" onclick="confirmEdit('<%= product._id %>', '<%= product.productname %>')">
-                                                <i class="fas fa-edit"></i> Edit
+                                            <button class="btn btn-warning btn-sm ml-3" onclick="confirmEdit('<%= product._id %>', '<%= product.productname %>')">
+                                                <i class="fas fa-edit"></i> 
                                             </button>
-                                            <button class="btn btn-danger btn-sm" onclick="deleteconfirm('<%= product._id %>')">
-                                                <i class="fas fa-trash"></i> Delete
+                                            <button class="btn btn-danger btn-sm ml-3" onclick="deleteconfirm('<%= product._id %>')">
+                                                <i class="fas fa-trash"></i> 
                                             </button>
                                     <% } %>
                                 </td>

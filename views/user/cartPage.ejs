@@ -1,5 +1,5 @@
 <%- include('../../views/partials/userHeader') %>
-    <style>
+  <style>
       .icon-hover-primary:hover {
     border-color: #3b71ca !important;
     background-color: white !important;
@@ -16,11 +16,7 @@
   .icon-hover-danger:hover i {
     color: #dc4c64 !important;
   }
-  </style>
   
-  </head>
-  <body>
-    <style>
       body {
         background-color: #f8f9fa;
         padding-top: 80px;
@@ -205,7 +201,10 @@
                   <a href="wishlist" class="profile-link">
                     <img src="/public/images/wishlist.png" class="profile-avatar"> Wishlist
                   </a>
-                  <a href="/logout" class="profile-link logout-link">
+                  <a href="/loadWalletPage" class="profile-link">
+                    <img src="/public/images/wallet.png" class="profile-avatar"> Wallet
+                  </a>
+                  <a href="/logout"class="profile-link logout-link">
                     <img src="/public/images/shutdown.png" class="profile-avatar"> Logout
                   </a>
                 </div>
@@ -437,8 +436,6 @@
   });
 </script>
 
-
-  
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

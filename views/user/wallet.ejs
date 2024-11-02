@@ -1,237 +1,472 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impressive Home Page</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<%- include('../../views/partials/userHeader') %>
     <style>
         body {
             font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            padding-top: 80px;
         }
-        .hero-pattern {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath fill-rule='evenodd' d='M11 0l5 20H6l5-20zm42 31a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM0 72h40v4H0v-4zm0-8h31v4H0v-4zm20-16h20v4H20v-4zM0 56h40v4H0v-4zm63-25a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM53 41a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-30 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-28-8a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zM56 5a5 5 0 0 0-10 0h10zm10 0a5 5 0 0 1-10 0h10zm-3 46a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm10 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM21 0l5 20H16l5-20zm43 64v-4h-4v4h-4v4h4v4h4v-4h4v-4h-4zM36 13h4v4h-4v-4zm4 4h4v4h-4v-4zm-4 4h4v4h-4v-4zm8-8h4v4h-4v-4z'/%3E%3C/g%3E%3C/svg%3E");
+        .wallet-card {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .btn-custom {
+            border-radius: 25px;
+            padding: 10px 20px;
+        }
+        .transaction-item:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.3s ease;
+        }
+        .nav-link {
+            color: #495057;
+            font-weight: 500;
+        }
+        .nav-link:hover {
+            color: #2575fc;
+        }
+        .table th {
+            font-weight: 600;
+            color: #495057;
+        }
+    .sidebar {
+      height: 100vh;
+      background-color: #2c3e50;
+      position: fixed;
+      padding-top: 5rem;
+    }
+    .sidebar a {
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    .sidebar a:hover {
+      background-color: #34495e;
+    }
+    .profile-header {
+      background-color: #00bcd4; /* Teal 300 */
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .profile-pic {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 5px solid white;
+      transition: transform 0.3s;
+    }
+    .profile-pic:hover {
+      transform: scale(1.1);
+    }
+    .profile-card {
+      margin-top: 20px;
+      z-index: 1;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .address-card {
+      background: #f1f1f1;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 10px;
+      position: relative;
+      transition: background 0.3s;
+    }
+    .address-card:hover {
+      background: #e1e1e1;
+    }
+
+    .dropdown-menu {
+  padding: 0;
+  margin: 0;
+}
+
+.profile-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  padding: 8px 16px;
+  transition: background-color 0.2s ease; 
+}
+
+.profile-link:hover {
+  background-color: #f0f0f0; 
+}
+
+.profile-avatar {
+  width: 24px; 
+  height: 24px;
+  border-radius: 50%; 
+  margin-right: 8px; 
+}
+
+.logout-link {
+  margin-bottom: 8px; 
+}
+.fixed-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000; 
+}
+
+.content-section {
+  margin-top: 20px; 
+}
+
+.breadcrumb {
+            background-color: #f8f9fa; 
+            border-radius: 0.375rem;
+            padding: 0.75rem 1rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1); 
+        }
+
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: #6c757d;
+        }
+
+        .breadcrumb-item a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .breadcrumb-item a:hover {
+            text-decoration: underline;
+        }
+
+        .breadcrumb-item.active {
+            color: #6c757d; 
         }
     </style>
 </head>
-<body class="bg-gray-100">
-    <header class="bg-white shadow-md fixed w-full z-10">
-        <nav class="container mx-auto px-6 py-3">
-            <div class="flex justify-between items-center">
-                <div class="text-xl font-bold text-purple-600">YourLogo</div>
-                <div class="hidden md:flex space-x-6">
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition duration-300">Home</a>
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition duration-300">Features</a>
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition duration-300">Pricing</a>
-                    <a href="#" class="text-gray-600 hover:text-purple-600 transition duration-300">Contact</a>
+<body>
+    <header class="header_section bg-dark fixed-header">
+        <div class="container">
+          <nav class="navbar navbar-expand-lg custom_nav-container">
+            <a class="navbar-brand" href="/userHomePage">
+              <span>
+                Arabian Food Court
+              </span>
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent">
+              <span class=""> </span>
+            </button>
+      
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav mx-auto">
+                <li class="nav-item active">
+                  <a class="nav-link" href="/userHomePage">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">About us</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Contact us</a>
+                </li>
+              </ul>
+      
+              <!-- User Profile and Cart Section -->
+              <div class="user_option">
+                <a class="cart_link position-relative" href="/getCartPage">
+                  <!-- Cart Icon SVG -->
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 456.029 456.029" width="50" height="50">
+                    <path d="M345.6 338.862c-29.184 0-53.248 23.552-53.248 53.248s23.552 53.248 53.248 53.248 53.248-23.552 53.248-53.248-23.552-53.248-53.248-53.248zM439.296 84.91h-330.56l-5.12-34.304c-2.048-13.824-21.504-30.72-44.544-30.72H20.48C9.216 19.886 0 29.102 0 40.366S9.216 60.846 20.48 60.846h41.472c2.56 0 4.608 2.048 5.12 4.608l31.744 216.064c4.096 27.136 27.648 47.616 55.296 47.616h212.992c26.624 0 49.664-18.944 55.296-45.056l33.28-166.4c4.096-21.504-3.072-32.256-14.336-34.304zM215.04 389.55c-1.024-28.16-24.576-50.688-52.736-50.688-29.696 1.536-52.224 26.112-51.2 55.296 1.024 28.16 24.064 50.688 52.224 50.688 29.184 0 52.224-24.576 51.712-55.296z"/>
+                  </svg>
+                  <!-- Cart Count Badge -->
+                  <span id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <%= cartCount %>
+                  </span>
+                </a>
+                <a class="cart_link position-relative" href="/wishlist">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="50" height="50" fill="red">
+                    <path d="M462.3 62.7C407 7.4 324.8 23.9 270.1 79.1L256 93.3l-14.1-14.2c-54.8-55.2-136.9-71.7-192.2-16.4S-7.4 199.9 48 255.2L239 445.5c7.4 7.5 19.6 7.5 27 0l205.4-205.4c55.2-54.8 71.7-136.9 16.4-192.2z"/>
+                  </svg>
+                  <span data-toggle="tooltip" data-placement="bottom" title="<%= wishlistCount %>" id="cartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    <%= wishlistCount %>
+                  </span>
+                </a>
+                <p class="user_proname"><%= user.name %></p>
+      
+                <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" id="loginDropdown" data-toggle="dropdown">
+                    <i class="fa fa-user" aria-hidden="true"></i>
+                  </button>
+      
+                  <div class="dropdown-menu">
+                    <a href="/profilePage" class="profile-link">
+                      <img src="/public/images/profile.png" class="profile-avatar"> Profile
+                    </a>
+                    <a href="/orderHistory" class="profile-link">
+                      <img src="/public/images/purchase-order.png" class="profile-avatar"> Orders
+                    </a>
+                    <a href="/getCartPage" class="profile-link">
+                      <img src="/public/images/shopping-cart (1).png" class="profile-avatar"> Cart
+                    </a>
+                    <a href="wishlist" class="profile-link">
+                      <img src="/public/images/wishlist.png" class="profile-avatar"> Wishlist
+                    </a>
+                    <a href="/loadWalletPage" class="profile-link">
+                      <img src="/public/images/wallet.png" class="profile-avatar"> Wallet
+                    </a>
+                    <a href="/logout"class="profile-link logout-link">
+                      <img src="/public/images/shutdown.png" class="profile-avatar"> Logout
+                    </a>
+                  </div>
                 </div>
-                <button class="md:hidden focus:outline-none">
-                    <svg class="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                        <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                    </svg>
-                </button>
+              </div>
             </div>
-        </nav>
-    </header>
+          </nav>
+        </div>
+      </header>
+      <div class="container mt-5">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="/userHomePage">Home</a></li>
+              <li class="breadcrumb-item"><a href="/profilePage">Profile</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Wallet</li>
+          </ol>
+      </nav>
 
-    <main class="pt-16">
-        <section class="hero-pattern bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-32">
-            <div class="container mx-auto px-6 text-center">
-                <h1 class="text-5xl md:text-7xl font-bold mb-8 animate-pulse">Welcome to Our Amazing Platform</h1>
-                <p class="text-xl md:text-2xl mb-12 max-w-3xl mx-auto">Discover the power of innovation and creativity with our cutting-edge solutions.</p>
-                <a href="#" class="bg-white text-purple-600 font-bold py-3 px-8 rounded-full hover:bg-gray-100 transition duration-300 transform hover:scale-105">Get Started</a>
-            </div>
-        </section>
+    <main class="container py-5">
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6">
+                <div class="card wallet-card h-100">
+                    <div class="card-body d-flex flex-column">
+                        <h5 class="card-title">Current Balance</h5>
+                        <h2 class="card-text mb-4 display-4 fw-bold">₹<%= wallet.balanceAmount.toFixed(2) %></h2>
+                        <div class="mt-auto d-flex justify-content-between">
+                            <button class="btn btn-outline-light btn-custom" data-bs-toggle="modal" data-bs-target="#addFundsModal">
+                                <i class="fas fa-plus-circle me-2"></i>Add Funds
+                            </button>
 
-        <section class="py-20 bg-white">
-            <div class="container mx-auto px-6">
-                <h2 class="text-4xl font-bold text-center text-gray-800 mb-12">Our Features</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-                    <div class="bg-gray-100 rounded-lg shadow-lg p-8 transform hover:scale-105 transition duration-300">
-                        <svg class="h-16 w-16 text-purple-600 mb-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                        </svg>
-                        <h3 class="text-2xl font-semibold mb-4 text-center">Lightning Fast</h3>
-                        <p class="text-gray-600 text-center">Experience blazing fast performance with our optimized platform, designed for speed and efficiency.</p>
-                    </div>
-                    <div class="bg-gray-100 rounded-lg shadow-lg p-8 transform hover:scale-105 transition duration-300">
-                        <svg class="h-16 w-16 text-purple-600 mb-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                        </svg>
-                        <h3 class="text-2xl font-semibold mb-4 text-center">Secure & Reliable</h3>
-                        <p class="text-gray-600 text-center">Your data is safe with our state-of-the-art security measures, ensuring peace of mind for all users.</p>
-                    </div>
-                    <div class="bg-gray-100 rounded-lg shadow-lg p-8 transform hover:scale-105 transition duration-300">
-                        <svg class="h-16 w-16 text-purple-600 mb-6 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/>
-                        </svg>
-                        <h3 class="text-2xl font-semibold mb-4 text-center">Fully Customizable</h3>
-                        <p class="text-gray-600 text-center">Tailor our platform to fit your unique needs and preferences with our flexible customization options.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-20 bg-gray-100">
-            <div class="container mx-auto px-6">
-                <div class="bg-white rounded-lg shadow-xl p-8 md:p-12 md:flex items-center">
-                    <div class="md:w-2/3 mb-8 md:mb-0 md:pr-8">
-                        <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Ready to get started?</h2>
-                        <p class="text-gray-600 text-lg mb-6">Join thousands of satisfied users and experience the power of our platform today.</p>
-                        <a href="#" class="bg-purple-600 text-white font-bold py-3 px-8 rounded-full hover:bg-purple-700 transition duration-300 inline-block">Sign Up Now</a>
-                    </div>
-                    <div class="md:w-1/3">
-                        <img src="https://media.istockphoto.com/id/499517325/photo/a-man-speaking-at-a-business-conference.jpg?s=612x612&w=0&k=20&c=gWTTDs_Hl6AEGOunoQ2LsjrcTJkknf9G8BGqsywyEtE=" alt="Get Started" class="rounded-lg shadow-md">
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- New Admin Dashboard Section -->
-        <section class="py-20 bg-gray-100">
-            <div class="container mx-auto px-6">
-                <h2 class="text-3xl font-bold text-center text-gray-800 mb-8">Admin Dashboard</h2>
-                <div class="bg-white rounded-lg shadow-xl p-8">
-                    <div class="mb-6">
-                        <h3 class="text-xl font-semibold mb-4">Date Sorting Options</h3>
-                        <div class="flex flex-wrap gap-4">
-                            <button class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-300">
-                                Daily
-                            </button>
-                            <button class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-300">
-                                Weekly
-                            </button>
-                            <button class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition duration-300">
-                                Monthly
-                            </button>
-                        </div>
-                    </div>
-                    <div class="mb-6">
-                        <h3 class="text-xl font-semibold mb-4">Date Range Selection</h3>
-                        <div class="flex flex-wrap gap-4">
-                            <div>
-                                <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                                <input type="date" id="start-date" class="border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                            </div>
-                            <div>
-                                <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-                                <input type="date" id="end-date" class="border-gray-300 rounded-md shadow-sm focus:ring-purple-500 focus:border-purple-500">
-                            </div>
-                            <button class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition duration-300 self-end">
-                                Apply Filter
-                            </button>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold mb-4">Data Table</h3>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full bg-white border border-gray-300">
-                                <thead>
-                                    <tr>
-                                        <th class="py-2 px-4 border-b">Date</th>
-                                        <th class="py-2 px-4 border-b">Metric 1</th>
-                                        <th class="py-2 px-4 border-b">Metric 2</th>
-                                        <th class="py-2 px-4 border-b">Metric 3</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td class="py-2 px-4 border-b">2023-05-01</td>
-                                        <td class="py-2 px-4 border-b">100</td>
-                                        <td class="py-2 px-4 border-b">200</td>
-                                        <td class="py-2 px-4 border-b">300</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="py-2 px-4 border-b">2023-05-02</td>
-                                        <td class="py-2 px-4 border-b">110</td>
-                                        <td class="py-2 px-4 border-b">220</td>
-                                        <td class="py-2 px-4 border-b">330</td>
-                                    </tr>
-                                    <!-- Add more rows as needed -->
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-gray-800 text-white py-12">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-2xl font-semibold mb-4">YourCompany</h3>
-                    <p class="text-gray-400">Making the world a better place through innovative solutions.</p>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Services</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Blog</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Contact</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Follow Us</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white transition duration-300">
-                            <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
-                        </a>
-                    </div>
-                </div>
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Newsletter</h4>
-                    <p class="text-gray-400 mb-4">Stay updated with our latest news and offers.</p>
-                    <form class="flex">
-                        <input type="email" placeholder="Enter your email" class="bg-gray-700 text-white px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-purple-600 w-full">
-                        <button type="submit" class="bg-purple-600 text-white px-4 py-2 rounded-r-md hover:bg-purple-700 transition duration-300">Subscribe</button>
-                    </form>
-                </div>
-            </div>
-            <div class="border-t border-gray-700 mt-10 pt-8 text-sm text-center text-gray-400">
-                <p>&copy; 2023 YourCompany. All rights reserved.</p>
             </div>
         </div>
-    </footer>
 
-    <!-- Add this just before the closing </body> tag -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title mb-4">Recent Transactions</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Description</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                          <% if (wallet.wallet_history.length>0) { %>
+                            <% wallet.wallet_history.forEach(element => { %>
+                              <% if (element.transactionType == 'credited') { %>
+                                <tr class="transaction-item">
+                                  <td><i class="fas fa-arrow-up text-success"></i></td>
+                                  <td><%= element.description %></td>
+                                  <td class="text-success">+₹<%= element.amount %></td>
+                                  <td>
+                                    <%= ("0" + element.date.getDate()).slice(-2) %>/
+                                    <%= ("0" + (element.date.getMonth() + 1)).slice(-2) %>/
+                                    <%= element.date.getFullYear() %> 
+                                    <%= ("0" + element.date.getHours()).slice(-2) %>:
+                                    <%= ("0" + element.date.getMinutes()).slice(-2) %>:
+                                    <%= ("0" + element.date.getSeconds()).slice(-2) %>
+                                  </td>                                  
+                              </tr>
+                              <% }else{ %>
+                                <tr class="transaction-item">
+                                  <td><i class="fas fa-arrow-down text-danger"></i></td>
+                                  <td><%= element.description %></td>
+                                  <td class="text-danger">-₹<%= element.amount %></td>
+                                  <td>
+                                    <%= ("0" + element.date.getDate()).slice(-2) %>/
+                                    <%= ("0" + (element.date.getMonth() + 1)).slice(-2) %>/
+                                    <%= element.date.getFullYear() %> 
+                                    <%= ("0" + element.date.getHours()).slice(-2) %>:
+                                    <%= ("0" + element.date.getMinutes()).slice(-2) %>:
+                                    <%= ("0" + element.date.getSeconds()).slice(-2) %>
+                                  </td>
+                                  
+                              </tr>
+                              <% } %>
+                              <% }) %>
+                          <% } else{ %>
+                            <tr class="transaction-item">
+                              <td colspan="5" class="text-center text-danger">No transaction found</td>
+                          </tr>
+                            <% } %>
+                         
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Add Funds Modal -->
+    <div class="modal fade" id="addFundsModal" tabindex="-1" aria-labelledby="addFundsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFundsModalLabel">Add Funds</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="mb-3">
+                            <label for="addAmount" class="form-label">Amount</label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" class="form-control" id="amount" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary btn-custom" onclick="AddFund()">Add Funds</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        function sortByDaily() {
-            console.log('Sorting by daily');
-            // Implement daily sorting logic here
+      async function AddFund() {
+  
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 3000,
+          timerProgressBar: true,
+          didOpen: (toast) => {
+            toast.onmouseenter = Swal.stopTimer;
+            toast.onmouseleave = Swal.resumeTimer;
+          }
+        });
+  
+        const amount = document.getElementById('amount').value;
+  
+        if (!amount) {
+          Toast.fire({
+            icon: "error",
+            title: "amount is empty"
+          });
+          return
         }
-
-        function sortByWeekly() {
-            console.log('Sorting by weekly');
-            // Implement weekly sorting logic here
+        if (isNaN(amount)) {
+          Toast.fire({
+            icon: "error",
+            title: "Invalid amount. Please enter a number."
+          });
+          return;
         }
-
-        function sortByMonthly() {
-            console.log('Sorting by monthly');
-            // Implement monthly sorting logic here
+        if (parseFloat(amount) <= 0) {
+          Toast.fire({
+            icon: "error",
+            title: "Amount must be greater than zero."
+          });
+          return;
         }
-
-        function applyDateFilter() {
-            const startDate = document.getElementById('start-date').value;
-            const endDate = document.getElementById('end-date').value;
-            console.log(`Applying filter from ${startDate} to ${endDate}`);
-            // Implement date range filtering logic here
+        const maxAmount = 100000;
+        if (parseFloat(amount) > maxAmount) {
+          Toast.fire({
+            icon: "error",
+            title: `Amount cannot exceed ${maxAmount}.`
+          });
+          return;
         }
-
-        // Add event listeners to buttons
-        document.querySelector('button:contains("Daily")').addEventListener('click', sortByDaily);
-        document.querySelector('button:contains("Weekly")').addEventListener('click', sortByWeekly);
-        document.querySelector('button:contains("Monthly")').addEventListener('click', sortByMonthly);
-        document.querySelector('button:contains("Apply Filter")').addEventListener('click', applyDateFilter);
+  
+  
+        try {
+          const response = await fetch('/addFund', {
+            headers: {
+              "Content-Type": "application/json"
+            },
+            method: 'POST',
+            body: JSON.stringify({ amount })
+          });
+          if (response.ok) {
+            const result = await response.json()
+            console.log(result)
+            
+  
+            const options = {
+              key: 'rzp_test_Lbm5uqOcFryrT5',
+              amount: result.amount,
+              currency: result.currency,
+              name: 'Your wallet',
+              order_id: result.id,
+              description: "Adding fund to wallet",
+              handler: async function (response) {
+                try {
+                
+  
+                  
+                  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = response;
+                  
+                  const responce = await fetch('/verifyPayment', {
+                    method: "POST",
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ razorpay_order_id, razorpay_payment_id, razorpay_signature, amount: result.amount })
+                  })
+  
+  
+                  const data = await responce.json();
+  
+                  if (data.success) {
+                    Swal.fire("Success", "Funds added successfully!", "success").then(() => {
+                      location.reload();  
+                    });
+                  } else {
+                    Swal.fire("Error", "Payment verification failed. Please try again.", "error");
+                  }
+  
+  
+                } catch (error) {
+                  console.error('Error verifying payment:', error);
+                  swal("Error", "An error occurred while verifying the payment. Please try again.", "error");
+                }
+  
+              },
+              prefill: {
+                name: 'Shafeeq',
+                email: '2009shafeeq@gamil.com',
+                contact: '9895089017'
+              },
+              theme: {
+                color: '#000000'
+              }
+            }
+            const razorpay = new Razorpay(options);
+            razorpay.open();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'failed to create order',
+            })
+  
+          }
+        } catch (error) {
+          console.error('Error adding funds:', error);
+          swal("Error", "An error occurred while adding funds. Please try again.", "error");
+        }  
+      }
     </script>
-</body>
-</html>
+
+    <%- include('../../views/partials/userFooter') %>

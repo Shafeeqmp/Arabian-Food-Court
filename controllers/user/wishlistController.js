@@ -38,9 +38,6 @@ exports.loadWishlist=async(req,res)=>{
       if (!product) {
         return res.status(404).json({ success: false, message: "Product not found" });
       }
-      if (product.stock === 0) {
-        return res.status(400).json({ success: false, message: "Product is out of stock" });
-      }
       let wishlist = await Wishlist.findOne({ user: user._id });
       if (!wishlist) {
         wishlist = new Wishlist({ user: user._id, items: [] });
@@ -85,3 +82,6 @@ exports.loadWishlist=async(req,res)=>{
       res.status(500).json({ success: false, message: "Something went wrong!" });
     }
   };
+
+
+  

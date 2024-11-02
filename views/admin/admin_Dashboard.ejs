@@ -1,89 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
+        <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title><%- title %></title>
+                <link rel="shortcut icon" href="/public/images/favicon.png" type="">
+                <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+                <style>
+                    .sidebar {
+                        height: 100vh;
+                        background-color: #ffbe33;
+                        color: #fff;
+                        padding-top: 1rem;
+                    }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <link rel="shortcut icon" href="/public/images/favicon.png" type="">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <style>
-        .sidebar {
-            height: 100vh;
-            background-color: #ffbe33;
-            color: #fff;
-            padding-top: 1rem;
-        }
+                    .sidebar a {
+                        color: #fff;
+                        text-decoration: none;
+                    }
 
-        .sidebar a {
-            color: #fff;
-            text-decoration: none;
-        }
+                    .sidebar a:hover {
+                        background-color: #071553;
+                    }
 
-        .sidebar a:hover {
-            background-color: #071553;
-        }
+                    .content {
+                        padding: 2rem;
+                    }
 
-        .content {
-            padding: 2rem;
-        }
+                    .navbar {
+                        margin-bottom: 0;
+                    }
 
-        .navbar {
-            margin-bottom: 0;
-        }
+                    #couponDetails {
+                        display: none;
+                    }
 
-        #couponDetails {
-            display: none;
-        }
+                    .date-range {
+                        display: none;
+                    }
+                </style>
+               </head>
 
-        .date-range {
-            display: none;
-        }
-    </style>
-</head>
-
-<body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Admin Dashboard</a>
-        <div class="collapse navbar-collapse justify-content-end">
-            <ul class="navbar-nav">
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user"></i> Admin
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="adminDropdown">
-                        <a class="dropdown-item" href="/admin/logout" id="logoutBtn">Logout</a>
+               <body>
+                <!-- Navbar -->
+                <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                    <div class="collapse navbar-collapse justify-content-end">
+                        <ul class="navbar-nav">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="adminDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-user"></i> Admin
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="adminDropdown">
+                                    <a class="dropdown-item" href="/admin/logout" id="logoutBtn">Logout</a>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
-                </li>
-            </ul>
-        </div>
-    </nav>
+                </nav>
 
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-2 sidebar">
-                <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loadProuctPage"><i class="fas fa-box"></i> Products</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loardOrderMng"> <i class="fas fa-shopping-cart"></i> Orders</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/categoryPage"><i class="fas fa-sliders-h"></i> Category</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/loadCouponPage"><i class="fas fa-tag"></i> Coupon</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/offer"><i class="fas fa-tags"></i> Offer</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                </ul>
-            </nav>
-
-            <!-- Main Content -->
-            <main role="main" class="col-md-10 content">
-                <div class="container">
-                    <h1>Dashboard</h1>
+                 <div class="container-fluid">
                     <div class="row">
-                        <!-- Sales Report Section -->
-                        <div class="col-md-12 mb-4">
+                        <!-- Sidebar -->
+                        <nav class="col-md-2 sidebar">
+                            <ul class="nav flex-column">
+                                <li class="nav-item"><a class="nav-link active" href="/admin/loadAdminDash"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/loaduserMng"><i class="fas fa-users"></i> Users</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/loadProuctPage"><i class="fas fa-box"></i> Products</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/loardOrderMng"> <i class="fas fa-shopping-cart"></i> Orders</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/categoryPage"><i class="fas fa-sliders-h"></i> Category</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/loadCouponPage"><i class="fas fa-tag"></i> Coupon</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/offer"><i class="fas fa-tags"></i> Offer</a></li>
+                                <li class="nav-item"><a class="nav-link" href="/admin/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </nav>
+                        <!-- Main Content -->
+                        <main role="main" class="col-md-10 content">
+                           <div class="container">
+                           <h1 class="text-center">Admin Dashboard</h1>
+                            <div class="row">
+                             <!-- Sales Report Section -->
+                            <div class="col-md-12 mb-4">
                             <div class="card">
                                 <div class="card-header">
                                     Sales Report
@@ -126,11 +123,11 @@
                                     <div id="reportResults" class="mt-4"></div>
                                 </div>
                             </div>
-                        </div>
+                            </div>
 
-                        <!-- Sales Overview Chart -->
-                        <div class="col-md-6">
-                            <div class="card">
+                            <!-- Sales Overview Chart -->
+                            <div class="col-md-12">
+                             <div class="card">
                                 <div class="card-header">
                                     Sales Overview
                                 </div>
@@ -138,15 +135,15 @@
                                     <canvas id="salesChart"></canvas>
                                 </div>
                             </div>
-                        </div>
+                           </div>
 
-                        <!-- Recent Orders -->
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">
-                                    Recent Orders
-                                </div>
-                                <div class="card-body">
+                               <!-- Recent Orders Start -->
+                            <div class="col-md-12 mt-5">
+                                <div class="card">
+                                    <div class="card-header">
+                                      Recent Orders
+                                    </div>
+                                    <div class="card-body">
                                     <table class="table">
                                         <thead>
                                             <tr>
@@ -154,34 +151,92 @@
                                                 <th>Order ID</th>
                                                 <th>Date</th>
                                                 <th>Status</th>
-                                            </tr>
+                                              </tr>
                                         </thead>
-                                        <tbody>
-                                            <% if(orders.length != 0) { %>
-                                            <% orders.forEach((order, index) => { %>
-                                            <tr>
-                                                <td><%= index + 1 %></td> <!-- To display order index -->
-                                                <td><%= order.orderId %></td>
-                                                <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
-                                                <td><%= order.orderStatus || 'Pending' %></td> <!-- Adjust to your status field -->
-                                            </tr>
-                                            <% }) %>
-                                            <% } else { %>
-                                            <tr>
-                                                <td colspan="4" class="text-center">No recent orders found</td>
-                                            </tr>
-                                            <% } %>
-                                        </tbody>
-                                    </table>
+                                            <tbody>
+                                                <% if(orders.length != 0) { %>
+                                                <% orders.forEach((order, index) => { %>
+                                                <tr>
+                                                    <td><%= index + 1 %></td> 
+                                                    <td><%= order.orderId %></td>
+                                                    <td><%= new Date(order.createdAt).toLocaleDateString() %></td>
+                                                    <td><%= order.orderStatus || 'Pending' %></td> 
+                                                </tr>
+                                                <% }) %>
+                                                <% } else { %>
+                                                <tr>
+                                                    <td colspan="4" class="text-center">No recent orders found</td>
+                                                </tr>
+                                                <% } %>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                            </div>
+                            <!-- Recent Orders End -->
+
+                            <!-- Best Selling product Section Start -->
+                                <div class="container mt-5">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    Best Selling product 
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <% if(orders.length != 0) { %>
+                                                            <% orders.forEach((order, index) => { %>
+                                                            <tr>
+                                                                <td><%= index + 1 %></td>
+                                                                <td><%= order.orderId %></td>
+                                                            </tr>
+                                                            <% }) %>
+                                                            <% } else { %>
+                                                            <tr>
+                                                                <td colspan="4" class="text-center">No recent orders found</td>
+                                                            </tr>
+                                                            <% } %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Best Selling product Section End -->
+
+                                        <!-- Best Selling Category Section Start -->
+                                        <div class="col-md-6">
+                                            <div class="card">
+                                                <div class="card-header">
+                                                    Best Selling Category
+                                                </div>
+                                                <div class="card-body">
+                                                    <table class="table">
+                                                        <tbody>
+                                                            <% if(orders.length != 0) { %>
+                                                            <% orders.forEach((order, index) => { %>
+                                                            <tr>
+                                                                <td><%= index + 1 %></td> 
+                                                                <td><%= order.orderId %></td>
+                                                            </tr>
+                                                            <% }) %>
+                                                            <% } else { %>
+                                                            <tr>
+                                                                <td colspan="4" class="text-center">No recent orders found</td>
+                                                            </tr>
+                                                            <% } %>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Best Selling Category Section End -->
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </main>
                     </div>
                 </div>
-            </main>
-        </div>
-    </div>
-
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>

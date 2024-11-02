@@ -12,6 +12,35 @@ const { name } = require('ejs');
 const Cart=require('../../models/cartModel')
 const Wishlist=require('../../models/wishlistModel')
 const Offer=require('../../models/offerModel')
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const Order = require('../../models/orderModel');
+const path = require('path');
+const InvoiceCounter = require('../../models/invoiceCounterModel');
+
+async function generateInvoiceNumber() {
+    try {
+        const currentYear = new Date().getFullYear();
+        let counter = await InvoiceCounter.findOne({ year: currentYear }).exec();
+        
+        if (!counter) {
+            counter = new InvoiceCounter({ 
+                year: currentYear,
+                sequence: 0 
+            });
+        }
+        
+        counter.sequence += 1;
+        await counter.save();
+        
+        // Format: AFC-YYYY-XXXXX (e.g., AFC-2024-00001)
+        const invoiceNumber = `AFC-${currentYear}-${counter.sequence.toString().padStart(5, '0')}`;
+        return invoiceNumber;
+    } catch (error) {
+        console.error('Error generating invoice number:', error);
+        throw error;
+    }
+}
 
 exports.loadUserHomePage = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
@@ -19,6 +48,7 @@ exports.loadUserHomePage = async (req, res) => {
     const skip = (page - 1) * limit;
   
     try {
+        const Category = await category.find({ isDeleted: false }).lean();
         const  offer= await Offer.find({isDelete: false,offerStartDate: { $lte: new Date() }});
       const totalProducts = await product.countDocuments({ isDelete: false });
       const totalPages = Math.ceil(totalProducts / limit);
@@ -27,14 +57,13 @@ exports.loadUserHomePage = async (req, res) => {
     
       const cart = await Cart.findOne({ user: user._id }).populate("items.product");
       const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
-      
-      const products = await product.find({ isDelete: false }).populate('offer')
+
+     
+        const products = await product.find({ isDelete: false }).populate('offer')
         .skip(skip)
         .limit(limit)
         .lean();
-       
-        
-  
+
         let cartCount = 0;
         if (cart && cart.items && cart.items.length > 0) {
            cart.items.forEach(item => {
@@ -46,8 +75,7 @@ exports.loadUserHomePage = async (req, res) => {
       if(wishlist){
         wishlistCount  = wishlist.items.length;
       }  
-      const Category = await category.find({ isDeleted: false }).lean();
-  
+      
       res.render('user/menuPage', {
         user: user, 
         Category: Category,
@@ -465,5 +493,316 @@ exports. resendOtp = async (req, res) => {
       }
   };
   
+
+exports.generateInvoice = async (req, res) => {
+    try {
+        const orderId = req.params.orderId;
+        const order = await Order.findById(orderId)
+            .populate('user')
+            .populate('items.product')
+            .populate('address');
+
+        if (!order) {
+            return res.status(404).send('Order not found');
+        }
+
+        // Generate invoice number if it doesn't exist
+        if (!order.invoiceNumber) {
+            order.invoiceNumber = await generateInvoiceNumber();
+            await order.save();
+        }
+
+        // Create directory if not exists
+        const invoiceDir = path.join(__dirname, '../../public/invoices');
+        if (!fs.existsSync(invoiceDir)){
+            fs.mkdirSync(invoiceDir, { recursive: true });
+        }
+
+        // Create PDF document
+        const doc = new PDFDocument({
+            size: 'A4',
+            margin: 50,
+            bufferPages: true // Enable buffer pages
+        });
+
+        const fileName = `invoice-${order.invoiceNumber}.pdf`;
+        const filePath = path.join(invoiceDir, fileName);
+
+        // Create a Promise to handle PDF generation
+        const pdfPromise = new Promise((resolve, reject) => {
+            const writeStream = fs.createWriteStream(filePath);
+            
+            writeStream.on('error', reject);
+            writeStream.on('finish', () => resolve(filePath));
+            
+            doc.pipe(writeStream);
+
+            // Add header function with better alignment
+            const addHeader = () => {
+                doc.image(path.join(__dirname, '../../public/images/logo.png'), 50, 45, { width: 50 })
+                   .fillColor('#444444')
+                   .fontSize(24)
+                   .text('Arabian Food Court', 110, 57)
+                   .fontSize(10)
+                   .text('Food Street', 450, 50, { align: 'right' })
+                   .text('Kerala, India, 673001', 450, 65, { align: 'right' })
+                   .text('Phone: +91 9895089017', 450, 80, { align: 'right' })
+                   .moveDown();
+
+                // Thicker line separator
+                doc.fillColor('#3498db')
+                   .rect(50, 120, doc.page.width - 100, 3)
+                   .fill();
+
+                // Invoice title
+                doc.fillColor('#444444')
+                   .fontSize(20)
+                   .text('INVOICE', 50, 140, { align: 'center' });
+            };
+
+            addHeader();
+
+            const customerInformationTop = 180;
+
+            // Left column - Bill To section
+            doc.fontSize(12)
+               .font('Helvetica-Bold')
+               .text('BILL TO:', 50, customerInformationTop)
+               .fontSize(10)
+               .font('Helvetica')
+               .text(order.user.name, 50, customerInformationTop + 20)
+               .text(order.user.email, 50, customerInformationTop + 35);
+
+            // Right column - Invoice Details
+            doc.fontSize(10)
+               .font('Helvetica-Bold')
+               .text('Invoice Number:', 350, customerInformationTop)
+               .font('Helvetica')
+               .text(order.invoiceNumber, 450, customerInformationTop)
+               .font('Helvetica-Bold')
+               .text('Order ID:', 350, customerInformationTop + 20)
+               .font('Helvetica')
+               .text(order.orderId, 450, customerInformationTop + 20)
+               .font('Helvetica-Bold')
+               .text('Date:', 350, customerInformationTop + 40)
+               .font('Helvetica')
+               .text(formatDate(order.createdAt), 450, customerInformationTop + 40)
+               .font('Helvetica-Bold')
+               .text('Payment Method:', 350, customerInformationTop + 60)
+               .font('Helvetica')
+               .text(order.paymentMethod, 450, customerInformationTop + 60);
+
+            // Shipping Address with better formatting
+            doc.fontSize(12)
+               .font('Helvetica-Bold')
+               .text('SHIPPING ADDRESS:', 50, customerInformationTop + 80)
+               .fontSize(10)
+               .font('Helvetica')
+               .text(order.address[0].fullName, 50, customerInformationTop + 100)
+               .text(order.address[0].streetAddress, 50, customerInformationTop + 115)
+               .text(`${order.address[0].city}, ${order.address[0].state}`, 50, customerInformationTop + 130)
+               .text(`PIN: ${order.address[0].zipCode}`, 50, customerInformationTop + 145)
+               .text(`Phone: ${order.address[0].phone}`, 50, customerInformationTop + 160);
+
+            // Items table with improved layout
+            const tableTop = 380;
+            let position = tableTop;
+
+            // Table header with better column widths
+            function generateTableRow(doc, y, item, quantity, unitPrice, total) {
+                doc.fontSize(10)
+                   .text(item, 50, y, { width: 250 })
+                   .text(quantity, 300, y, { width: 90, align: 'center' })
+                   .text(unitPrice, 390, y, { width: 90, align: 'right' })
+                   .text(total, 480, y, { width: 70, align: 'right' });
+            }
+
+            // Add table header with bold font
+            doc.font('Helvetica-Bold')
+               .fillColor('#444444');
+            generateTableRow(
+                doc,
+                position,
+                'Item Description',
+                'Quantity',
+                'Unit Price',
+                'Amount'
+            );
+
+            // Add thick line below header
+            doc.strokeColor('#3498db')
+               .lineWidth(2)
+               .moveTo(50, position + 20)
+               .lineTo(550, position + 20)
+               .stroke();
+
+            // Reset for items
+            doc.font('Helvetica')
+               .strokeColor('#aaaaaa')
+               .lineWidth(1);
+
+            position += 30;
+            let total = 0;
+
+            // Process items with consistent spacing
+            if (order.items.length > 10) {
+                // First page items (1-10)
+                for (let i = 0; i < 10; i++) {
+                    const item = order.items[i];
+                    const itemTotal = item.price;
+                    total += itemTotal;
+
+                    generateTableRow(
+                        doc,
+                        position,
+                        item.product.productname,
+                        item.quantity,
+                        `${item.price}`,
+                        `${itemTotal}`
+                    );
+                    generateHr(doc, position + 20);
+                    position += 30;
+                }
+
+                // Add new page for remaining items
+                doc.addPage();
+                addHeader();
+                position = 150; // Reset position for new page
+
+                // Table header for new page
+                doc.font('Helvetica-Bold');
+                generateTableRow(
+                    doc,
+                    position,
+                    'Item',
+                    'Quantity',
+                    'Unit Price',
+                    'Total'
+                );
+                generateHr(doc, position + 20);
+                doc.font('Helvetica');
+                position += 30;
+
+                // Remaining items
+                for (let i = 10; i < order.items.length; i++) {
+                    const item = order.items[i];
+                    const itemTotal = item.price;
+                    total += itemTotal;
+
+                    generateTableRow(
+                        doc,
+                        position,
+                        item.product.productname,
+                        item.quantity,
+                        `${item.price/item.quantity}`,
+                        `${itemTotal}`
+                    );
+                    generateHr(doc, position + 20);
+                    position += 30;
+                }
+            } else {
+                // Single page for 10 or fewer items
+                order.items.forEach(item => {
+                    const itemTotal = item.price;
+                    total += itemTotal;
+
+                    generateTableRow(
+                        doc,
+                        position,
+                        item.product.productname,
+                        item.quantity,
+                        `${item.price/item.quantity}`,
+                        `${itemTotal}`
+                    );
+                    generateHr(doc, position + 20);
+                    position += 30;
+                });
+            }
+
+            // Totals section with right alignment and better spacing
+            const subtotalPosition = position + 30;
+            
+            // Add totals with better formatting
+            doc.font('Helvetica-Bold');
+            
+            // Right-aligned totals
+            doc.text('Subtotal:', 350, subtotalPosition)
+               .text(`${total.toFixed(2)}`, 480, subtotalPosition, { align: 'right' });
+
+            if (order.discountAmount) {
+                doc.text('Coupon Discount:', 350, subtotalPosition + 20)
+                   .text(`-${order.discountAmount.toFixed(2)}`, 480, subtotalPosition + 20, { align: 'right' });
+            }
+
+            // Add line above grand total
+            generateHr(doc, subtotalPosition + 40);
+
+            doc.fontSize(12)
+               .text('Grand Total:', 350, subtotalPosition + 50)
+               .text(`${order.totalAmount.toFixed(2)}`, 480, subtotalPosition + 50, { align: 'right' });
+
+            // Footer with better styling
+            doc.font('Helvetica')
+               .fontSize(10)
+               .fillColor('#666666')
+               .text(
+                   'We appreciate your trust in us. Looking forward to serving you again!',
+                   50,
+                   doc.page.height - 70,
+                   { align: 'center', width: 500 }
+               )
+            doc.end();
+        });
+
+        // Wait for PDF to be generated then send it
+        pdfPromise
+            .then((filePath) => {
+                // Set response headers
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+
+                // Stream the file to response
+                const fileStream = fs.createReadStream(filePath);
+                fileStream.pipe(res);
+
+                // Delete file after streaming
+                fileStream.on('end', () => {
+                    fs.unlink(filePath, (err) => {
+                        if (err) console.error('Error deleting file:', err);
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error('Error generating PDF:', error);
+                res.status(500).send('Error generating invoice');
+            });
+
+    } catch (error) {
+        console.error('Error in invoice generation:', error);
+        res.status(500).send('Error generating invoice');
+    }
+};
+
+// Helper functions
+function generateHr(doc, y) {
+    doc.strokeColor('#aaaaaa')
+       .lineWidth(1)
+       .moveTo(50, y)
+       .lineTo(550, y)
+       .stroke();
+}
+
+function formatDate(date) {
+    const d = new Date(date);
+    return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+}
+
+function generateTableRow(doc, y, item, quantity, unitPrice, total) {
+    doc.fontSize(10)
+       .text(item, 50, y)
+       .text(quantity, 280, y, { width: 90, align: 'center' })
+       .text(unitPrice, 370, y, { width: 90, align: 'right' })
+       .text(total, 0, y, { align: 'right' });
+}
 
 
