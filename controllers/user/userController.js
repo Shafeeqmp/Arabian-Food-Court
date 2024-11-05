@@ -17,6 +17,8 @@ const fs = require('fs');
 const Order = require('../../models/orderModel');
 const path = require('path');
 const InvoiceCounter = require('../../models/invoiceCounterModel');
+const Rating =require('../../models/ratingModel')
+const Wallet =require('../../models/walletModel')
 
 async function generateInvoiceNumber() {
     try {
@@ -48,6 +50,7 @@ exports.loadUserHomePage = async (req, res) => {
     const skip = (page - 1) * limit;
   
     try {
+        const item = await Rating.find();
         const Category = await category.find({ isDeleted: false }).lean();
         const  offer= await Offer.find({isDelete: false,offerStartDate: { $lte: new Date() }});
       const totalProducts = await product.countDocuments({ isDelete: false });
@@ -84,7 +87,8 @@ exports.loadUserHomePage = async (req, res) => {
         totalPages: totalPages,
         cartCount,
         wishlistCount,
-        offer
+        offer,
+        item
       });
     } catch (error) {
       console.error('Error loading user home page:', error);
@@ -200,20 +204,57 @@ async function sendVerificationEmail(email, otp) {
     }
 }
 
+// Referal Code Generatr
+function generateReferralCode() {
+    const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const numbers = "0123456789";
+    let letterPart = "";
+    for (let i = 0; i < 3; i++) {
+      letterPart += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    let numberPart = "";
+    for (let i = 0; i < 4; i++) {
+      numberPart += numbers.charAt(Math.floor(Math.random() * numbers.length));
+    }
+    return letterPart + numberPart;
+  }
+
 exports. signup = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password } = req.body; 
+        const referalCode = req.body.referalCode;
         const findUser = await User.findOne({ email });
         if (findUser) {
             return res.status(400).json({ error: "Email already exists" });
         }
+        if(referalCode){
+            const user = await User.findOne({ referalCode: referalCode });
+          
+            if (!user) {
+              return res.json({ success: false, message: "Invalid user name" });
+            }
+            let wallet = await Wallet.findOne({ user: user._id });
+          if (!wallet) {
+            wallet = new Wallet({
+              user: user._id,
+              balance: 0,
+              wallet_history: [],
+            });
+            await wallet.save();
+          }
+          req.session.referalCode = referalCode;
+          }
+        
+          
+        
+
         const otp = generateOtp();
         const emailSent = await sendVerificationEmail(email, otp);
         if (!emailSent) {
             return res.json({ error: 'email-error' });
         }
         req.session.userOtp = otp;
-        req.session.userData = { name, email, password };
+        req.session.userData = { name, email, password,referalCode: generateReferralCode() };
         console.log('Stored OTP in session:', req.session.userOtp);
         res.json({ success: true });
         console.log("OTP sent:", otp);
@@ -243,8 +284,7 @@ exports. otpPage=async(req,res)=>{
 //Forgot Pass Gmail acc
 exports.post_ResetPage = async (req, res) => {
     const { email } = req.body;
-
-    // Find user by email
+    
     const user = await User.findOne({ email });
     if (!user) {
         return res.status(404).json({ error: 'No user with that email found.' });
@@ -257,13 +297,13 @@ exports.post_ResetPage = async (req, res) => {
     // Set cookie for additional security (optional)
     res.cookie('resetToken', token, {
         httpOnly: true,
-        maxAge: 2 * 60 * 1000, // Match token expiration
-        secure: false // Change to true if using HTTPS
+        maxAge: 2 * 60 * 1000, 
+        secure: false 
     });
     res.cookie('resetEmail', email, {
         httpOnly: true,
-        maxAge: 2 * 60 * 1000, // Match token expiration
-        secure: false // Change to true if using HTTPS
+        maxAge: 2 * 60 * 1000, 
+        secure: false 
     });
 
     // Set up email transporter
@@ -349,7 +389,27 @@ exports. verifyOTP=async(req,res)=>{
             name:user.name,
             email:user.email,
             password:passwordHash,
+            referalCode:user.referalCode
         })
+        const referalCode = req.session.referalCode;
+        if(referalCode){
+          const user = await User.findOne({ referalCode: referalCode });
+          if (!user) {
+            return res.json({ success: false, message: "Invalid referal code" });
+          }
+          let wallet = await Wallet.findOne({ user: user._id });
+          console.log(wallet);
+          
+          if (wallet) {
+            wallet.balanceAmount += 200;
+            wallet.wallet_history.push({
+              amount: 200,
+              description: "Referral Reward",
+              transactionType: "credited",
+            });
+            await wallet.save();
+          }
+        }
         await saveUserData.save()
         req.session.user=saveUserData._id;
         res.json({success:true,redirectUrl:"/login"})
@@ -804,5 +864,7 @@ function generateTableRow(doc, y, item, quantity, unitPrice, total) {
        .text(unitPrice, 370, y, { width: 90, align: 'right' })
        .text(total, 0, y, { align: 'right' });
 }
+
+
 
 

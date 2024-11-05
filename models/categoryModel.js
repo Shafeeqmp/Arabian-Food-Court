@@ -13,6 +13,10 @@ const categorySchema=mongoose.Schema({
         type:Boolean,
         default:false
     },
+    saleCount:{
+        type:Number,
+        default:0
+    },
 },{
       timestamps:true
 });

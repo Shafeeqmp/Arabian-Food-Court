@@ -213,6 +213,15 @@
             <div class="text-center mt-4">
               <img src="/public/images/profile.png" alt="Profile Picture" class="profile-pic img-fluid">
               <h4 class="mt-3"><%= user.name %></h4>
+              <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Referral Code</h5>
+                    <div class="input-group mb-3">
+                        <input type="text" class="form-control" id="myInput" value="<%= user.referalCode %>" readonly>
+                        <button class="btn btn-primary" onclick="myFunction()">Copy Code</button>
+                    </div>
+                </div>
+            </div>
               <ul class="list-group list-group-flush">
                 <li class="list-group-item"><strong>Email:</strong><%= user.email %></li>
               </ul>
@@ -833,6 +842,33 @@ async function editProfile() {
     });
   }
 }
+
+function myFunction() {
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',  // Positioned at the top-right for better visibility
+        iconColor: 'white',
+        customClass: {
+            popup: 'colored-toast',
+        },
+        showConfirmButton: false,
+        timer: 2000,  // Slightly longer to give users time to see it
+        timerProgressBar: true,
+    });
+    
+    var copyText = document.getElementById("myInput");
+    copyText.select();
+    copyText.setSelectionRange(0, 99999); // For mobile devices
+    document.execCommand("copy");
+
+    // Trigger SweetAlert notification
+    Toast.fire({
+        icon: 'success',
+        title: 'Referral code copied to clipboard!'
+    });
+}
+
+
 </script>
 
   </script>

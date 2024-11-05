@@ -11,6 +11,7 @@ const couponController=require('../../controllers/user/couponController')
 const wishlistController=require('../../controllers/user/wishlistController');
 const walletController=require('../../controllers/user/walletController')
 const { whitelist } = require('validator');
+const ratingController=require('../../controllers/user/ratingController')
 
 
 userRouter.use(isBlockAuth)
@@ -87,6 +88,10 @@ userRouter.post('/verifyPayment',userAuth,walletController.verifyPayment)
 
 //sales invoice
 userRouter.get('/invoice/:orderId', userAuth, userController.generateInvoice);
+
+//Rating Star Router
+userRouter.post('/submit-rating',userAuth,ratingController.submitRating)
+userRouter.get('/get-product-rating',userAuth,ratingController.getProductRating)
 
 
 

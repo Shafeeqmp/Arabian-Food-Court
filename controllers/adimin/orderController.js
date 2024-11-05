@@ -4,7 +4,9 @@ const User = require('../../models/userModel');
 const Address = require('../../models/addressModel');
 const Cart = require('../../models/cartModel');
 const Order = require('../../models/orderModel');
-const Wallet=require('../../models/walletModel')
+const Wallet=require('../../models/walletModel');
+const { setDefaultHighWaterMark } = require('nodemailer/lib/xoauth2');
+
 exports.loard_OrderMng = async (req, res) => {
     try {
         const orders = await Order.find().populate('user', 'name email').populate('items.product').populate('address').sort({ createdAt: -1 });
@@ -37,10 +39,7 @@ exports.getOrderDetails = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => { 
     try {
         const { orderId, status } = req.body;
-        
-
         const order = await Order.findById(orderId).populate('items.product');
-        
         if (!order) {
             return res.status(404).json({ success: false, message: 'Order not found' });
         }
@@ -54,10 +53,20 @@ exports.updateOrderStatus = async (req, res) => {
         }
         if(status === 'Delivered'){
             order.paymentStatus = 'Paid';
-        }
+            for (const item of order.items) {
+                await Product.findByIdAndUpdate(
+                    item.product._id,
+                    { $inc: { saleCount: item.quantity } }
+                );
+                await Category.findByIdAndUpdate(
+                    item.product.category_id,
+                    { $inc: { saleCount: item.quantity } }
+                );
+                
+            }
 
+        }
         if(status === 'Cancelled'){
-            
                 if (order.paymentStatus === "Paid") {
                     const refund = order.totalAmount;
                     let wallet = await Wallet.findOne({ user: order.user });
@@ -78,7 +87,6 @@ exports.updateOrderStatus = async (req, res) => {
                     await wallet.save();
             }
         }
-
         order.orderStatus = status;
         const updatedOrder = await order.save();
         

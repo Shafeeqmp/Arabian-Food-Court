@@ -131,8 +131,15 @@
                     type="password"
                     id="cPassword"
                     class="form-control form-control-lg"placeholder="Re-Enter Password" name="cPassword"
-                    required
-                  />
+                    required/>
+                </div>
+                <div class="form-outline mb-4">
+                  <p class="text-danger"><%= locals.message ? message:null %></p>
+                  <label class="form-label" for="form3Example4cdg"> referalCode</label>
+                  <input
+                    type="text"
+                    id="referalCode"
+                    class="form-control form-control-lg"placeholder="referalCode(optonal)" name="referalCode"/>
                 </div>
                 <!-- Register Button -->
                 <div class="d-flex justify-content-center mb-4">
@@ -186,6 +193,7 @@
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
     const cpassword = document.getElementById('cPassword').value.trim();
+    const referalCode = document.getElementById('referalCode').value
 
     if (!userName || !email || !password || !cpassword) {
       Swal.fire({
@@ -226,7 +234,7 @@
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ name: userName, email, password })
+        body: JSON.stringify({ name: userName, email, password,referalCode })
     })
     .then((res) => res.json())
     .then((data) => {

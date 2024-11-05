@@ -2,6 +2,8 @@ const admin=require('../../routes/admin/adminRoutes')
 const user=require('../../models/userModel')
 const bcrypt=require('bcrypt')
 const Order=require('../../models/orderModel')
+const Product = require('../../models/productModel')
+const Category=require('../../models/categoryModel')
 
 //Admin Login Page Loading
 exports.load_AdminPage=async(req,res)=>{
@@ -17,9 +19,11 @@ try {
 //Admin Dashboard Page Loading
 exports.load_AdminDash=async(req,res)=>{
     try {
+      const category = await Category.find({}).sort({saleCount:-1}).limit(10)
+      const product=await Product.find({}).sort({saleCount:-1}).limit(10)
       const orders=await Order.find({}).sort({createdAt:-1}).limit(5)
         if(req.session.isAdmin){
-            res.render('admin/admin_Dashboard',{orders,title:'Admin Dashboard'})
+            res.render('admin/admin_Dashboard',{orders,product,category,title:'Admin Dashboard'})
         }else{
             return res.redirect('/admin')
         }

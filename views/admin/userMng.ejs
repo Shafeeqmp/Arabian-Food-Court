@@ -9,12 +9,17 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
-        /* Sidebar for large screens */
         .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
             background-color: #ffbe33;
             color: #fff;
-            padding-top: 1rem;
+            padding-top: 5rem;
+            width: 16.666667%;
+            overflow-y: auto;
+            z-index: 100;
         }
 
         .sidebar a {
@@ -26,33 +31,122 @@
             background-color: #071553;
         }
 
-        /* Hide sidebar for small screens */
-        @media (max-width: 767px) {
-            .sidebar {
-                display: none;
-            }
-        }
-
-        /* Content padding */
         .content {
+            margin-left: 16.666667%;
             padding: 2rem;
+            margin-top: 3.5rem;
+            width: calc(100% - 16.666667%);
         }
 
-        /* Navbar adjustments */
         .navbar {
-            margin-bottom: 0;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 200; 
+      }
+
+        #couponDetails {
+            display: none;
         }
 
-        /* Sidebar navigation */
-        .navbar-toggler {
+        .date-range {
+            display: none;
+        }
+
+        .chart-container {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+        }
+
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            border-top-left-radius: 15px !important;
+            border-top-right-radius: 15px !important;
+            background: linear-gradient(45deg, #3a7bd5, #00d2ff) !important;
             border: none;
         }
 
-        /* Show sidebar in larger screens */
-        @media (min-width: 768px) {
-            .navbar-collapse {
-                display: none;
+        #salesChart {
+            min-height: 400px;
+            padding: 20px;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        #loadingIndicator {
+            position: relative;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .alert {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
             }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-dismissible .close {
+            padding: 0.5rem 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                height: auto;
+                width: 100%;
+                padding-top: 1rem;
+            }
+            
+            .content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        .sidebar .nav-link {
+            padding: 0.8rem 1rem;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+            margin: 0.2rem 0.5rem;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #071553;
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar .nav-link.active {
+            font-weight: bold;
         }
     </style>
 </head>

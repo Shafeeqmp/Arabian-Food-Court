@@ -356,7 +356,7 @@
                                             <%= order.orderStatus === 'Cancelled' ? 'Cancelled' : 'Cancel' %>
                                         </button>
                                     <% } else { %>
-                                        <button type="button" class="btn btn-outline-danger" onclick="cancelOrder('<%= order.orderId %>', this)" data-toggle="tooltip" data-placement="bottom" title="You Want to Cancel Order">Cancel</button>
+                                        <button type="button" class="btn btn-outline-danger"onclick="cancelOrder('<%= order.orderId %>', this)" data-toggle="tooltip" data-placement="bottom" title="You Want to Cancel Order">Cancel</button>
                                     <% } %>
                                     <!-- Item details button -->
                                     <button class="btn btn-outline-info ms-2" onclick="toggleDetails('<%= index %>')" data-toggle="tooltip" data-placement="bottom" title="Click Item Details" >
@@ -364,7 +364,7 @@
                                     </button>
                                     <!-- Re-payment button -->
                                     <% if (order.paymentStatus === 'Failed') { %>
-                                        <button type="button" onclick="Repayment('<%= order._id %>')" class="btn btn-outline-success ms-2" data-toggle="tooltip" data-placement="bottom" title="Again Your Payment">
+                                        <button type="button" onclick="Repayment('<%= order._id %>')" class="btn btn-outline-success ms-2" data-toggle="tooltip" data-placement="bottom" title="Retry Payment">
                                             <i class="bi bi-arrow-repeat"></i>
                                         </button>
                                         <% } else { %>
@@ -421,6 +421,36 @@
             </table>
         </div>
     </div>
+
+    <!-- Cancel Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="recipient-name" class="col-form-label">Recipient:</label>
+                  <input type="text" class="form-control" id="recipient-name">
+                </div>
+                <div class="form-group">
+                  <label for="message-text" class="col-form-label">Message:</label>
+                  <textarea class="form-control" id="message-text"></textarea>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+              <button type="button" class="btn btn-primary">Send message</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>

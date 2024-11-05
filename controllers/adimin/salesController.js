@@ -143,11 +143,11 @@ function generatePDFReport(data) {
             for (const item of order.items) {
                 const itemTop = doc.y;
                 doc.fontSize(10).fillColor('#000');
-                doc.text(item.productName || 'Unknown Product', 50, itemTop, { width: 200 });
+                doc.text(item.product || 'Unknown Product', 50, itemTop, { width: 200 });
                 doc.text(item.quantity.toString(), 250, itemTop, { width: 30, align: 'center' });
-                doc.text(`Rs. ${item.unitPrice.toFixed(2)}`, 280, itemTop, { width: 80, align: 'right' });
-                doc.text(`Rs. ${item.offerPrice.toFixed(2)}`, 360, itemTop, { width: 80, align: 'right' });
-                doc.text(`Rs. ${item.lineTotal.toFixed(2)}`, 440, itemTop, { width: 80, align: 'right' });
+                doc.text(`${item.unitPrice.toFixed(2)}`, 280, itemTop, { width: 80, align: 'right' });
+                doc.text(`${item.offerPrice.toFixed(2)}`, 360, itemTop, { width: 80, align: 'right' });
+                doc.text(`${item.lineTotal.toFixed(2)}`, 440, itemTop, { width: 80, align: 'right' });
                 doc.moveDown(0.5);
                 orderSubtotal += item.lineTotal;
             }
@@ -239,4 +239,43 @@ function calculateReportData(orders) {
         finalTotal: afterOfferTotal - totalCouponDiscount 
     };
 }
+
+
+
+exports.sales_Chart = async (req, res) => {
+    try {
+      const orderData = await Order.aggregate([
+        {
+          $group: {
+            _id: { $month: "$createdAt" },  
+            orderCount: { $sum: 1 }          
+          }
+        },
+        {
+          $project: {
+            month: {
+              $let: {
+                vars: {
+                  monthsInString: [, 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+                },
+                in: {
+                  $arrayElemAt: ['$$monthsInString', '$_id']
+                }
+              }
+            },
+            orderCount: 1,
+            _id: 0
+          }
+        },
+        { $sort: { _id: -1 } },             
+        { $limit: 5 },                     
+        { $sort: { _id: 1 } }               
+      ]);
+  
+      res.json(orderData);
+    } catch (error) {
+      console.error('Error fetching order data:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  };
 

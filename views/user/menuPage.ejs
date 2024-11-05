@@ -49,6 +49,69 @@
 .logout-link {
   margin-bottom: 8px; /* Space between logout and profile link */
 }
+.rating-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.rating {
+  display: flex;
+  direction: row-reverse;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.star {
+  font-size: 30px;
+  color: #ccc;
+  transition: color 0.3s;
+}
+
+.star.selected,
+.star:hover,
+.star:hover ~ .star {
+  color: #ffcc00;
+}
+
+.rating-container {
+  text-align: center;
+  margin: 10px 0;
+}
+
+.rating {
+  display: inline-block;
+}
+
+.stars {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+}
+
+.star {
+  font-size: 24px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0 2px;
+}
+
+.star:hover,
+.star:hover ~ .star,
+.star.selected {
+  color: #ffcc00;
+}
+
+.rating-info {
+  font-size: 14px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.average-rating,
+.total-ratings {
+  margin: 0 5px;
+}
 
   </style>
 </head>
@@ -251,7 +314,21 @@
                         <%= product.stock > 0 ? `${product.stock} In Stock` : 'Out of Stock' %>
                       </p>
                       <p><%= product.description %></p>
-                      <span class="text-warning">★ ★ ★ ★ ☆</span> (4.5)
+                      <div class="rating-container">
+                        <div class="rating" data-item-id="<%= product._id %>">
+                          <div class="stars">
+                            <span class="star" data-value="5">&#9733;</span>
+                            <span class="star" data-value="4">&#9733;</span>
+                            <span class="star" data-value="3">&#9733;</span>
+                            <span class="star" data-value="2">&#9733;</span>
+                            <span class="star" data-value="1">&#9733;</span>
+                          </div>
+                          <div class="rating-info">
+                            <span class="average-rating"></span>
+                            <span class="total-ratings"></span>
+                          </div>
+                        </div>
+                      </div>
                       <div class="d-flex">
                         <!-- Add to Cart Button -->
                         <div class="btn btn-secondary btn-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
@@ -501,6 +578,62 @@
         });
       }
     }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+  const stars = document.querySelectorAll('.rating .star');
+  const ratingResult = document.getElementById('rating-result');
+  const averageRatingElement = document.getElementById('average-rating');
+  const itemId = document.querySelector('.rating').getAttribute('data-item-id');
+
+  stars.forEach(star => {
+    star.addEventListener('click', function () {
+      const rating = this.getAttribute('data-value');
+
+      // Highlight selected stars
+      stars.forEach(s => s.classList.remove('selected'));
+      this.classList.add('selected');
+      let sibling = this.previousElementSibling;
+      while (sibling) {
+        sibling.classList.add('selected');
+        sibling = sibling.previousElementSibling;
+      }
+
+      // Send rating to server
+      fetch('/submit-rating', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId, rating })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          ratingResult.textContent = `Your rating: ${rating}`;
+          updateAverageRating();
+        } else {
+          ratingResult.textContent = 'Failed to submit rating';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        ratingResult.textContent = 'An error occurred';
+      });
+    });
+  });
+
+  function updateAverageRating() {
+    fetch(`/average-rating?itemId=${itemId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          averageRatingElement.textContent = `Average Rating: ${data.averageRating}`;
+        }
+      });
+  }
+  updateAverageRating();
+});
+
+
 
      
 </script>
