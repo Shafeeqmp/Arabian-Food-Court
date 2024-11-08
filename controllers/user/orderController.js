@@ -9,6 +9,32 @@ const Razorpay=require('../../config/razorPay')
 const crypto = require('crypto');
 const Wishlist=require('../../models/wishlistModel')
 const Wallet=require('../../models/walletModel')
+const InvoiceCounter = require('../../models/invoiceCounterModel');
+
+
+async function generateInvoiceNumber() {
+  try {
+      const currentYear = new Date().getFullYear();
+      let counter = await InvoiceCounter.findOne({ year: currentYear }).exec();
+      
+      if (!counter) {
+          counter = new InvoiceCounter({ 
+              year: currentYear,
+              sequence: 0 
+          });
+      }
+      
+      counter.sequence += 1;
+      await counter.save();
+      
+      // Format: AFC-YYYY-XXXXX (e.g., AFC-2024-00001)
+      const invoiceNumber = `AFC-${currentYear}-${counter.sequence.toString().padStart(5, '0')}`;
+      return invoiceNumber;
+  } catch (error) {
+      console.error('Error generating invoice number:', error);
+      throw error;
+  }
+}
 
 
 exports.place_Order = async (req, res) => {
@@ -75,10 +101,11 @@ exports.place_Order = async (req, res) => {
 
     
     const newOrderId = await generateOrderId();
-
+    const invoiceNumber = await generateInvoiceNumber();
   
     const newOrder = new Order({
       orderId: newOrderId,
+      invoiceNumber:invoiceNumber,
       user: req.session.userId,
       address: addressOrder,
       items: cart.items.map((item) => ({
@@ -167,60 +194,63 @@ exports.getOrderHistory = async (req, res) => {
 
 
 exports.cancelOrder = async (req, res) => {
-    try {
-        const { orderId } = req.params;
-        const userId = req.session.userId;
-        if (!userId) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        const order = await Order.findOne({ orderId, user: userId });
-        if (!order) {
-            return res.status(404).json({ message: "Order not found" });
-        }
-        if (order.orderStatus === 'Cancelled') {
-            return res.status(400).json({ message: "Order is already cancelled" });
-        }
+  try {
+      const { orderId } = req.params;
+      const userId = req.session.userId;
 
-        if (['Shipped', 'Delivered'].includes(order.orderStatus)) {
-            return res.status(400).json({ message: "Cannot cancel order at this stage" });
-        }
+      if (!userId) {
+          return res.status(401).json({ message: "Unauthorized" });
+      }
 
-        order.orderStatus = 'Cancelled';
-        order.orderStatusTimestamps.cancelled = new Date();
+      const order = await Order.findOne({ orderId, user: userId });
+      if (!order) {
+          return res.status(404).json({ message: "Order not found" });
+      }
 
-        for (const item of order.items) {
-            await Product.findByIdAndUpdate(item.product, {
-                $inc: { stock: item.quantity }
-            });
-        }
-        if (order.paymentStatus === "Paid") {
-          const refund = order.totalAmount;
+      if (order.orderStatus === 'Cancelled') {
+          return res.status(400).json({ message: "Order is already cancelled" });
+      }
+
+      if (['Shipped', 'Delivered'].includes(order.orderStatus)) {
+          return res.status(400).json({ message: "Cannot cancel order at this stage" });
+      }
+
+      order.orderStatus = 'Cancelled';
+      order.orderStatusTimestamps.cancelled = new Date();
+      for (const item of order.items) {
+          await Product.findByIdAndUpdate(item.product, {
+              $inc: { stock: item.quantity }
+          });
+      }
+      if (order.paymentStatus === "Paid") {
+          let refund = order.totalAmount;
           let wallet = await Wallet.findOne({ user: userId });
           if (!wallet) {
-            wallet = new Wallet({
-              user: order.user,
-              balanceAmount: 0,
-              wallet_history: [],
-            });
+              wallet = new Wallet({
+                  user: order.user,
+                  balanceAmount: 0,
+                  wallet_history: [],
+              });
           }
           wallet.balanceAmount += refund;
           wallet.wallet_history.push({
-            date: new Date(),
-            amount: refund,
-            description: `Refund for cancelled item (Order ID: ${order.orderId})`,
-            transactionType: "credited",
+              date: new Date(),
+              amount: refund,
+              description: `Refund for cancelled order (Order ID: ${order.orderId})`,
+              transactionType: "credited",
           });
           await wallet.save();
-        }
+      }
 
-        await order.save();
+      await order.save();
 
-        res.status(200).json({ message: "Order cancelled successfully" });
-    } catch (error) {
-        console.error("Error cancelling order:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-    }
+      res.status(200).json({ message: "Order cancelled successfully" });
+  } catch (error) {
+      console.error("Error cancelling order:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+  }
 };
+
 
 
 exports.getOrderStatus = async (req, res) => {
@@ -330,6 +360,7 @@ exports.razorPay_payment = async (req, res) => {
       },
     ];
     const newOrderId = await generateOrderId();
+    const invoiceNumber = await generateInvoiceNumber();
 
 
     const body = `${order_id}|${payment_id}`;
@@ -344,8 +375,8 @@ exports.razorPay_payment = async (req, res) => {
 
     
     const newOrder = new Order({
-
       orderId: newOrderId,
+      invoiceNumber:invoiceNumber,
       user: req.session.userId,
       address: addressOrder,
       items: cart.items.map((item) => ({

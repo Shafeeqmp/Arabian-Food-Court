@@ -122,11 +122,10 @@
                                     <div class="img-container">
                                         <img src="/public/<%= Product.images[i-1] %>" alt="" style="width:100px;height:auto" id="imgview<%= i %>" class="pt-3">
                                     </div>
-                                    <input type="file" name="image<%= i %>" class="form-control image-input" data-target="imgview<%= i %>">
+                                    <input type="file" name="productImage<%= i %>" class="form-control image-input" data-target="imgview<%= i %>">
                                     <input type="hidden" name="croppedImage<%= i %>" id="croppedImage<%= i %>">
                                 </div>
                             <% } %>
-                        
                             <!-- Submit Button -->
                             <button type="submit" class="btn btn-submit mt-4">Submit</button>
                         </form>
@@ -168,8 +167,6 @@
     <script>
         let cropper;
         let currentImageInput;
-
-        // Function to handle file input change
         $('.image-input').on('change', function(event) {
             const file = event.target.files[0];
             currentImageInput = $(this);
@@ -182,8 +179,6 @@
                 reader.readAsDataURL(file);
             }
         });
-
-        // Initialize Cropper when the modal is shown
         $('#cropperModal').on('shown.bs.modal', function () {
             cropper = new Cropper($('#cropperImage')[0], {
                 aspectRatio: 1,
@@ -196,37 +191,38 @@
             cropper = null;
         });
 
-        // Handle crop button click
+
         $('#cropImageBtn').click(function() {
             if (cropper) {
                 const canvas = cropper.getCroppedCanvas({
                     width: 300,
                     height: 300
                 });
-                
-                // Create a new canvas with white background
+
+
                 const whiteCanvas = document.createElement('canvas');
                 whiteCanvas.width = canvas.width;
                 whiteCanvas.height = canvas.height;
                 const ctx = whiteCanvas.getContext('2d');
-                
-                // Fill the canvas with white background
+
+
                 ctx.fillStyle = '#FFFFFF';
                 ctx.fillRect(0, 0, whiteCanvas.width, whiteCanvas.height);
-                
-                // Draw the cropped image on top of the white background
+
+
                 ctx.drawImage(canvas, 0, 0, whiteCanvas.width, whiteCanvas.height);
-                
+
                 const croppedImageData = whiteCanvas.toDataURL('image/jpeg');
                 const targetImgId = currentImageInput.data('target');
                 $(`#${targetImgId}`).attr('src', croppedImageData);
-                
-                // Store the cropped image data in the hidden input
+
+
                 const hiddenInputId = targetImgId.replace('imgview', 'croppedImage');
+
                 $(`#${hiddenInputId}`).val(croppedImageData);
                 
                 $('#cropperModal').modal('hide');
-                // Swal.fire('Success', 'Image cropped successfully with white background!', 'success');
+
             }
         });
 

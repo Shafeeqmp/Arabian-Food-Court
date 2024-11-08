@@ -12,20 +12,32 @@ const { title } = require('process');
 //Load Product Page Section
 exports.load_ProuctPage = async (req, res) => {
   try {
-    if (req.session.isAdmin) {
-      const Product = await product.find().populate('category_id')
-      res.render("admin/productMng",{Product,title:'Product Management' });
-    } else {
-      res.redirect("/admin/loadAdminDash");
-    }
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
+    const totalProducts = await product.countDocuments();
+    const totalPages = Math.ceil(totalProducts / limit);
+    const Product = await product.find()
+        .populate('category_id')
+        .skip(skip)
+        .limit(limit);
+    res.render('admin/productMng', {
+        title: 'Product Management',
+        Product,
+        currentPage: page,
+        totalPages,
+        totalProducts,
+        limit
+    });
   } catch (error) {
-    console.error(error);
-        res.status(500).json({ err: "something went wrong while adding new category" });
+    console.log(error.message);
+    res.status(500).send('Server Error');
   }
-   
-  };
+
+};
+
   
-//Add Product Page Section
+//Add Product Loading Page Section
 exports.addProuct_Page=async (req, res) => {
     if (req.session.isAdmin) {
       const Category = await category.find({isDeleted:false});
@@ -35,11 +47,13 @@ exports.addProuct_Page=async (req, res) => {
     }
   };
 
+
+
 //Add Product Section
 exports. add_Product = async (req, res) => {
   try {
     const { productName, Category_id, description, stock, price } = req.body;
-    const images = req.files || []; // Ensure `images` is always an array
+    const images = req.files || []; 
     const existProduct = await product.findOne({ productname: productName });
     const Category = await category.find({ isDeleted: false });
 
@@ -90,31 +104,34 @@ exports.loadEditProductPage = async (req, res) => {
 };
 
 
-
-
-//Edit Product post Section
-exports. editProduct = async (req, res) => {
-  try {   
+//Edit Product Section
+exports.editProduct = async (req, res) => {
+  try {
     const productId = req.params.id;
-    const { productName, Category_id,price,stock,description} = req.body;
-    const images = req.files;
+    const { productName, Category_id, price, stock, description } = req.body;
+    const comingImages = req.files; 
     const existingProduct = await product.findById(productId);
     if (!existingProduct) {
       return res.status(404).send('Product not found');
     }
+
+    // Update product fields
     existingProduct.productname = productName;
     existingProduct.category_id = Category_id;
     existingProduct.description = description;
     existingProduct.stock = stock;
     existingProduct.price = price;
-    if (images && images.length > 0) {
-      let updatedImages = [];
-      images.forEach(image => {
-        const relativePath = image.path.replace(/^.*[\\\/]public[\\\/]uploads[\\\/]/, '/uploads/');
-        updatedImages.push(relativePath);
+    let updatedImages = existingProduct.images ? [...existingProduct.images] : [];
+    if (comingImages && comingImages.length > 0) {
+      comingImages.forEach(image => {
+        const index = parseInt(image.fieldname.split('productImage')[1], 10) - 1;
+        if (index >= 0 && index < updatedImages.length) {
+          const relativePath = image.path.replace(/^.*[\\\/]public[\\\/]uploads[\\\/]/, '/uploads/');
+          updatedImages[index] = relativePath;
+        }
       });
-      existingProduct.images = updatedImages;
     }
+    existingProduct.images = updatedImages;
     await existingProduct.save();
     res.redirect('/admin/loadProuctPage');
   } catch (error) {
@@ -123,6 +140,9 @@ exports. editProduct = async (req, res) => {
   }
 };
 
+
+
+//Delete Product sction
 exports. delete_Product = async (req, res) => {
   if (req.session.isAdmin) {
 
@@ -141,6 +161,7 @@ exports. delete_Product = async (req, res) => {
 
 
 
+//Restore Product Section
 exports. restore_Product = async (req, res) => {
   if (req.session.isAdmin) {
     try {
