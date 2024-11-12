@@ -92,7 +92,7 @@ const orderSchema = new mongoose.Schema({
     discountAmount: {
         type: Number
     },
-    offerPercentage: {
+    offerAmount: {
         type: Number,
         default: 0
     },

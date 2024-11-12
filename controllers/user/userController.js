@@ -459,7 +459,23 @@ exports. resendOtp = async (req, res) => {
       const { id } = req.params; 
       const Product = await product.findById(id).populate('category_id').populate('offer') 
       const Category=await product.find({category_id:Product.category_id._id}).populate('offer')
-      res.render('user/single-product', { Product,Category});
+      const user = await User.findById(req.session.userId).lean();
+      const cart = await Cart.findOne({ user: user._id }).populate("items.product");
+      const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
+
+      let cartCount = 0;
+        if (cart && cart.items && cart.items.length > 0) {
+           cart.items.forEach(item => {
+           cartCount += item.quantity; 
+        });
+    }
+
+    let wishlistCount=0
+    if(wishlist){
+        wishlistCount=wishlist.items.length
+    }
+
+      res.render('user/single-product', { Product,Category,cartCount,wishlistCount,user});
     } catch (err) {
       console.error(err);
       res.redirect('/userHomePage');

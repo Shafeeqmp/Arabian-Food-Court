@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const Wishlist=require('../../models/wishlistModel')
 const Wallet=require('../../models/walletModel')
 const InvoiceCounter = require('../../models/invoiceCounterModel');
+const Offer=require('../../models/offerModel')
 
 
 async function generateInvoiceNumber() {
@@ -80,6 +81,13 @@ exports.place_Order = async (req, res) => {
       }
     }
    
+
+      const product=await Product.findOne({isDelete:false}).populate('offer') 
+      if(product){
+        offerAmount=(product.price * product.offer.offerPercentage)/100
+      }
+
+   
     if(totalAmount > 1000){
       return res.json({success:false,message:'above 1000 is not allowed cash of delivery'})
     }
@@ -116,6 +124,7 @@ exports.place_Order = async (req, res) => {
       paymentMethod: paymentMethod,
       totalAmount: totalAmount,
       discountAmount: discountAmount,
+      offerAmount:offerAmount,
       orderStatus: 'Pending',
       orderStatusTimestamps: {
         pending: new Date(),
@@ -348,6 +357,11 @@ exports.razorPay_payment = async (req, res) => {
       }
     }
 
+    const product=await Product.findOne({isDelete:false}).populate('offer') 
+      if(product){
+        offerAmount=(product.price * product.offer.offerPercentage)/100
+      }
+
     const addressOrder = [
       {
         fullName: address.fullName,
@@ -386,6 +400,7 @@ exports.razorPay_payment = async (req, res) => {
       })),
       paymentMethod: paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer',
       totalAmount: totalAmount,
+      offerAmount:offerAmount,
       discountAmount: discountAmount,
       paymentStatus: paymentVerified ? 'Paid' : 'Failed',
       orderStatusTimestamps: {

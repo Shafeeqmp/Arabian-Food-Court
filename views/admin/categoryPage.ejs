@@ -302,6 +302,62 @@
             </main>
         </div>
     </div>
+    <div class="pagination-container">
+        <div class="pagination-wrapper">
+            <!-- Showing Entries -->
+            <div class="showing-entries text-muted">
+                Showing <%= (currentPage - 1) * limit + 1 %> to <%= Math.min(currentPage * limit, totalcategory) %> of <%= totalcategory %> entries
+            </div>
+        
+            <!-- Pagination Navigation -->
+            <nav aria-label="Order pagination">
+                <ul class="pagination mb-0">
+                    <!-- Previous button -->
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>Previous</a>
+                    </li>
+                    
+                    <!-- First Page -->
+                    <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
+                        <a class="page-link" href="?page=1">1</a>
+                    </li>
+        
+                    <!-- Left Ellipsis -->
+                    <% if (currentPage > 3) { %>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <% } %>
+        
+                    <!-- Pages around current page -->
+                    <% for(let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Right Ellipsis -->
+                    <% if (currentPage < totalPages - 2) { %>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <% } %>
+        
+                    <!-- Last Page -->
+                    <% if (totalPages > 1) { %>
+                        <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Next button -->
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
 
     <!-- JavaScript -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>

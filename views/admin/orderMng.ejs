@@ -149,6 +149,51 @@
         .sidebar .nav-link.active {
             font-weight: bold;
         }
+
+        .showing-entries {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination .page-link {
+            border-radius: 5px;
+        }
+
+        .pagination .page-item.active .page-link {
+            background-color: #007bff;
+            color: #fff;
+            border-color: #007bff;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #6c757d;
+        }
+
+        .pagination-container {
+            width: calc(100% - 16.666667%);
+            padding: 0 2rem;
+            margin-left: 16.666667%;
+            margin-bottom: 2rem;
+        }
+
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .pagination-container {
+                width: 100%;
+                margin-left: 0;
+                padding: 0 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -246,7 +291,7 @@
                 <!-- User Table -->
 
                 <div class="container mt-4">
-    <table class="table table-striped">
+     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Order ID</th>
@@ -265,7 +310,7 @@
                     <td><%= order.orderId %></td>
                     <td><%= order.createdAt.toLocaleDateString() %></td>
                     <td><%= order.user.name %></td>
-                    <td>$<%= order.totalAmount.toFixed(2) %></td>
+                    <td>₹<%= order.totalAmount.toFixed(2) %></td>
                     <td><%= order.paymentMethod %></td>
                     <td><%= order.paymentStatus %></td>
                     
@@ -286,9 +331,65 @@
             <% }); %>
            </tbody>
         </table>
-         </div>
+     </div>
+     </div>
+     </div>
     </div>
-    </div>
+    <div class="pagination-container">
+        <div class="pagination-wrapper">
+            <!-- Showing Entries -->
+            <div class="showing-entries text-muted">
+                Showing <%= (currentPage - 1) * limit + 1 %> to <%= Math.min(currentPage * limit, totalOrder) %> of <%= totalOrder %> entries
+            </div>
+        
+            <!-- Pagination Navigation -->
+            <nav aria-label="Order pagination">
+                <ul class="pagination mb-0">
+                    <!-- Previous button -->
+                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage - 1 %>" <%= currentPage === 1 ? 'tabindex="-1" aria-disabled="true"' : '' %>>Previous</a>
+                    </li>
+                    
+                    <!-- First Page -->
+                    <li class="page-item <%= currentPage === 1 ? 'active' : '' %>">
+                        <a class="page-link" href="?page=1">1</a>
+                    </li>
+        
+                    <!-- Left Ellipsis -->
+                    <% if (currentPage > 3) { %>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <% } %>
+        
+                    <!-- Pages around current page -->
+                    <% for(let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) { %>
+                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Right Ellipsis -->
+                    <% if (currentPage < totalPages - 2) { %>
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    <% } %>
+        
+                    <!-- Last Page -->
+                    <% if (totalPages > 1) { %>
+                        <li class="page-item <%= currentPage === totalPages ? 'active' : '' %>">
+                            <a class="page-link" href="?page=<%= totalPages %>"><%= totalPages %></a>
+                        </li>
+                    <% } %>
+        
+                    <!-- Next button -->
+                    <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                        <a class="page-link" href="?page=<%= currentPage + 1 %>" <%= currentPage === totalPages ? 'tabindex="-1" aria-disabled="true"' : '' %>>Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
     </div>
 
     

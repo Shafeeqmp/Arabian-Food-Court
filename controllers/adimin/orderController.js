@@ -9,13 +9,34 @@ const { setDefaultHighWaterMark } = require('nodemailer/lib/xoauth2');
 
 exports.loard_OrderMng = async (req, res) => {
     try {
-        const orders = await Order.find().populate('user', 'name email').populate('items.product').populate('address').sort({ createdAt: -1 });
-        res.render('admin/orderMng', { orders,title:'Order Management' });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 6;
+        const skip = (page - 1) * limit;
+        const totalOrder = await Order.countDocuments();
+        const totalPages = Math.ceil(totalOrder / limit);
+        const orders = await Order.find()
+            .populate('user', 'name email')
+            .populate('items.product')
+            .populate('address')
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        // Render the order management view
+        res.render('admin/orderMng', {
+            orders,
+            title: 'Order Management',
+            currentPage: page,
+            totalPages,
+            totalOrder,
+            limit
+        });
     } catch (error) {
         console.error('Error loading orders:', error);
         res.status(500).render('admin/error', { error: 'Failed to load orders' });
     }
 };
+
 
 exports.getOrderDetails = async (req, res) => {
     try {

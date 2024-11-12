@@ -8,7 +8,21 @@ exports. load_CategoryPage=async(req,res)=>{
     try {
        if(req.session.isAdmin){
         const catData = await category.find();
-           res.render('admin/categoryPage',{catData,title:'Category Management'})
+        const page = parseInt(req.query.page) || 1;
+        const limit = 6;
+        const skip = (page - 1) * limit;
+        const totalcategory = await category.countDocuments();
+        const totalPages = Math.ceil(totalcategory / limit);
+        const Category = await category.find().skip(skip).limit(limit);
+           res.render('admin/categoryPage',{
+            catData,
+            Category,
+            title:'Category Management',
+            totalcategory,
+            totalPages,
+            currentPage: page,
+            limit
+           })
        } else{
         res.redirect('/admin')
        }

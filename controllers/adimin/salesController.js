@@ -17,20 +17,24 @@ exports.generateSalesReport = async (req, res) => {
         const orders = await Order.find({
             placedAt: { $gte: start, $lte: end }
         }).populate('user', 'username email')
-          .populate('items.product', 'product_name category')
+          .populate('items.product', 'productname category')
           .sort({ placedAt: -1 });
-         
+    
         if (orders.length === 0) {
             return res.status(404).json({ message: 'No orders found for the specified date range' });
         }
         const reportData = calculateReportData(orders);
+        
+        
+        reportData.startDate = startDate;
+        reportData.endDate = endDate;
 
         reportData.orders = orders.map(order => ({
             orderId: order.orderId,
             orderDate: order.placedAt,
             userName: order.user ? (order.user.username || order.user.email) : 'Unknown User', 
             items: order.items.map(item => ({
-                productName: item.product ? item.product.product_name : 'Unknown Product',
+                productName: item.product ? item.product.productname : 'Unknown Product',
                 quantity: item.quantity,
                 unitPrice: item.price / item.quantity,
                 offerPrice: item.discountAmount || item.price,
@@ -75,107 +79,118 @@ function generatePDFReport(data) {
             resolve(pdfData);
         });
 
-        // Title and Header
-        doc.fontSize(22).fillColor('#333').text('Sales Report', { align: 'center', underline: true });
-        doc.moveDown(2);
-
-        // Divider
-        generateHr(doc, doc.y + 10);
-
-        // Sales Information
-        doc.fontSize(14).fillColor('#000').text('Summary:', { underline: true });
-        doc.moveDown(1);
+        // Header
+        doc.rect(0, 0, doc.page.width, 40).fill('#1a237e');
+        doc.fontSize(16).fillColor('#FFFFFF')
+           .text('SALES REPORT', 50, 12, { align: 'center' });
         
-        const summaryData = [
-            { label: 'Total Orders:', value: data.totalOrders },
-            { label: 'Original Total:', value: `Rs. ${data.originalTotal.toFixed(2)}` },
-            { label: 'Offer Discount:', value: `Rs. ${data.offerDiscount.toFixed(2)}` },
-            { label: 'Total After Offers:', value: `Rs. ${data.afterOfferTotal.toFixed(2)}` },
-            { label: 'Coupon Discount:', value: `Rs. ${data.totalCouponDiscount.toFixed(2)}` },
-            { label: 'Final Total:', value: `Rs. ${data.finalTotal.toFixed(2)}` }
-        ];
+        // Date Range
+        doc.fontSize(10).fillColor('#000')
+           .text(`Period: ${new Date(data.startDate).toLocaleDateString()} - ${new Date(data.endDate).toLocaleDateString()}`, 
+                 50, 50, { align: 'right' });
+
+        // Summary Cards
+        const summaryY = 70;
+        const cardWidth = 158;
+        const cardSpacing = 10;
         
-        
-     
-        
+        // Total Orders Card
+        doc.rect(50, summaryY, cardWidth, 60).fill('#f8f9fa').stroke('#e0e0e0');
+        doc.fontSize(12).fillColor('#666')
+           .text('TOTAL ORDERS', 60, summaryY + 10);
+        doc.fontSize(20).fillColor('#1a237e')
+           .text(data.totalOrders.toString(), 60, summaryY + 30);
 
+        // Total Revenue Card
+        doc.rect(50 + cardWidth + cardSpacing, summaryY, cardWidth, 60).fill('#f8f9fa').stroke('#e0e0e0');
+        doc.fontSize(12).fillColor('#666')
+           .text('TOTAL REVENUE', 60 + cardWidth + cardSpacing, summaryY + 10);
+        doc.fontSize(20).fillColor('#1a237e')
+           .text(`${data.finalTotal.toFixed(2)}`, 60 + cardWidth + cardSpacing, summaryY + 30);
 
-        summaryData.forEach((item, index) => {
-            doc.fontSize(12)
-               .text(item.label, 50, doc.y)
-               .text(item.value, 200, doc.y - 12, { align: 'left' });
-            if (index < summaryData.length - 1) doc.moveDown(0.5);
-        });
+        // Total Savings Card (Offers + Coupons)
+        const totalSavings = data.offerDiscount + data.totalCouponDiscount;
+        doc.rect(50 + (cardWidth + cardSpacing) * 2, summaryY, cardWidth, 60).fill('#f8f9fa').stroke('#e0e0e0');
+        doc.fontSize(12).fillColor('#666')
+           .text('TOTAL SAVINGS', 60 + (cardWidth + cardSpacing) * 2, summaryY + 10);
+        doc.fontSize(20).fillColor('#2e7d32')  // Green color for savings
+           .text(`${totalSavings.toFixed(2)}`, 60 + (cardWidth + cardSpacing) * 2, summaryY + 30);
 
-        generateHr(doc, doc.y + 20);
+        doc.moveDown(4);
 
-        // Detailed Order Section
-        doc.fontSize(14).fillColor('#000').text('Detailed Order List:', { underline: true });
-        doc.moveDown(1);
+        // Orders Section with Items Detail
+        data.orders.forEach((order, orderIndex) => {
+            if (doc.y > 700) doc.addPage();
 
-        for (const order of data.orders) {
-            // Add Order header
-            doc.fontSize(12).fillColor('#333')
-               .text(`Order ID: ${order.orderId}`, 50, doc.y)
-               .text(`Order Date: ${new Date(order.orderDate).toLocaleDateString()}`, 400, doc.y - 12, { align: 'right' });
-            doc.moveDown(0.5);
-            doc.text(`User: ${order.userName}`, 50, doc.y); // Add this line
-            doc.moveDown(0.5);
-
-            // Table header
-            const tableTop = doc.y;
-            doc.fontSize(10).fillColor('#555');
-            [
-                { text: 'Item', x: 50, width: 200 },
-                { text: 'Qty', x: 250, width: 30, align: 'center' },
-                { text: 'Unit Price', x: 280, width: 80, align: 'right' },
-                { text: 'Offer Price', x: 360, width: 80, align: 'right' },
-                { text: 'Line Total', x: 440, width: 80, align: 'right' }
-            ].forEach(header => {
-                doc.text(header.text, header.x, tableTop, { width: header.width, align: header.align || 'left' });
-            });
-
-            generateHr(doc, doc.y + 10);
-            doc.moveDown(0.5);
-
-            // Add each item in the order
-            let orderSubtotal = 0;
-            for (const item of order.items) {
-                const itemTop = doc.y;
-                doc.fontSize(10).fillColor('#000');
-                doc.text(item.product || 'Unknown Product', 50, itemTop, { width: 200 });
-                doc.text(item.quantity.toString(), 250, itemTop, { width: 30, align: 'center' });
-                doc.text(`${item.unitPrice.toFixed(2)}`, 280, itemTop, { width: 80, align: 'right' });
-                doc.text(`${item.offerPrice.toFixed(2)}`, 360, itemTop, { width: 80, align: 'right' });
-                doc.text(`${item.lineTotal.toFixed(2)}`, 440, itemTop, { width: 80, align: 'right' });
-                doc.moveDown(0.5);
-                orderSubtotal += item.lineTotal;
-            }
-
-            // Order total and coupon
-            generateHr(doc, doc.y + 5);
-            doc.moveDown(0.5);
+            // Order Header Box
+            const orderY = doc.y;
+            doc.rect(50, orderY, 495, 35).fill('#f8f9fa');
+            
+            // Order Header Info
             doc.fontSize(10).fillColor('#333');
-            doc.text(`Subtotal: Rs. ${orderSubtotal.toFixed(2)}`, 350, doc.y, { width: 150, align: 'right' });
-            if (order.couponCode) {
-                doc.moveDown(0.5);
-                doc.text(`Coupon (${order.couponCode}): -Rs. ${order.couponDiscount.toFixed(2)}`, 350, doc.y, { width: 150, align: 'right' });
-            }
-            doc.moveDown(0.5);
-            doc.fontSize(12).fillColor('#000');
-            doc.text(`Total: Rs. ${order.totalAmount.toFixed(2)}`, 350, doc.y, { width: 150, align: 'right' });
+            doc.text(`Order ID: ${order.orderId}`, 60, orderY + 10);
+            doc.text(`Date: ${new Date(order.orderDate).toLocaleDateString()}`, 200, orderY + 10);
+            doc.text(`Time: ${new Date(order.orderDate).toLocaleTimeString()}`, 340, orderY + 10);
+            doc.text(`Customer: ${order.userName}`, 60, orderY + 20);
 
             doc.moveDown(2);
-        }
+
+            // Items Table Header
+            const tableTop = doc.y;
+            doc.rect(50, tableTop, 495, 20).fill('#e3f2fd');
+            
+            // Column Headers
+            doc.fontSize(9).fillColor('#1a237e');
+            doc.text('PRODUCT', 60, tableTop + 6, { width: 200 });
+            doc.text('QTY', 270, tableTop + 6, { width: 50, align: 'center' });
+            doc.text('UNIT PRICE', 330, tableTop + 6, { width: 80, align: 'right' });
+            doc.text('TOTAL', 420, tableTop + 6, { width: 80, align: 'right' });
+
+            // Items Detail
+            let currentY = tableTop + 20;
+            order.items.forEach((item, index) => {
+                doc.rect(50, currentY, 495, 25)
+                   .fill(index % 2 === 0 ? '#ffffff' : '#f5f5f5');
+                
+                doc.fontSize(9).fillColor('#444');
+                doc.text(item.productName, 60, currentY + 8, { width: 200 });
+                doc.text(item.quantity.toString(), 270, currentY + 8, { width: 50, align: 'center' });
+                doc.text(`${item.unitPrice.toFixed(2)}`, 330, currentY + 8, { width: 80, align: 'right' });
+                doc.text(`${item.lineTotal.toFixed(2)}`, 420, currentY + 8, { width: 80, align: 'right' });
+
+                currentY += 25;
+            });
+
+            // Order Summary Box
+            doc.rect(50, currentY, 495, order.couponCode ? 75 : 50).fill('#f8f9fa');
+            
+            // Summary Details
+            doc.fontSize(9).fillColor('#666');
+            doc.text('Subtotal:', 350, currentY + 10, { width: 70, align: 'right' });
+            doc.fillColor('#333')
+               .text(`${order.subtotal.toFixed(2)}`, 420, currentY + 10, { width: 80, align: 'right' });
+
+            if (order.couponCode) {
+                doc.fillColor('#666')
+                   .text(`Coupon Applied (${order.couponCode}):`, 350, currentY + 25, { width: 70, align: 'right' });
+                doc.fillColor('#ff4444')
+                   .text(`-${order.couponDiscount.toFixed(2)}`, 420, currentY + 25, { width: 80, align: 'right' });
+                currentY += 15;
+            }
+
+            doc.fontSize(10).fillColor('#1a237e')
+               .text('Total Amount:', 350, currentY + 40, { width: 70, align: 'right' });
+            doc.fillColor('#1a237e')
+               .text(`${order.totalAmount.toFixed(2)}`, 420, currentY + 40, { width: 80, align: 'right' });
+
+            doc.moveDown(3);
+        });
 
         // Footer
-        const footerPosition = doc.page.height - 50;
-        doc.fontSize(10).fillColor('#888')
-           .text('Generated on: ' + new Date().toLocaleDateString(), 50, footerPosition, { align: 'center', width: 500 });
-        
-        doc.fontSize(10).text('Thank you for your business!', { align: 'center', width: 500 });
+        doc.fontSize(8).fillColor('#666')
+           .text(`Generated on: ${new Date().toLocaleString()}`, 50, doc.page.height - 20, 
+                { align: 'center', width: 495 });
 
-        // Finalize PDF file
         doc.end();
     });
 }
@@ -196,17 +211,17 @@ async function generateExcelReport(data) {
     const worksheet = workbook.addWorksheet('Sales Report');
 
     worksheet.columns = [
-        { header: 'Metric', key: 'metric', width: 30 },
+        { header: 'Details', key: 'Details', width: 30 },
         { header: 'Value', key: 'value', width: 15 }
     ];
 
     worksheet.addRows([
-        { metric: 'Total Orders', value: data.totalOrders },
-        { metric: 'Original Total', value: data.originalTotal },
-        { metric: 'Offer Discount', value: data.offerDiscount },
-        { metric: 'Total After Offers', value: data.afterOfferTotal },
-        { metric: 'Coupon Discount', value: data.totalCouponDiscount },
-        { metric: 'Final Total', value: data.finalTotal }
+        { Details: 'Total Orders', value: data.totalOrders },
+        { Details: 'Original Total', value: data.originalTotal },
+        { Details: 'Offer Discount', value: data.offerDiscount },
+        { Details: 'Total After Offers', value: data.afterOfferTotal },
+        { Details: 'Coupon Discount', value: data.totalCouponDiscount },
+        { Details: 'Final Total', value: data.finalTotal }
     ]);
 
     return await workbook.xlsx.writeBuffer();
@@ -216,6 +231,7 @@ function calculateReportData(orders) {
     let originalTotal = 0;
     let afterOfferTotal = 0;
     let totalCouponDiscount = 0;
+    let totalofferDiscount=0
     let finalTotal = 0;
 
     orders.forEach(order => {
@@ -223,17 +239,20 @@ function calculateReportData(orders) {
         const afterOfferOrderTotal = order.items.reduce((sum, item) => 
             sum + ((item.discountAmount || item.price) * item.quantity), 0);
         const couponDiscount = order.discountAmount || 0;
-        
+        const offerdiscount = order.offerAmount || 0;
         originalTotal += originalOrderTotal;
         afterOfferTotal += afterOfferOrderTotal;
-        totalCouponDiscount += couponDiscount;  
+        totalCouponDiscount += couponDiscount; 
+        totalofferDiscount +=offerdiscount; 
         finalTotal += order.totalAmount;
     });
+    
+    
 
     return {
         totalOrders: orders.length,
-        originalTotal,
-        offerDiscount: originalTotal - afterOfferTotal,
+        originalTotal:originalTotal+totalofferDiscount,
+        offerDiscount: totalofferDiscount,
         afterOfferTotal,
         totalCouponDiscount,
         finalTotal: afterOfferTotal - totalCouponDiscount 

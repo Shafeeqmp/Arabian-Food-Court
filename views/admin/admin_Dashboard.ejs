@@ -625,7 +625,7 @@
           table.innerHTML = `
               <thead>
                   <tr>
-                      <th>Metric</th>
+                      <th>Details</th>
                       <th>Value</th>
                   </tr>
               </thead>
@@ -636,9 +636,6 @@
                   <tr><td>Total After Offers</td><td>₹${(data.afterOfferTotal || 0).toFixed(2)}</td></tr>
                   <tr><td>Coupon Discount</td><td>₹${(data.totalCouponDiscount || 0).toFixed(2)}</td></tr>
                   <tr><td>Final Total</td><td>₹${(data.finalTotal || 0).toFixed(2)}</td></tr>
-                  <tr><td>Online Payments</td><td>${data.onlinePayments || 0}</td></tr>
-                  <tr><td>COD Payments</td><td>${data.codPayments || 0}</td></tr>
-                  <tr><td>Wallet Payments</td><td>${data.walletPayments || 0}</td></tr>
               </tbody>
           `;
       
@@ -668,11 +665,11 @@
               const currentDate = new Date().toISOString().slice(0, 10);
               const fileName = `sales_report_${currentDate}.xlsx`;
               
-              // Convert blob to array buffer and create workbook
+              
               blob.arrayBuffer().then(data => {
                   const workbook = new ExcelJS.Workbook();
                   workbook.xlsx.load(data).then(() => {
-                      // Save the workbook
+
                       workbook.xlsx.writeBuffer().then(buffer => {
                           const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                           const url = window.URL.createObjectURL(blob);
@@ -687,7 +684,7 @@
                   });
               });
           } else {
-              // Handle PDF download
+             
               const url = window.URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;
@@ -701,7 +698,7 @@
       
       
       
-      // Add quick date range selection
+     
       const quickRanges = {
           'today': () => {
               const today = new Date();

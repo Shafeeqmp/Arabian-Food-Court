@@ -66,15 +66,28 @@ exports.admin_Dashboard = async (req, res) => {
   
 
 //User Manage Page Loading
-exports.load_userMng=async(req,res)=>{
-    try {
-          const userdata = await user.find({ isAdmin: false });
-          res.render("admin/userMng", { userdata, title: "User Management" });
-       
-      } catch (error) {
-        console.log(error);
-      }
-} 
+exports.load_userMng = async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = 6;
+    const skip = (page - 1) * limit;
+    const totalUser = await user.countDocuments({ isAdmin: false });
+    const totalPages = Math.ceil(totalUser / limit);
+    const users = await user.find({ isAdmin: false }).skip(skip).limit(limit);
+    res.render("admin/userMng", {
+      userdata: users,
+      title: "User Management",
+      currentPage: page,
+      totalPages,
+      totalUser,
+      limit
+    });
+  } catch (error) {
+    console.error("Error loading user management page:", error);
+    res.status(500).send("An error occurred while loading user data.");
+  }
+};
+
 
 //User Block Sectioin
 exports.block_user=async(req,res)=>{

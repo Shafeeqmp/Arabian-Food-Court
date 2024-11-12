@@ -7,21 +7,3 @@
     <label class="form-check-label" for="card">Wallet</label>
 </div>
 
-<script>
-let existingVariant = product.variants[i] || {}; 
-let variantImages = existingVariant.images ? [...existingVariant.images] : [];
-
-
-if (images && images.length > 0) {
-  images.forEach((image) => {
-    if (image.fieldname.startsWith(`productImage${i + 1}`)) {
-      const imageIndex = parseInt(image.fieldname.replace(`productImage${i + 1}-`, ''), 10) - 1;
-      if (variantImages[imageIndex]) {
-        variantImages[imageIndex] = image.path; 
-      } else {
-        variantImages.push(image.path); 
-      }
-    }
-  });
-}
-</script>
