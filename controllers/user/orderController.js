@@ -39,38 +39,49 @@ async function generateInvoiceNumber() {
 
 
 exports.place_Order = async (req, res) => {
+ 
+  
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
-
+   
     const { addressId, couponCode } = req.body;
     let { paymentMethod } = req.body;
     const address = await Address.findById(addressId);
 
-  
+   
     paymentMethod = paymentMethod === 'cod' ? 'Cash on Delivery' : 'Bank Transfer';
 
-   
+    
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ success: false, message: "Cart is empty" });
+      return res.json({ success: false, message: "Cart is empty" });
     }
-
-    
+  
     for (const item of cart.items) {
       const product = item.product;
-      if (product.stock < item.quantity) {
-        return res.status(400).json({
+      if(product.isDelete){
+  
+        return res.json({
           success:false,
-          message: `Insufficient stock for ${product.product_name}. Only ${product.stock} left in stock.`,
+          message: `product is unavailable`,
+        });
+        
+      }
+    
+      if (product.stock < item.quantity) {
+       
+        return res.json({
+          success:false,
+          message: 'Insufficient stock' ,
         });
       }
     }
-
-  
+   
     let totalAmount = cart.total_price;
     let discountAmount = 0;
+    let offerAmount=0
 
     if (couponCode) {
       const coupon = await Coupon.findOne({ coupon_code: couponCode, isDeleted: false });
@@ -80,18 +91,17 @@ exports.place_Order = async (req, res) => {
         totalAmount -= discountAmount;
       }
     }
-   
-
-      const product=await Product.findOne({isDelete:false}).populate('offer') 
-      if(product){
-        offerAmount=(product.price * product.offer.offerPercentage)/100
+    
+      const product=await Product.findOne({isDelete:false}).populate('offer')
+       
+      if(product.offer){
+        offerAmount=product.price * (product.offer.offerPercentage)/100
       }
-
-   
+      
     if(totalAmount > 1000){
       return res.json({success:false,message:'above 1000 is not allowed cash of delivery'})
     }
-    
+   
 
     const addressOrder = [
       {
@@ -130,7 +140,7 @@ exports.place_Order = async (req, res) => {
         pending: new Date(),
       },
     });
-
+    
     await newOrder.save();
 
     // Update product stock
@@ -139,7 +149,7 @@ exports.place_Order = async (req, res) => {
       product.stock -= item.quantity;
       await product.save();
     }
-
+    
     // Clear the user's cart after placing the order
     await Cart.deleteOne({ user: req.session.userId });
 
@@ -150,6 +160,7 @@ exports.place_Order = async (req, res) => {
       order: newOrder,
       discountAmount: discountAmount > 0 ? `Discount Applied: ₹${discountAmount}` : "No Discount",
     });
+    
   } catch (error) {
     console.error("Error placing order:", error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -285,16 +296,25 @@ exports.razor_PayOrderCreate = async (req, res) => {
     const { addressId, couponCode, paymentMethod } = req.body;
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
-      
-      return res.status(400).json({ success: false, message: 'Cart is empty' });
+      return res.json({ success: false, message: "Cart is empty" });
     }
+  
     for (const item of cart.items) {
       const product = item.product;
+      if(product.isDelete){
+  
+        return res.json({
+          success:false,
+          message: `product is unavailable`,
+        });
+        
+      }
+    
       if (product.stock < item.quantity) {
-
-        return res.status(400).json({
-          success: false,
-          message: `Insufficient stock for ${product.product_name}. Only ${product.stock} left in stock.`,
+       
+        return res.json({
+          success:false,
+          message: 'Insufficient stock' ,
         });
       }
     }
@@ -340,15 +360,34 @@ exports.razorPay_payment = async (req, res) => {
 
 
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
-
-
     if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ success: false, message: 'Cart is empty' });
+      return res.json({ success: false, message: "Cart is empty" });
+    }
+  
+    for (const item of cart.items) {
+      const product = item.product;
+      if(product.isDelete){
+  
+        return res.json({
+          success:false,
+          message: `product is unavailable`,
+        });
+        
+      }
+    
+      if (product.stock < item.quantity) {
+       
+        return res.json({
+          success:false,
+          message: 'Insufficient stock' ,
+        });
+      }
     }
 
   
     let totalAmount = cart.total_price;
     let discountAmount = 0;
+    let offerAmount = 0;
     if (couponCode) {
       const coupon = await Coupon.findOne({ coupon_code: couponCode, isDeleted: false });
       if (coupon) {
@@ -358,9 +397,11 @@ exports.razorPay_payment = async (req, res) => {
     }
 
     const product=await Product.findOne({isDelete:false}).populate('offer') 
-      if(product){
+      if(product.offer){
         offerAmount=(product.price * product.offer.offerPercentage)/100
       }
+
+      
 
     const addressOrder = [
       {

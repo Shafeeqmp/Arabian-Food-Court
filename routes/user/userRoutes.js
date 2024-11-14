@@ -63,6 +63,7 @@ userRouter.post('/placeOrder',userAuth,orderController.place_Order);
 userRouter.get('/orderHistory',userAuth,orderController.getOrderHistory);
 userRouter.post('/orders/:orderId',userAuth,orderController.cancelOrder);
 userRouter.get('/order-status/:orderId',userAuth,orderController.getOrderStatus);
+userRouter.get('/loadCheckoutPage',userAuth,cartController.load_CheckoutPage)
 
 
 //Coupon section
@@ -84,6 +85,7 @@ userRouter.post('/remove-Wishlist-Item',userAuth,wishlistController.remove_Wishl
 userRouter.get('/loadWalletPage',userAuth,walletController.load_walletPage)
 userRouter.post('/addFund',userAuth,walletController.addFund)
 userRouter.post('/verifyPayment',userAuth,walletController.verifyPayment)
+userRouter.post('/orderWallet',userAuth,walletController.Order_Wallet)
 
 
 //sales invoice
