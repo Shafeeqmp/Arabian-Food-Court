@@ -125,18 +125,35 @@ exports.load_walletPage=async(req,res)=>{
 };
 
 
-exports.verifyPayment = async (req,res)=>{
+exports.verifyPayment = async (req, res) => {
+  try {
+    // First check if user is authenticated
+    if (!req.session || !req.session.userId) {
+      return res.status(401).json({
+        success: false,
+        message: "User not authenticated"
+      });
+    }
 
-  
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } = req.body;
+    const userId = req.session.userId;
+    const user = await User.findById(userId);
+    
+    // Check if user exists
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
 
-const expectedSignature = crypto
-    .createHmac("sha256", process.env.RAZOR_PAY_KEY_SECRET)
-    .update(razorpay_order_id + "|" + razorpay_payment_id)
-    .digest("hex");
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, amount } = req.body;
+
+    const expectedSignature = crypto
+        .createHmac("sha256", process.env.RAZOR_PAY_KEY_SECRET)
+        .update(razorpay_order_id + "|" + razorpay_payment_id)
+        .digest("hex");
     if (expectedSignature === razorpay_signature) {
       try {
-          const user = await User.findOne({email:req.session.email}) 
           const wallet = await Wallet.findOne({ user: user._id });
 
           if (wallet) {
@@ -168,7 +185,13 @@ const expectedSignature = crypto
       });
   }
 
-
+  } catch (error) {
+    console.error('Full error details:', error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error"
+    });
+  }
 }
 
 

@@ -61,8 +61,8 @@ exports.postCart_Page = async (req, res) => {
       if (newQuantity > 5) {
         return res.status(400).json({ success: false, message: "Maximum quantity reached" });
       }
-      
-      
+
+
       existingItem.quantity = newQuantity;
       existingItem.price = actualPrice * newQuantity;
     } else {
@@ -80,6 +80,60 @@ exports.postCart_Page = async (req, res) => {
     res.status(500).json({ success: false, message: "Something went wrong!" });
   }
 };
+
+
+
+exports.checkOutPage= async(req,res)=>{ 
+  try {
+    const user = await User.findById(req.session.userId).lean();
+    if (!req.session.userId) {
+      return res.status(401).json({ success: false, message: "User not authenticated" })
+    }
+    const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
+    if (!cart || !cart.items && cart.items.length === 0) {
+      return res.status(400).json({ success: false, message: "Cart is empty" });
+    }
+  
+
+    let cartCount=0;
+    if(cart){
+      cart.total_price = cart.total_price || 0;
+       cartCount  = cart.items.length;
+    }
+    
+    const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
+  let wishlistCount=0;
+  if(wishlist){
+    wishlistCount  = wishlist.items.length;
+  } 
+
+  const deletedItems = cart.items.filter(item => item.product.isDelete);
+  if (deletedItems.length > 0) {
+    return res.status(401).json({ success: false, message: "Item not found" })
+  }   
+  
+  const productNotStock = cart.items.filter(item => item.product.stock <= 0);
+  if (productNotStock.length > 0) {
+    return res.status(401).json({ success: false, message: "Item not stock" })
+  }
+
+    const address = await Address.find({userId:req.session.userId});
+ 
+    res.status(200).json({
+      success: true,
+      message: 'Checkout is successful',
+      cart,
+      address,
+      wishlistCount,
+      cartCount,
+      user,
+      redirect: '/loadCheckoutPage'
+    });    
+} catch (error) {
+    console.error('Error fetching cart:', error); 
+res.status(500).send('Something went wrong!');
+}
+}
 
 // Add this new function to handle cart item removal
 exports.removeCartItem = async (req, res) => {
@@ -159,51 +213,7 @@ exports.updateCartItemQuantity = async (req, res) => {
   }
 };
 
-exports.checkOutPage= async(req,res)=>{ 
-  try {
-    const cart =await Cart.findOne({user:req.session.userId}).populate('items.product')
-    const user = await User.findById(req.session.userId).lean();
-    if (!req.session.userId) {
-      return res.status(401).json({ success: false, message: "User not authenticated" })
-    }
-    if (cart.items.length === 0) {
-      return res.status(400).json({ success: false, message: "Cart is empty" });
-    }
-   
-    let cartCount=0;
-    if(cart){
-      cart.total_price = cart.total_price || 0;
-       cartCount  = cart.items.length;
-    }
-    const wishlist =await Wishlist.findOne({user:req.session.userId}).populate('items.product')
-  let wishlistCount=0;
-  if(wishlist){
-    wishlistCount  = wishlist.items.length;
-  }  
-  const deletedItems = cart.items.filter(item => item.product.isDelete);
-  if (deletedItems.length > 0) {
-    return res.status(401).json({ success: false, message: "Item not found" })
-  }   
-  const productNotStock = cart.items.filter(item => item.product.stock <= 0);
-  if (productNotStock.length > 0) {
-    return res.status(401).json({ success: false, message: "Item not stock" })
-  }
-    const address = await Address.find({userId:req.session.userId});
-    res.status(200).json({
-      success: true,
-      message: 'Checkout is successful',
-      cart,
-      address,
-      wishlistCount,
-      cartCount,
-      user,
-      redirect: '/loadCheckoutPage'
-    });    
-} catch (error) {
-    console.error('Error fetching cart:', error); 
-res.status(500).send('Something went wrong!');
-}
-}
+
 
 exports.load_CheckoutPage=async(req,res)=>{
   try {
