@@ -881,6 +881,24 @@ function generateTableRow(doc, y, item, quantity, unitPrice, total) {
        .text(total, 0, y, { align: 'right' });
 }
 
+exports.about_Page = async (req, res) => {
+    try {
+        res.status(200).render('user/about');
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+
+exports.contact_Page=async(req,res)=>{
+    try {
+        res.status(200).render('user/contact')
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+}
+
 
 
 

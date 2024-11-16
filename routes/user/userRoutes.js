@@ -20,6 +20,8 @@ userRouter.use(isBlockAuth)
 //Index Page Loading
 userRouter.get('/',userController.loadIndexPage);
 userRouter.get('/login',userController.loadLogin);
+userRouter.get('/about',userController.about_Page)
+userRouter.get('/contact',userController.contact_Page)
 
 //User Loging && Signup pages
 userRouter.post('/login',userController.login);
