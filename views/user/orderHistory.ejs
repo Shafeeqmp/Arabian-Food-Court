@@ -389,10 +389,12 @@
                                             </div>
                                             <div class="flex-grow-1">
                                                 <ul class="list-unstyled">
-                                                    <li class="mb-2"><strong>Order Date:</strong> <span class="text-muted"><%= order.createdAt.toLocaleString() %></span></li>
+                                                    <li class="mb-2"><strong>Order Date:</strong> <span class="text-muted"><%= order.createdAt.toLocaleString('en-IN') %></span></li>
                                                     <li class="mb-2"><strong>Delivered Time:</strong> 
                                                         <span class="text-muted">
-                                                            <%= new Date(order.createdAt.getTime() + 30 * 60 * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) %>
+                                                            
+                                                            <%= new Date(order.createdAt.getTime() + 30 * 60 * 1000).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) %>
+
                                                         </span>
                                                     </li>
                                                     <li>
