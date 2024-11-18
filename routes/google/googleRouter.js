@@ -9,7 +9,9 @@ googleRouter.get("/google/callback",passport.authenticate("google", { failureRed
   (req, res) => {
     if (req.isAuthenticated()) {
       const googleUser=req.user;
-      req.session.userId=googleUser.id || googleUser._id
+    
+      req.session.userId=googleUser._id
+      
       res.redirect("/userHomePage"); 
     }else{
       res.redirect('/')

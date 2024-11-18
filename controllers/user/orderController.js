@@ -39,8 +39,6 @@ async function generateInvoiceNumber() {
 
 
 exports.place_Order = async (req, res) => {
- 
-  
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
@@ -288,20 +286,17 @@ exports.getOrderStatus = async (req, res) => {
 
 // Create Razorpay Order
 exports.razor_PayOrderCreate = async (req, res) => {
-  console.log("1");
-  
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
-    console.log("2");
     const { addressId, couponCode, paymentMethod } = req.body;
-    console.log("3");
+  
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
     if (!cart || !cart.items || cart.items.length === 0) {
       return res.status(404).json({ success: false, message: "Cart is empty or not found" });
     }    
-    console.log("4");
+  
   
     for (const item of cart.items) {
       const product = item.product;
@@ -322,7 +317,7 @@ exports.razor_PayOrderCreate = async (req, res) => {
         });
       }
     }
-    console.log("5");
+  
     let totalAmount = cart.total_price;
     let discountAmount = 0;
 
