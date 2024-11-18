@@ -204,8 +204,11 @@ exports.Order_Wallet=async(req,res)=>{
     }
     console.log("2");
     const user = await User.findOne({email:req.session.email})
-    console.log("3");
-    
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
     const { addressId, couponCode } = req.body;
     let { paymentMethod } = req.body;
     const wallet=await Wallet.findOne({user:user._id})
