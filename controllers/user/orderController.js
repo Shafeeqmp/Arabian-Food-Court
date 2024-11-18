@@ -288,16 +288,20 @@ exports.getOrderStatus = async (req, res) => {
 
 // Create Razorpay Order
 exports.razor_PayOrderCreate = async (req, res) => {
+  console.log("1");
   
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
+    console.log("2");
     const { addressId, couponCode, paymentMethod } = req.body;
+    console.log("3");
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
-    if (!cart || cart.items.length === 0) {
-      return res.json({ success: false, message: "Cart is empty" });
-    }
+    if (!cart || !cart.items || cart.items.length === 0) {
+      return res.status(404).json({ success: false, message: "Cart is empty or not found" });
+    }    
+    console.log("4");
   
     for (const item of cart.items) {
       const product = item.product;
@@ -318,6 +322,7 @@ exports.razor_PayOrderCreate = async (req, res) => {
         });
       }
     }
+    console.log("5");
     let totalAmount = cart.total_price;
     let discountAmount = 0;
 
@@ -359,10 +364,13 @@ exports.razorPay_payment = async (req, res) => {
     }
 
 
+
     const cart = await Cart.findOne({ user: req.session.userId }).populate('items.product');
     if (!cart || cart.items.length === 0) {
       return res.json({ success: false, message: "Cart is empty" });
     }
+    
+    
   
     for (const item of cart.items) {
       const product = item.product;
@@ -383,6 +391,8 @@ exports.razorPay_payment = async (req, res) => {
         });
       }
     }
+  
+    
 
   
     let totalAmount = cart.total_price;
@@ -395,11 +405,15 @@ exports.razorPay_payment = async (req, res) => {
         totalAmount -= discountAmount;
       }
     }
+   
+    
 
     const product=await Product.findOne({isDelete:false}).populate('offer') 
       if(product.offer){
         offerAmount=(product.price * product.offer.offerPercentage)/100
       }
+      
+      
 
       
 

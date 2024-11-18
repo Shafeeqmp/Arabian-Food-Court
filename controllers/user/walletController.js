@@ -196,16 +196,22 @@ exports.verifyPayment = async (req, res) => {
 
 
 exports.Order_Wallet=async(req,res)=>{
+  console.log("1");
+  
   try {
     if (!req.session.userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
+    console.log("2");
     const user = await User.findOne({email:req.session.email})
+    console.log("3");
+    
     const { addressId, couponCode } = req.body;
     let { paymentMethod } = req.body;
     const wallet=await Wallet.findOne({user:user._id})
     const address = await Address.findById(addressId);
-
+    console.log("4");
+    
     if(!address){
       return res
       .status(400)
